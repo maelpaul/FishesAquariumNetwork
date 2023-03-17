@@ -1,0 +1,8 @@
+{
+  "fonts" : {
+	  "arial": {
+		  "texture" : "arial",
+		  "info" : "arial.fnt"
+	  }
+  }
+}
