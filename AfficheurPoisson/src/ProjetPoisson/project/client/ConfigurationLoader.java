@@ -1,8 +1,7 @@
-package ProjetPoisson.project.lib;
+package ProjetPoisson.project.client;
 
 import ProjetPoisson.mightylib.resources.DataType;
 import ProjetPoisson.mightylib.resources.ResourceLoader;
-import ProjetPoisson.mightylib.resources.map.TileMap;
 
 import java.util.Map;
 

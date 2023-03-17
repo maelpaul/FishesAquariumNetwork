@@ -8,12 +8,8 @@ import ProjetPoisson.mightylib.inputs.InputConfiguration;
 import ProjetPoisson.mightylib.inputs.InputManager;
 import ProjetPoisson.mightylib.main.Context;
 import ProjetPoisson.mightylib.resources.Resources;
-import ProjetPoisson.mightylib.resources.map.TileMapLoader;
-import ProjetPoisson.mightylib.resources.map.TileSetLoader;
 import ProjetPoisson.project.lib.ActionId;
-import ProjetPoisson.project.lib.ConfigurationLoader;
-
-import java.lang.module.Configuration;
+import ProjetPoisson.project.client.ConfigurationLoader;
 
 class ProjectLoading {
 
