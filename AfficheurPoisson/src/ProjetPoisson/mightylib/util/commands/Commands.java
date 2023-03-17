@@ -47,7 +47,8 @@ public class Commands {
 
         int i = 0;
         for (Context context : ContextManager.getInstance().getAllContext()){
-            context.getMouseManager().setCursor(!previousMouseStates.get(i));
+            System.out.println(previousMouseStates.get(i));
+            context.getMouseManager().setCursor(previousMouseStates.get(i));
             ++i;
         }
         previousMouseStates.clear();
