@@ -13,7 +13,6 @@ public class ActionId {
     public static final int RIGHT_CLICK = InputManager.getAndIncrementId();
     public static final int ESCAPE = InputManager.getAndIncrementId();
     public static final int ENTER = InputManager.getAndIncrementId();
-
     public static final int SELECT_UP = InputManager.getAndIncrementId();
     public static final int SELECT_DOWN = InputManager.getAndIncrementId();
 }

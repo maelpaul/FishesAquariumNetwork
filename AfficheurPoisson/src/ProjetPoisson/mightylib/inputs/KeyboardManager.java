@@ -1,5 +1,7 @@
 package ProjetPoisson.mightylib.inputs;
 
+import ProjetPoisson.mightylib.inputs.keyboardlanguage.KeyboardLanguage;
+import ProjetPoisson.mightylib.inputs.keyboardlanguage.NativeKeyboardLanguage;
 import ProjetPoisson.mightylib.main.WindowInfo;
 
 import java.util.Arrays;
@@ -21,6 +23,8 @@ public class KeyboardManager {
     private final boolean[] state = new boolean[KEYS];
     private final boolean[] oldState = new boolean[KEYS];
 
+    public KeyboardLanguage language;
+
     /**
      * Keyboard manager class.
      * Instance the class.
@@ -29,15 +33,25 @@ public class KeyboardManager {
         this.windowInfo = info;
         Arrays.fill(state, false);
         Arrays.fill(oldState, false);
+
+        language = NativeKeyboardLanguage.getInstance();
     }
 
     public boolean getKeyState(int keyID){
-        if(keyID >= BEGIN_KEYS && keyID <= 348) return state[keyID];
+        if(keyID >= BEGIN_KEYS && keyID <= BEGIN_KEYS + KEYS) return state[keyID];
         return false;
     }
 
     private boolean testState(int keyID){
         return glfwGetKey(windowInfo.getWindowId(), keyID) == 1;
+    }
+
+    public int getKeyByLanguage(int key){
+        return language.translateKeyTo(key);
+    }
+
+    public void setKeyboardLanguage(KeyboardLanguage language){
+        this.language = language;
     }
 
     /**

@@ -35,8 +35,6 @@ public class MainScene extends Scene {
         setClearColor(0, 0, 0, 1f);
 
         /// RENDERERS ///
-
-
     }
 
 

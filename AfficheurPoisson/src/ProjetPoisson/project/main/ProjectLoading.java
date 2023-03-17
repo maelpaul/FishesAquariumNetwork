@@ -8,6 +8,7 @@ import ProjetPoisson.mightylib.inputs.InputConfiguration;
 import ProjetPoisson.mightylib.inputs.InputManager;
 import ProjetPoisson.mightylib.main.Context;
 import ProjetPoisson.mightylib.resources.Resources;
+import ProjetPoisson.mightylib.util.commands.Commands;
 import ProjetPoisson.project.lib.ActionId;
 import ProjetPoisson.project.client.ConfigurationLoader;
 
@@ -16,6 +17,12 @@ class ProjectLoading {
     static void init(){
         Resources resources = Resources.getInstance();
         resources.Loaders.add(new ConfigurationLoader());
+
+        addCommands();
+    }
+
+    static void addCommands(){
+
     }
 
     static void ContextLoading(Context context){

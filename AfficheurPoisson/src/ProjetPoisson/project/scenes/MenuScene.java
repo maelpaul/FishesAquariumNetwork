@@ -3,6 +3,8 @@ package ProjetPoisson.project.scenes;
 import ProjetPoisson.mightylib.graphics.GUI.BackgroundlessButton;
 import ProjetPoisson.mightylib.graphics.GUI.GUIList;
 import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
+import ProjetPoisson.mightylib.inputs.InputManager;
+import ProjetPoisson.mightylib.inputs.KeyboardManager;
 import ProjetPoisson.mightylib.resources.texture.TextureParameters;
 import ProjetPoisson.mightylib.scene.Scene;
 import ProjetPoisson.mightylib.sounds.SoundManager;
@@ -19,6 +21,7 @@ import ProjetPoisson.project.lib.ActionId;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
 
 public class MenuScene extends Scene {
     private GUIList guiList;
@@ -80,6 +83,16 @@ public class MenuScene extends Scene {
                         sceneManagerInterface.exit(0);
                         break;
                 }
+            }
+        }
+
+        KeyboardManager manager = mainContext.getKeyboardManager();
+
+        System.out.println(manager.getKeyState(GLFW.GLFW_KEY_A));
+
+        for (char letter = 'a'; letter <= 'z'; ++letter){
+            if (manager.keyPressed(GLFW.GLFW_KEY_A + (letter - 'A'))){
+                System.out.println(letter);
             }
         }
     }

@@ -1,6 +1,7 @@
 package ProjetPoisson.project.main;
 
 import ProjetPoisson.mightylib.graphics.shader.ShaderManager;
+import ProjetPoisson.mightylib.inputs.keyboardlanguage.AZERTYKeyboardLanguage;
 import ProjetPoisson.mightylib.main.*;
 import ProjetPoisson.mightylib.resources.Resources;
 import ProjetPoisson.mightylib.resources.texture.Icon;
@@ -92,6 +93,8 @@ public final class MainLoop {
         long start = System.nanoTime();
 
         Context mainContext = contextManager.getMainContext();
+        mainContext.getKeyboardManager().setKeyboardLanguage(AZERTYKeyboardLanguage.getInstance());
+
         Window window = mainContext.getWindow();
 
         while (!window.wantExit()){
