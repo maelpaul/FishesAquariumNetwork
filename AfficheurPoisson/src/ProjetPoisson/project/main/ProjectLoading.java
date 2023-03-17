@@ -11,13 +11,15 @@ import ProjetPoisson.mightylib.resources.Resources;
 import ProjetPoisson.mightylib.resources.map.TileMapLoader;
 import ProjetPoisson.mightylib.resources.map.TileSetLoader;
 import ProjetPoisson.project.lib.ActionId;
+import ProjetPoisson.project.lib.ConfigurationLoader;
+
+import java.lang.module.Configuration;
 
 class ProjectLoading {
 
     static void init(){
         Resources resources = Resources.getInstance();
-        resources.Loaders.add(new TileSetLoader());
-        resources.Loaders.add(new TileMapLoader());
+        resources.Loaders.add(new ConfigurationLoader());
     }
 
     static void ContextLoading(Context context){
