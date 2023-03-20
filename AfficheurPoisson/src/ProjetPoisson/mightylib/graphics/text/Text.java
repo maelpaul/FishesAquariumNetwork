@@ -81,6 +81,39 @@ public class Text extends Renderer {
         return this;
     }
 
+    public Text fitText(String text, Vector2f boxSize, boolean removeEscapeChars){
+        String clean = (removeEscapeChars) ? text.replace("\n", "") : text;
+
+        String result = "";
+        String temp = "";
+
+        Vector2f sizeTaken = new Vector2f();
+
+        for (char c : clean.toCharArray()){
+            temp = result + c;
+
+            if (c == '\n'){
+                if (sizeTaken.y > boxSize.y){
+                    break;
+                }
+
+                result = temp;
+            } else {
+                sizeTaken = font.computeSize(temp, fontSize);
+
+                if (sizeTaken.x > boxSize.x){
+                    result = result + "\n" + c;
+                } else {
+                    result = temp;
+                }
+            }
+        }
+
+        setText(result);
+
+        return this;
+    }
+
     public String text(){
         return this.text;
     }
@@ -154,9 +187,6 @@ public class Text extends Renderer {
         leftUpPosition.x = position.x;
         leftUpPosition.y = position.y;
 
-        rectangleSize.x = 0;
-        rectangleSize.y = 0;
-
         int charNumber = text.replace("\n", "").length();
 
         int[] indices = new int[charNumber * 6];
@@ -178,6 +208,8 @@ public class Text extends Renderer {
         Vector2f textReference = new Vector2f();
         float lineAlignmentOffset = 0;
 
+        rectangleSize.set(font.computeSize(text, fontSize));
+
         for (int j = 0; j < lines.length; ++j) {
             for (int i = 0; i < lines[j].length(); i++) {
                 currentCharOffset.x += font.getFontFile().getCharacter(lines[j].charAt(i)).getxAdvance() * fontSize;
@@ -185,12 +217,10 @@ public class Text extends Renderer {
             }
 
             linesSize[j] = currentCharOffset.x;
-            rectangleSize.x = Math.max(rectangleSize.x, currentCharOffset.x);
             currentCharOffset.x = 0;
         }
 
         currentCharOffset.x = 0;
-        rectangleSize.y += font.getFontFile().getLineHeight() * fontSize * lines.length;
         charCount = 0;
 
         switch(this.reference){
@@ -323,6 +353,6 @@ public class Text extends Renderer {
                 .setReference(this.reference)
                 .setText(this.text);
 
-        return this;
+        return copy;
     }
 }
