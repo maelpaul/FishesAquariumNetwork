@@ -15,4 +15,8 @@ void free_command(struct command * command);
 
 void print_command(struct command * command);
 
+void init_command(struct command * command);
+
+int check_add_wiew_format(char * input);
+
 #endif
