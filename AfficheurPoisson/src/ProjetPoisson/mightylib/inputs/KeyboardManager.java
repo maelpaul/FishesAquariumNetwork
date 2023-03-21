@@ -100,7 +100,6 @@ public class KeyboardManager {
             state[key] = testState(key);
 
             if (state[key]){
-                System.out.println(key);
                 numberKeyPressed += 1;
 
                 if (key >= MIN_LANGUAGE_KEY && key <= MAX_LANGUAGE_KEY){

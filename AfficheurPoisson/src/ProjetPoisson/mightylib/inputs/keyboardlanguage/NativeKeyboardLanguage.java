@@ -1,6 +1,7 @@
 package ProjetPoisson.mightylib.inputs.keyboardlanguage;
 
 import ProjetPoisson.mightylib.inputs.KeyboardLanguage;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 
@@ -37,18 +38,23 @@ public class NativeKeyboardLanguage extends KeyboardLanguage {
 
     @Override
     public char translateKeyTo(int keyId) {
-        return super.translateKeyTo(keyId);
+        if (keyId >= GLFW.GLFW_KEY_A && keyId <= GLFW.GLFW_KEY_Z)
+            return (char) ('a' + (keyId - GLFW.GLFW_KEY_A));
+
+        if (keyId >= GLFW.GLFW_KEY_0 && keyId <= GLFW.GLFW_KEY_9)
+            return (char)('0' + (keyId - GLFW.GLFW_KEY_0));
+
+        if (keyId >= GLFW.GLFW_KEY_KP_0 && keyId <= GLFW.GLFW_KEY_KP_9)
+            return (char)('0' + (keyId - GLFW.GLFW_KEY_KP_0));
+
+        if (keyId == GLFW.GLFW_KEY_SPACE)
+            return ' ';
+
+        return (char)-1;
     }
 
     @Override
     public String keyboardConfigurationName() {
         return "qwerty";
-    }
-
-    @Override
-    protected char toCapsLock(char c) {
-
-
-        return c;
     }
 }
