@@ -20,13 +20,20 @@ public class CharInputEntry {
         entries = new HashMap<>();
     }
 
-    public CharInputEntry addActionModification(int action, char modified){
+    public CharInputEntry addModifier(int action, char modified){
         entries.put(action, modified);
 
         return this;
     }
 
     public char getModification(int action){
+        if (entries.containsKey(action))
+            return entries.get(action);
+
+        return (char) -1;
+    }
+
+    public char getModificationOrDefault(int action){
         if (entries.containsKey(action))
             return entries.get(action);
 
