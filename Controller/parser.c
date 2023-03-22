@@ -99,27 +99,27 @@ void init_command(struct command * command){
 }
 
 int check_add_wiew_format(char * input){
-    int i = 0;
+    size_t i = 0;
     int times_founded = 0;
     int plus_founded = 0;
-    while(input+i != NULL){
-        if(input[i] == "x"){times_founded+=1;}
-        else if(input[i] == "+"){plus_founded+=1;}
+    while(i <  strlen(input)){
+        if(input[i] == 'x'){times_founded+=1;}
+        else if(input[i] == '+'){plus_founded+=1;}
         else{
-            if(input[i] != "1" 
-            && input[i] != "2" 
-            && input[i] != "3" 
-            && input[i] != "4" 
-            && input[i] != "5" 
-            && input[i] != "6" 
-            && input[i] != "7" 
-            && input[i] != "8" 
-            && input[i] != "9" 
-            && input[i] != "0")
+            if(input[i] != '1' 
+            && input[i] != '2' 
+            && input[i] != '3' 
+            && input[i] != '4' 
+            && input[i] != '5' 
+            && input[i] != '6' 
+            && input[i] != '7' 
+            && input[i] != '8' 
+            && input[i] != '9' 
+            && input[i] != '0')
             {return 0;}
         }
 
-        if(input[i] == "x" && plus_founded != 0){
+        if(input[i] == 'x' && plus_founded != 0){
             return 0;
         }
         i++;
@@ -139,7 +139,6 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
-    // tested with ./parser load 54
     parse_command(command, argv, argc);
     
     //print
