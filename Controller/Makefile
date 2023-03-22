@@ -1,9 +1,14 @@
 CFLAGS = -Wall -Wextra -std=c99
 
-all : parser
+all : build
 
-parser : parser.c
-	gcc ${CFLAGS} $< -o $@
+build : parser.o main
+
+parser.o : parser.c
+	gcc ${CFLAGS} $< -c
+
+main : parser.o
+	gcc ${CFLAGS} $@.c $< -o $@
 
 clean :
-	rm *.o parser
+	rm *.o

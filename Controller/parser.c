@@ -1,8 +1,8 @@
 #include "parser.h"
 
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 void parse_command(struct command * command, char** argv, int argc){
     if(strcmp(argv[1],"load") == 0){
@@ -126,25 +126,4 @@ int check_add_wiew_format(char * input){
     }
     if(times_founded == 1 && plus_founded == 2){return 1;}
     else{return 0;}
-}
-
-int main(int argc, char** argv){
-    struct command * command = malloc(sizeof(struct command));
-    
-    init_command(command);
-
-    if (argc < 3) {
-        printf("failure\n");
-        free_command(command);
-        return EXIT_FAILURE;
-    }
-
-    parse_command(command, argv, argc);
-    
-    //print
-    print_command(command);
-    
-    //free
-    free_command(command);
-    return EXIT_SUCCESS;
 }
