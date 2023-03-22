@@ -29,7 +29,7 @@ public class MenuScene extends Scene {
     private GUIList guiList;
     private BackgroundlessButton buttonQuit;
 
-    private Text text;
+    private Text text, text2;
 
     private Terminal terminal;
 
@@ -71,8 +71,8 @@ public class MenuScene extends Scene {
         guiList.ShouldLoop = false;*/
 
         text = new Text();
-        text.setText(((char)GLFW.GLFW_KEY_Q) + "")
-                .setFont("arial")
+        text.setText("Aquarium poisson")
+                .setFont("bahnschrift")
                 .setAlignment(ETextAlignment.Center)
                 .setReference(EDirection.None)
                 .setPosition(new Vector2f(windowSize.x * 0.5f, windowSize.y * 0.2f))
@@ -120,6 +120,8 @@ public class MenuScene extends Scene {
 
         //guiList.display();
 
+        text.display();
+
         terminal.display();
 
         super.setAndDisplayRealScene();
@@ -130,5 +132,9 @@ public class MenuScene extends Scene {
         super.unload();
 
         //guiList.unload();
+
+        text.unload();
+        text2.unload();
+        terminal.unload();
     }
 }

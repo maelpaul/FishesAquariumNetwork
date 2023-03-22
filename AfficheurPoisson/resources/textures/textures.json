@@ -4,7 +4,11 @@
 		},
 		"fonts" : {
 			"arial" : {
-				"file": "arial.png",
+				"file": "arial_0.png",
+				"type" : "realistic"
+			},
+			"bahnschrift" : {
+				"file": "bahnschrift_0.png",
 				"type" : "realistic"
 			}
 		},

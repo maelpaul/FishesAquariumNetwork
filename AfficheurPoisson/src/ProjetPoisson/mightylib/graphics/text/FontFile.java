@@ -36,6 +36,8 @@ public class FontFile {
             } while(!values.containsKey("count"));
 
             size = Integer.parseInt(values.get("size"));
+            if (size < 0 )
+                size *= -1;
 
             String[] tempPadding = values.get("padding").split(",");
 

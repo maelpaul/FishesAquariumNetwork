@@ -22,7 +22,8 @@ public class AZERTYKeyboardLanguage extends KeyboardLanguage {
         inputEntries.add(new CharInputEntry(GLFW_KEY_B, 'b').addModifier(CharInputEntry.CAPSLOCK, 'B'));
         inputEntries.add(new CharInputEntry(GLFW_KEY_C, 'c').addModifier(CharInputEntry.CAPSLOCK, 'C'));
         inputEntries.add(new CharInputEntry(GLFW_KEY_D, 'd').addModifier(CharInputEntry.CAPSLOCK, 'D'));
-        inputEntries.add(new CharInputEntry(GLFW_KEY_E, 'e').addModifier(CharInputEntry.CAPSLOCK, 'E'));
+        inputEntries.add(new CharInputEntry(GLFW_KEY_E, 'e').addModifier(CharInputEntry.CAPSLOCK, 'E')
+                .addModifier(CharInputEntry.ALT, '€'));
         inputEntries.add(new CharInputEntry(GLFW_KEY_F, 'f').addModifier(CharInputEntry.CAPSLOCK, 'F'));
         inputEntries.add(new CharInputEntry(GLFW_KEY_G, 'g').addModifier(CharInputEntry.CAPSLOCK, 'G'));
         inputEntries.add(new CharInputEntry(GLFW_KEY_H, 'h').addModifier(CharInputEntry.CAPSLOCK, 'H'));
@@ -101,7 +102,6 @@ public class AZERTYKeyboardLanguage extends KeyboardLanguage {
             else if (shouldAltGr())
                 return charInputEntry.getModification(CharInputEntry.ALT);
 
-            System.out.println("Hey");
             return charInputEntry.getChar();
         }
 

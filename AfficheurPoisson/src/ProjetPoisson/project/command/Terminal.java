@@ -19,7 +19,7 @@ public class Terminal {
         this.maxSize = maxSize;
 
         commandText = new Text();
-        commandText.setFont("arial")
+        commandText.setFont("bahnschrift")
                 .setAlignment(ETextAlignment.Left)
                 .setReference(EDirection.LeftDown)
                 .setPosition(new Vector2f(referencePosition))
@@ -67,5 +67,10 @@ public class Terminal {
     public void display(){
         commandText.display();
         resultText.display();
+    }
+
+    public void unload(){
+        commandText.unload();
+        resultText.unload();
     }
 }

@@ -3,6 +3,10 @@
 	  "arial": {
 		  "texture" : "arial",
 		  "info" : "arial.fnt"
+	  },
+	  "bahnschrift" : {
+		  "texture" : "bahnschrift",
+		  "info" : "bahnschrift.fnt"
 	  }
   }
 }
