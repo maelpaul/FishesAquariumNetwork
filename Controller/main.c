@@ -9,6 +9,7 @@ int main(int argc, char** argv){
     
     init_command(command);
 
+    // there should be at least 3 args  
     if (argc < 3) {
         printf("failure\n");
         free_command(command);
@@ -17,10 +18,8 @@ int main(int argc, char** argv){
 
     parse_command(command, argv, argc);
     
-    //print
     print_command(command);
     
-    //free
     free_command(command);
     return EXIT_SUCCESS;
 }
