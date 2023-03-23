@@ -1,8 +1,8 @@
 #include "parser.h"
 
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 void parse_command(struct command * command, char** argv, int argc){
     if(strcmp(argv[1],"load") == 0){
@@ -99,53 +99,31 @@ void init_command(struct command * command){
 }
 
 int check_add_wiew_format(char * input){
-    int i = 0;
+    size_t i = 0;
     int times_founded = 0;
     int plus_founded = 0;
-    while(input+i != NULL){
-        if(input[i] == "x"){times_founded+=1;}
-        else if(input[i] == "+"){plus_founded+=1;}
+    while(i <  strlen(input)){
+        if(input[i] == 'x'){times_founded+=1;}
+        else if(input[i] == '+'){plus_founded+=1;}
         else{
-            if(input[i] != "1" 
-            && input[i] != "2" 
-            && input[i] != "3" 
-            && input[i] != "4" 
-            && input[i] != "5" 
-            && input[i] != "6" 
-            && input[i] != "7" 
-            && input[i] != "8" 
-            && input[i] != "9" 
-            && input[i] != "0")
+            if(input[i] != '1' 
+            && input[i] != '2' 
+            && input[i] != '3' 
+            && input[i] != '4' 
+            && input[i] != '5' 
+            && input[i] != '6' 
+            && input[i] != '7' 
+            && input[i] != '8' 
+            && input[i] != '9' 
+            && input[i] != '0')
             {return 0;}
         }
 
-        if(input[i] == "x" && plus_founded != 0){
+        if(input[i] == 'x' && plus_founded != 0){
             return 0;
         }
         i++;
     }
     if(times_founded == 1 && plus_founded == 2){return 1;}
     else{return 0;}
-}
-
-int main(int argc, char** argv){
-    struct command * command = malloc(sizeof(struct command));
-    
-    init_command(command);
-
-    if (argc < 3) {
-        printf("failure\n");
-        free_command(command);
-        return EXIT_FAILURE;
-    }
-
-    // tested with ./parser load 54
-    parse_command(command, argv, argc);
-    
-    //print
-    print_command(command);
-    
-    //free
-    free_command(command);
-    return EXIT_SUCCESS;
 }
