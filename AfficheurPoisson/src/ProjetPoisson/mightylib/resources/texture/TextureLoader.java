@@ -11,6 +11,9 @@ import java.io.FileInputStream;
 import java.util.Iterator;
 import java.util.Map;
 
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL31.GL_TEXTURE_RECTANGLE;
+
 public class TextureLoader extends ResourceLoader {
 
     @Override
@@ -44,18 +47,23 @@ public class TextureLoader extends ResourceLoader {
         do{
             String currentNode = arrayNodes.next();
 
-            if(node.getJSONObject(currentNode).has("type")){
+            if(node.getJSONObject(currentNode).has("file")){
                 JSONObject information = node.getJSONObject(currentNode);
-                String type = information.getString("type");
+                String temp = information.getString("file");
 
                 Texture currentTexture = new Texture(currentNode, currentPath + information.getString("file"));
 
-                if (type.equals("pixelart")){
+                if (temp.equals("pixelart")){
                     currentTexture.setAspectTexture(TextureParameters.PIXEL_ART_PARAMETERS);
-                } else if (type.equals("realistic")){
+                } else if (temp.equals("realistic")){
                     currentTexture.setAspectTexture(TextureParameters.REALISTIC_PARAMETERS);
                 }
 
+                if (information.has("textureType")) {
+                    temp = information.getString("textureType");
+                    if (temp.equals("rectangle"))
+                        currentTexture.setTextureType(GL_TEXTURE_RECTANGLE);
+                }
 
                 data.put(currentNode, currentTexture);
             } else {

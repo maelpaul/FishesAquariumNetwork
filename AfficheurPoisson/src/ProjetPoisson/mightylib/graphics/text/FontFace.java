@@ -39,6 +39,7 @@ public class FontFace extends DataType {
                 currentCharOffset.x += getFontFile().getCharacter(chr).getxAdvance() * fontSize;
             }
         }
+
         result.x = Math.max(result.x, currentCharOffset.x);
 
         result.y += getFontFile().getLineHeight() * fontSize * numberLine;
