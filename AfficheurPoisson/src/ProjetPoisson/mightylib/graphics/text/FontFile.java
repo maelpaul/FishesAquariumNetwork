@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FontFile {
+    private static final int SPACE_CHAR_CODE = 32;
     private final String path;
     private Vector4i padding;
 
@@ -107,6 +108,9 @@ public class FontFile {
 
 
     public FontChar getCharacter(int code) {
+        if (!characters.containsKey(code))
+            return characters.get(SPACE_CHAR_CODE);
+
         return characters.get(code);
     }
 

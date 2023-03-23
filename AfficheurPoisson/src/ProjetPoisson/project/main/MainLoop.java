@@ -70,8 +70,8 @@ public final class MainLoop {
         resource.init();
         sceneManager.init(new MenuScene(), new String[]{""});
 
-        if (resource.isExistingResource(Icon.class, "icon"))
-            context.getWindow().setIcon(resource.getResource(Icon.class, "icon"));
+        if (resource.isExistingResource(Icon.class, "Kraken"))
+            context.getWindow().setIcon(resource.getResource(Icon.class, "Kraken"));
 
         System.out.println("\n" + Version.getVersion());
         System.out.println(glfwGetVersionString());

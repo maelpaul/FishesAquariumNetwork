@@ -27,6 +27,8 @@ public class Text extends Renderer {
     private EDirection reference;
     private ETextAlignment alignment;
 
+    private float[] charPositions;
+
     public Text() {
         super("coloredText", true, true);
 
@@ -191,7 +193,7 @@ public class Text extends Renderer {
 
         int[] indices = new int[charNumber * 6];
         float[] texturePosition = new float[charNumber * 8];
-        float[] position = new float[charNumber * 8];
+        charPositions = new float[charNumber * 8];
 
         String[] lines = text.split("\n");
         float[] linesSize = new float[lines.length];
@@ -286,17 +288,17 @@ public class Text extends Renderer {
                 temp.w = (sizeTemp.y + posTemp.y);
 
 
-                position[charCount * SIZE_COORDINATES] = temp.x;
-                position[charCount * SIZE_COORDINATES + 1] = temp.z;
+                charPositions[charCount * SIZE_COORDINATES] = temp.x;
+                charPositions[charCount * SIZE_COORDINATES + 1] = temp.z;
 
-                position[charCount * SIZE_COORDINATES + 2] = temp.x;
-                position[charCount * SIZE_COORDINATES + 3] = temp.w;
+                charPositions[charCount * SIZE_COORDINATES + 2] = temp.x;
+                charPositions[charCount * SIZE_COORDINATES + 3] = temp.w;
 
-                position[charCount * SIZE_COORDINATES + 4] = temp.y;
-                position[charCount * SIZE_COORDINATES + 5] = temp.w;
+                charPositions[charCount * SIZE_COORDINATES + 4] = temp.y;
+                charPositions[charCount * SIZE_COORDINATES + 5] = temp.w;
 
-                position[charCount * SIZE_COORDINATES + 6] = temp.y;
-                position[charCount * SIZE_COORDINATES + 7] = temp.z;
+                charPositions[charCount * SIZE_COORDINATES + 6] = temp.y;
+                charPositions[charCount * SIZE_COORDINATES + 7] = temp.z;
 
                 temp.x = (float)fontChar.getxAtlas();
                 temp.y = temp.x + (float)fontChar.getWidthAtlas();
@@ -324,11 +326,21 @@ public class Text extends Renderer {
             currentCharOffset.y += font.getFontFile().getLineHeight() * fontSize;
         }
 
-
         shape.setEbo(indices);
         shape.updateVbo(texturePosition, textureIndex);
-        shape.updateVbo(position, positionIndex);
+        shape.updateVbo(charPositions, positionIndex);
     }
+
+    // X Y Z W
+    public Vector4f getPositionOfChar(int index){
+
+        return new Vector4f(
+                charPositions[index * SIZE_COORDINATES] + position().x,
+                charPositions[index * SIZE_COORDINATES + 4] + position().x,
+                charPositions[index * SIZE_COORDINATES + 1] + position().y,
+                charPositions[index * SIZE_COORDINATES + 3] + position().y);
+    }
+
 
     public Text createCopy(){
         Text text = new Text();

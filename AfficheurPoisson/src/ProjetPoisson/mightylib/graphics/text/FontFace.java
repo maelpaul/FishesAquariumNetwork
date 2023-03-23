@@ -24,20 +24,24 @@ public class FontFace extends DataType {
     public Vector2f computeSize(String text, float fontSize){
         Vector2f result = new Vector2f();
         Vector2f currentCharOffset = new Vector2f();
-        String[] temp = text.split("\n");
 
-        for (String line : temp) {
-            currentCharOffset.x = 0;
+        char chr;
+        int numberLine = 1;
 
-            for (int i = 0; i < line.length(); i++) {
-                currentCharOffset.x += getFontFile().getCharacter(line.charAt(i)).getxAdvance() * fontSize;
+        for (int i = 0; i < text.length(); i++) {
+            chr = text.charAt(i);
+
+            if (chr == '\n'){
+                result.x = Math.max(result.x, currentCharOffset.x);
+                currentCharOffset.x = 0;
+                ++numberLine;
+            } else {
+                currentCharOffset.x += getFontFile().getCharacter(chr).getxAdvance() * fontSize;
             }
-
-            result.x = Math.max(result.x, currentCharOffset.x);
         }
+        result.x = Math.max(result.x, currentCharOffset.x);
 
-        currentCharOffset.x = 0;
-        result.y += getFontFile().getLineHeight() * fontSize * temp.length;
+        result.y += getFontFile().getLineHeight() * fontSize * numberLine;
 
         return result;
     }

@@ -29,7 +29,7 @@ public class MenuScene extends Scene {
     private GUIList guiList;
     private BackgroundlessButton buttonQuit;
 
-    private Text text, text2;
+    private Text text;
 
     private Terminal terminal;
 
@@ -110,7 +110,7 @@ public class MenuScene extends Scene {
             }
         }
 
-        terminal.update(mainContext.getKeyboardManager());
+        terminal.update(mainContext.getKeyboardManager(), mainContext.getSystemInfo());
     }
 
 
@@ -134,7 +134,6 @@ public class MenuScene extends Scene {
         //guiList.unload();
 
         text.unload();
-        text2.unload();
         terminal.unload();
     }
 }
