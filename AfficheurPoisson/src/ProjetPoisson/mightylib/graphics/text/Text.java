@@ -49,8 +49,8 @@ public class Text extends Renderer {
         shape.setEboStorage(Shape.STATIC_STORE);
         shape.setEbo(new int[0]);
 
-        positionIndex = shape.addVbo(new float[0], 2, Shape.STATIC_STORE);
-        textureIndex = shape.addVbo(new float[0], 2, Shape.STATIC_STORE);
+        positionIndex = shape.addVboFloat(new float[0], 2, Shape.STATIC_STORE);
+        textureIndex = shape.addVboFloat(new float[0], 2, Shape.STATIC_STORE);
     }
 
     private boolean shouldNotDrawText(){
@@ -299,10 +299,10 @@ public class Text extends Renderer {
                 charPositions[charCount * SIZE_COORDINATES + 6] = temp.y;
                 charPositions[charCount * SIZE_COORDINATES + 7] = temp.z;
 
-                temp.x = (float)fontChar.getxAtlas();
-                temp.y = temp.x + (float)fontChar.getWidthAtlas();
-                temp.z = (float)fontChar.getyAtlas();
-                temp.w = temp.z + (float)fontChar.getHeightAtlas();
+                temp.x = (float)fontChar.getxAtlas() + 0.5f;
+                temp.y = temp.x + (float)fontChar.getWidthAtlas() + 0.5f;
+                temp.z = (float)fontChar.getyAtlas() - 0.5f;
+                temp.w = temp.z + (float)fontChar.getHeightAtlas() - 0.5f;
 
                 texturePosition[charCount * SIZE_COORDINATES] = temp.x;
                 texturePosition[charCount * SIZE_COORDINATES + 1] = temp.z;
@@ -334,14 +334,12 @@ public class Text extends Renderer {
 
     // X Y Z W
     public Vector4f getPositionOfChar(int index){
-
         return new Vector4f(
                 charPositions[index * SIZE_COORDINATES] + position().x,
                 charPositions[index * SIZE_COORDINATES + 4] + position().x,
                 charPositions[index * SIZE_COORDINATES + 1] + position().y,
                 charPositions[index * SIZE_COORDINATES + 3] + position().y);
     }
-
 
     public Text createCopy(){
         Text text = new Text();

@@ -72,7 +72,7 @@ public class MenuScene extends Scene {
         guiList.ShouldLoop = false;*/
 
         text = new Text();
-        text.setText("Aquarium poisson")
+        text.setText("Aquarium poi")
                 .setFont("bahnschrift")
                 .setAlignment(ETextAlignment.Center)
                 .setReference(EDirection.None)

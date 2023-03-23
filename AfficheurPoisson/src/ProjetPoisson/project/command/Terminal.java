@@ -18,6 +18,9 @@ import org.lwjgl.opengl.GL;
 
 public class Terminal {
     private static final String BASE_RESULT_MESSAGE = "Write command:";
+    private static final float CURSOR_FIRST_PERIOD_TIME = 1;
+    private static final float CURSOR_PERIOD_TIME = 0.5f;
+
 
     private final Vector2f referencePosition;
     private final Vector2f maxSize;
@@ -26,7 +29,6 @@ public class Terminal {
     private Text commandText;
 
     private final Timer cursorTimer;
-    private static final int CURSOR_PERIOD_TIME = 1;
     private boolean cursorDisplayed;
 
     private int cursorPosition;
@@ -59,7 +61,7 @@ public class Terminal {
         updateResultPosition();
 
         cursorTimer = new Timer();
-        cursorTimer.start(CURSOR_PERIOD_TIME);
+        cursorTimer.start(CURSOR_FIRST_PERIOD_TIME);
         cursorDisplayed = false;
 
         cursor = new RectangleRenderer("colorShape2D");
@@ -113,7 +115,7 @@ public class Terminal {
         cursorTimer.update();
         if (cursorTimer.isFinished()){
             cursorDisplayed = !cursorDisplayed;
-            cursorTimer.resetStart();
+            cursorTimer.start(CURSOR_PERIOD_TIME);
         }
 
         if (commandTextCpy.length() > 20) {
@@ -154,7 +156,8 @@ public class Terminal {
         cursorPosition = index;
         Vector4f charPosition = commandText.getPositionOfChar(cursorPosition);
         cursor.setPosition(new Vector2f((int)(charPosition.y) - commandText.getFontSize() * 0.15f, (int)(charPosition.z)));
-        cursorTimer.resetStart();
+
+        cursorTimer.start(CURSOR_FIRST_PERIOD_TIME);
         cursorDisplayed = true;
     }
 
