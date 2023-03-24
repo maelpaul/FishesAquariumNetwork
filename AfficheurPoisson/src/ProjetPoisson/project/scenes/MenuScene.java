@@ -6,6 +6,7 @@ import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
 import ProjetPoisson.mightylib.graphics.text.Text;
 import ProjetPoisson.mightylib.inputs.InputManager;
 import ProjetPoisson.mightylib.inputs.KeyboardManager;
+import ProjetPoisson.mightylib.resources.texture.BasicBindableObject;
 import ProjetPoisson.mightylib.resources.texture.TextureParameters;
 import ProjetPoisson.mightylib.scene.Scene;
 import ProjetPoisson.mightylib.sounds.SoundManager;
@@ -34,7 +35,7 @@ public class MenuScene extends Scene {
     private Terminal terminal;
 
     public void init(String[] args) {
-        super.init(args, TextureParameters.REALISTIC_PARAMETERS);
+        super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
         /// SCENE INFORMATION ///
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
@@ -71,7 +72,7 @@ public class MenuScene extends Scene {
         guiList.ShouldLoop = false;*/
 
         text = new Text();
-        text.setText("Aquarium poisson")
+        text.setText("Aquarium poi")
                 .setFont("bahnschrift")
                 .setAlignment(ETextAlignment.Center)
                 .setReference(EDirection.None)
@@ -79,7 +80,6 @@ public class MenuScene extends Scene {
                 .setFontSize(40);
 
         terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.y * 0.5f,windowSize.y * 0.5f));
-        terminal.resultText.setText("Write command:");
     }
 
     public void update() {

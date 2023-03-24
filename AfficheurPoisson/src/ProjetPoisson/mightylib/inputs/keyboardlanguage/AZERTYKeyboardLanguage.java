@@ -14,9 +14,11 @@ public class AZERTYKeyboardLanguage extends KeyboardLanguage {
 
     public static KeyboardLanguage getInstance() { return instance; }
 
-    private HashSet<CharInputEntry> inputEntries;
+    private final HashSet<CharInputEntry> inputEntries;
     private AZERTYKeyboardLanguage(){
         inputEntries = new HashSet<>();
+
+        inputEntries.add(new CharInputEntry(GLFW_KEY_SPACE, ' '));
 
         inputEntries.add(new CharInputEntry(GLFW_KEY_A, 'q').addModifier(CharInputEntry.CAPSLOCK, 'Q'));
         inputEntries.add(new CharInputEntry(GLFW_KEY_B, 'b').addModifier(CharInputEntry.CAPSLOCK, 'B'));

@@ -23,8 +23,8 @@ public class RectangleRenderer extends Renderer {
         int[] indices = RendererUtils.indicesForSquare();
         shape.setEboStorage(Shape.STATIC_STORE);
         shape.setEbo(indices);
-        positionIndex = shape.addVbo(calculatePosition(), 2, Shape.STATIC_STORE);
-        textureIndex = shape.addVbo(texturePos(), 2, Shape.STATIC_STORE);
+        positionIndex = shape.addVboFloat(calculatePosition(), 2, Shape.STATIC_STORE);
+        textureIndex = shape.addVboFloat(texturePos(), 2, Shape.STATIC_STORE);
     }
 
 

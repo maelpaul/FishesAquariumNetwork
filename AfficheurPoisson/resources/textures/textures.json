@@ -5,30 +5,33 @@
 		"fonts" : {
 			"arial" : {
 				"file": "arial_0.png",
-				"type" : "realistic"
+				"qualityType" : "realistic"
 			},
 			"bahnschrift" : {
 				"file": "bahnschrift_0.png",
-				"type" : "realistic"
+				"qualityType" : "realistic",
+				"textureType" : "rectangle"
 			}
 		},
 		"gui": {
 			 "button-unhover" : {
 				 "file": "GUIButton.png",
-				 "type" : "realistic"
+				 "qualityType" : "realistic"
 			 },
 			 "button-hover" : {
 				 "file": "GUIButton-hover.png",
-				 "type" : "realistic"
-			 }
+				 "qualityType" : "realistic"
+			 },
+			"background" : {
+				"file" : "background.png",
+				"qualityType" : "realistic"
+			}
 		},
 		"hud" : {
 		},
 		"game" : {
 		},
 		"players" : {
-		},
-		"world" : {
 		},
 		"shaderEffects" : {
 		}

@@ -2,13 +2,14 @@ package ProjetPoisson.mightylib.graphics.renderer._2D;
 
 import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
 import ProjetPoisson.mightylib.main.WindowInfo;
+import ProjetPoisson.mightylib.resources.texture.IGLBindable;
 
 public class VirtualSceneRenderer extends RectangleRenderer {
     private final FrameBuffer frameBuffer;
 
-    public VirtualSceneRenderer(WindowInfo info,  int frameBufferAspect){
+    public VirtualSceneRenderer(WindowInfo info,  IGLBindable bindable){
         super("postProcessing");
-        frameBuffer = new FrameBuffer(info, frameBufferAspect);
+        frameBuffer = new FrameBuffer(info, bindable);
         this.shape.updateVbo(new float[]{
                -1, 1,
                -1, -1,
