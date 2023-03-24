@@ -5,7 +5,7 @@ import ProjetPoisson.project.command.ICommand;
 public class ClearCommand implements ICommand {
     @Override
     public String process(String[] args) {
-        return null;
+        return "¤¤clear¤¤";
     }
 
     @Override

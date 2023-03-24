@@ -77,16 +77,18 @@ public class MenuScene extends Scene {
             }
         }
 
-        terminal.update(mainContext.getKeyboardManager(), mainContext.getSystemInfo());
+        terminal.update(mainContext.getInputManager(), mainContext.getSystemInfo());
 
         if (terminal.shouldProcessCommand()){
             String result = analyser.analyseCommand(terminal.getCommandText());
 
-            if (result.equals("¤¤clear¤¤"))
-                terminal.clearResultText();
-            else {
-                terminal.addToResultText(result)
-                        .saveCommand()
+            if (result != null) {
+                if (result.equals("¤¤clear¤¤"))
+                    terminal.clearResultText();
+                else
+                    terminal.addToResultText(result);
+
+                terminal.saveCommand()
                         .clearCommandText();
             }
         }
