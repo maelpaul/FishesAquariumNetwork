@@ -21,15 +21,17 @@
 			 "button-hover" : {
 				 "file": "GUIButton-hover.png",
 				 "qualityType" : "realistic"
-			 }
+			 },
+			"background" : {
+				"file" : "background.png",
+				"qualityType" : "realistic"
+			}
 		},
 		"hud" : {
 		},
 		"game" : {
 		},
 		"players" : {
-		},
-		"world" : {
 		},
 		"shaderEffects" : {
 		}
