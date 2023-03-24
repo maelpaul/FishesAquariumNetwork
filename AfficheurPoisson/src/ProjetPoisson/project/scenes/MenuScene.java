@@ -2,6 +2,7 @@ package ProjetPoisson.project.scenes;
 
 import ProjetPoisson.mightylib.graphics.GUI.BackgroundlessButton;
 import ProjetPoisson.mightylib.graphics.GUI.GUIList;
+import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
 import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
 import ProjetPoisson.mightylib.graphics.text.Text;
 import ProjetPoisson.mightylib.inputs.InputManager;
@@ -23,6 +24,7 @@ import ProjetPoisson.mightylib.physics.tweenings.ETweeningType;
 import ProjetPoisson.mightylib.physics.tweenings.type.FloatTweening;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.client.ConfigurationLoader;
+import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.lib.ActionId;
 import org.joml.Vector2f;
@@ -33,12 +35,13 @@ import org.lwjgl.glfw.GLFW;
 import java.util.Map;
 
 public class MenuScene extends Scene {
-    private GUIList guiList;
-    private BackgroundlessButton buttonQuit;
-
     private Text text;
 
+    private RectangleRenderer renderer;
+
     private Terminal terminal;
+
+    private CommandAnalyser analyser;
 
     public void init(String[] args) {
         super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
@@ -51,68 +54,27 @@ public class MenuScene extends Scene {
 
         Vector2i windowSize = mainContext.getWindow().getInfo().getSizeCopy();
 
-       /*BackgroundlessButton buttonMainScene = new BackgroundlessButton(mainContext);
-        buttonMainScene.Text.setFont("arial")
-                .setAlignment(ETextAlignment.Center)
-                .setReference(EDirection.None)
-                .setPosition(new Vector2f(windowSize.x * 0.5f, windowSize.y * 0.5f))
-                .setFontSize(40)
-                .setText("Main menu");
-
-        buttonMainScene.Text.copyTo(buttonMainScene.OverlapsText);
-        buttonMainScene.OverlapsText.setColor(new Color4f(0.3f))
-                .setText("->Main menu<-");
-
-        buttonQuit = buttonMainScene.copy();
-        buttonQuit.Text.setPosition(new Vector2f(windowSize.x * 0.5f, windowSize.y * 0.9f))
-                .setText("Quit");
-
-        buttonQuit.Text.copyTo(buttonQuit.OverlapsText);
-        buttonQuit.OverlapsText.setColor(new Color4f(0.3f))
-                .setText("->Quit<-");
-
-        guiList = new GUIList(mainContext.getInputManager(), mainContext.getMouseManager());
-        guiList.setupActionInputValues(ActionId.SELECT_UP, ActionId.SELECT_DOWN);
-        guiList.GUIs.put(0, buttonMainScene);
-        guiList.GUIs.put(1, buttonQuit);
-        guiList.ShouldLoop = false;*/
+        renderer = new RectangleRenderer("texture2D");
+        renderer.switchToTextureMode("background");
+        renderer.setSizePix(windowSize.x, windowSize.y);
 
         text = new Text();
-        text.setText("Aquarium poi")
+        text.setText("Aquarium poisson")
                 .setFont("bahnschrift")
                 .setAlignment(ETextAlignment.Center)
                 .setReference(EDirection.None)
                 .setPosition(new Vector2f(windowSize.x * 0.5f, windowSize.y * 0.2f))
+                .setColor(new Color4f(1, 1, 1, 1))
                 .setFontSize(40);
 
         terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.y * 0.5f,windowSize.y * 0.5f));
         Configuration conf = Resources.getInstance().getResource(Configuration.class, "affichage");
-        System.out.println(conf.getAddress());
-        System.out.println(conf.getPort());
-        System.out.println(conf.getId());
-        System.out.println(conf.getDisplayTimeout());
-        System.out.println(conf.getDataName());
+
+        analyser = new CommandAnalyser();
     }
 
     public void update() {
         super.update();
-
-        /*guiList.update();
-
-        if (mainContext.getInputManager().input(ActionId.ENTER) || mainContext.getInputManager().inputPressed(ActionId.LEFT_CLICK)){
-            Integer id = guiList.getSelected();
-            if (id != null) {
-                switch (id) {
-                    case 0:
-                        sceneManagerInterface.setNewScene(new MainScene(), new String[]{""});
-                        break;
-                    case 1:
-                    default:
-                        sceneManagerInterface.exit(0);
-                        break;
-                }
-            }
-        }*/
 
         KeyboardManager manager = mainContext.getKeyboardManager();
 
@@ -123,6 +85,18 @@ public class MenuScene extends Scene {
         }
 
         terminal.update(mainContext.getKeyboardManager(), mainContext.getSystemInfo());
+
+        if (terminal.shouldProcessCommand()){
+            String result = analyser.sendCommand(terminal.getCommandText());
+
+            if (result.equals("¤¤clear¤¤"))
+                terminal.clearResultText();
+            else {
+                terminal.addToResultText(result)
+                        .saveCommand()
+                        .clearCommandText();
+            }
+        }
     }
 
 
@@ -130,7 +104,7 @@ public class MenuScene extends Scene {
         super.setVirtualScene();
         clear();
 
-        //guiList.display();
+        renderer.display();
 
         text.display();
 
@@ -143,7 +117,7 @@ public class MenuScene extends Scene {
     public void unload() {
         super.unload();
 
-        //guiList.unload();
+        renderer.unload();
 
         text.unload();
         terminal.unload();

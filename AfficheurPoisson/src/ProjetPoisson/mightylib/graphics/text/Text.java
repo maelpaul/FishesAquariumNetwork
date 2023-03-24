@@ -316,8 +316,6 @@ public class Text extends Renderer {
                 texturePosition[charCount * SIZE_COORDINATES + 6] = temp.y;
                 texturePosition[charCount * SIZE_COORDINATES + 7] = temp.z;
 
-                System.out.println(temp.x + " " + temp.y + " " + temp.z + " " + temp.w);
-
                 currentCharOffset.x += fontChar.getxAdvance() * fontSize;
 
                 ++charCount;
