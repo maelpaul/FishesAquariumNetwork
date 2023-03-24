@@ -38,7 +38,7 @@ public class Terminal {
 
     private boolean shouldProcessCommand;
 
-    private ArrayList<String> previousCommands;
+    private final ArrayList<String> previousCommands;
     private int previousCommandSelected;
 
     public Terminal(Vector2f referencePosition, Vector2f maxSize){

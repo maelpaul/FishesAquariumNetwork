@@ -17,6 +17,7 @@ public class CommandAnalyser {
         relations = new HashMap<>();
         relations.put("help", new HelpCommand());
         relations.put("clear", new ClearCommand());
+        relations.put("addFish", new AddFishCommand());
         relations.put("delFish", new DelFishCommand());
         relations.put("startFish", new StartFishCommand());
         relations.put("status", new StatusCommand());
@@ -29,7 +30,7 @@ public class CommandAnalyser {
             return "Empty command !";
 
         if ( ! relations.containsKey(args[COMMAND_TYPE_ARGUMENT]))
-            return "Unknown command, type help !";
+            return "-> NOK : command introuvable";
 
         if (args.length == NO_OPTIONAL_ARGUMENT)
             return relations.get(args[COMMAND_TYPE_ARGUMENT]).process(args);

@@ -92,14 +92,6 @@ public class MenuScene extends Scene {
                         .clearCommandText();
             }
         }
-
-        // créer une classe
-        // Ouvre thread
-
-        // Envoie info (str)
-        // Lit info (str)
-
-        // Atten pusi ferme thread
     }
 
 
