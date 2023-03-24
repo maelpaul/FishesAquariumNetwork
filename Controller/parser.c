@@ -5,9 +5,9 @@
 #include <stdio.h>
 
 int parse_command(struct command * command, char** argv, int argc){
-    if(strcmp(argv[1],"load") == 0){
-        if(argc-2 != 1){
-            printf("Uncorrect use of \"load\", there should be 1 argument (received %d) which is the aquarium to load.\n", argc-2);
+    if(strcmp(argv[0],"load") == 0){
+        if(argc-1 != 1){
+            printf("Incorrect use of \"load\", there should be 1 argument (received %d) which is the aquarium to load.\n", argc-1);
             return 0;
         }
         else{
@@ -15,14 +15,14 @@ int parse_command(struct command * command, char** argv, int argc){
             command->nb_params = 1;
             int malloc_size = command->nb_params * sizeof(char*);
             command->params=malloc(malloc_size);
-            command->params[0]=argv[2];
+            command->params[0]=argv[1];
             command->_total_param_len = malloc_size;
             return 1;
         }
     }
-    else if(strcmp(argv[1],"show") == 0){
-        if(argc-2 != 1){
-            printf("Uncorrect use of \"show\", there should be 1 argument (received %d) which is the aquarium to show.\n", argc-2);
+    else if(strcmp(argv[0],"show") == 0){
+        if(argc-1 != 1){
+            printf("Incorrect use of \"show\", there should be 1 argument (received %d) which is the aquarium to show.\n", argc-1);
             return 0;
         }
         else{
@@ -30,14 +30,14 @@ int parse_command(struct command * command, char** argv, int argc){
             command->nb_params = 1;
             int malloc_size = command->nb_params * sizeof(char*);
             command->params=malloc(malloc_size);
-            command->params[0]=argv[2];
+            command->params[0]=argv[1];
             command->_total_param_len = malloc_size;
             return 1;
         }
     }
-    else if(strcmp(argv[1],"add") == 0 && strcmp(argv[2],"view") == 0){
-        if(argc-3 != 2){
-            printf("Uncorrect use of \"add view\", there should be 2 arguments (received %d) which are the name of the view and its size\n", argc-3);
+    else if(strcmp(argv[0],"add") == 0 && strcmp(argv[1],"view") == 0){
+        if(argc-2 != 2){
+            printf("Incorrect use of \"add view\", there should be 2 arguments (received %d) which are the name of the view and its size\n", argc-2);
             return 0;
         }
         else{
@@ -45,19 +45,19 @@ int parse_command(struct command * command, char** argv, int argc){
             command->nb_params = 2;
             int malloc_size = command->nb_params * sizeof(char*);
             command->params=malloc(malloc_size);
-            command->params[0]=argv[3];
-            if(!check_add_wiew_format(argv[4])){
-                printf("Uncorrect use of \"add view\", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received %s)\n",argv[4]);
+            command->params[0]=argv[2];
+            if(!check_add_wiew_format(argv[3])){
+                printf("Incorrect use of \"add view\", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received %s)\n",argv[3]);
                 return 0;
             };
-            command->params[1]=argv[4];
+            command->params[1]=argv[3];
             command->_total_param_len = malloc_size;
             return 1;
         }
     }
-    else if(strcmp(argv[1],"del") == 0){
-        if(argc-3 != 1){
-            printf("Uncorrect use of \"del view\", there should be 1 argument 1 (received %d) which is the name of the view to remove.\n", argc-3);
+    else if(strcmp(argv[0],"del") == 0){
+        if(argc-2 != 1){
+            printf("Incorrect use of \"del view\", there should be 1 argument (received %d) which is the name of the view to remove.\n", argc-2);
             return 0;
         }
         else{
@@ -65,13 +65,13 @@ int parse_command(struct command * command, char** argv, int argc){
             command->nb_params = 1;
             int malloc_size = command->nb_params * sizeof(char*);
             command->params=malloc(malloc_size);
-            command->params[0]=argv[3];
+            command->params[0]=argv[2];
             command->_total_param_len = malloc_size;
             return 1;
         }
     }
-    else if(strcmp(argv[1],"save") == 0){
-        if(argc-2 != 1){
+    else if(strcmp(argv[0],"save") == 0){
+        if(argc-1 != 1){
             printf("Uncorrect use of \"save\", there should be 1 argument (received %d) which is the aquarium to save.\n", argc-2);
             return 0;
         }
@@ -80,7 +80,7 @@ int parse_command(struct command * command, char** argv, int argc){
             command->nb_params = 1;
             int malloc_size = command->nb_params * sizeof(char*);
             command->params=malloc(malloc_size);
-            command->params[0]=argv[2];
+            command->params[0]=argv[1];
             command->_total_param_len = malloc_size;
             return 1;
         }
