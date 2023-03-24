@@ -16,6 +16,8 @@ import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 
+import java.util.ArrayList;
+
 public class Terminal {
     private static final String BASE_RESULT_MESSAGE = "Write command:";
     private static final float CURSOR_FIRST_PERIOD_TIME = 1;
@@ -38,6 +40,9 @@ public class Terminal {
 
     private boolean shouldProcessCommand;
 
+    private ArrayList<String> previousCommands;
+    private int previousCommandSelected;
+
     public Terminal(Vector2f referencePosition, Vector2f maxSize){
         this.referencePosition = referencePosition;
         this.maxSize = maxSize;
@@ -49,13 +54,13 @@ public class Terminal {
                 .setAlignment(ETextAlignment.Left)
                 .setReference(EDirection.LeftDown)
                 .setPosition(new Vector2f(referencePosition))
-                .setColor(new Color4f(0.2f, 0.2f, 0.2f, 1f))
+                .setColor(new Color4f(0.8f, 0.8f, 0.8f, 1f))
                 .setFontSize(30)
                 .fitText(commandTextCpy.toString(), maxSize, true);
 
         resultText = new Text();
         commandText.copyTo(resultText)
-                .setColor(new Color4f(0, 0, 0, 1f))
+                .setColor(new Color4f(1, 1, 1, 1f))
                 .setText(BASE_RESULT_MESSAGE);
 
         updateResultPosition();
@@ -66,10 +71,13 @@ public class Terminal {
 
         cursor = new RectangleRenderer("colorShape2D");
         cursor.setScale(new Vector3f(3, commandText.getFontSize(), 1.f));
-        cursor.switchToColorMode(new Color4f(0, 0, 0, 0.8f));
+        cursor.switchToColorMode(new Color4f(1, 1, 1, 0.8f));
         cursor.setPosition(new Vector2f(37, 705));
 
         updateCursorPosition(0);
+
+        previousCommands = new ArrayList<>();
+        previousCommandSelected = 0;
     }
 
     public void update(KeyboardManager manager, SystemInfo info){
@@ -86,11 +94,22 @@ public class Terminal {
                 if (manager.getMainKeyPressed() == GLFW.GLFW_KEY_DELETE){
                     removeCharAtPosition(cursorPosition + 1);
                     updateCursorPosition(cursorPosition + 1);
-                    System.out.println("HEY");
                 } else if ((manager.getMainKeyPressed() == GLFW.GLFW_KEY_RIGHT) && cursorPosition < commandText.text().length() - 1) {
                     updateCursorPosition(cursorPosition + 1);
                 } else if ((manager.getMainKeyPressed() == GLFW.GLFW_KEY_LEFT) && cursorPosition > 0) {
                     updateCursorPosition(cursorPosition - 1);
+                } else if (manager.getMainKeyPressed() == GLFW.GLFW_KEY_UP && previousCommandSelected > 0) {
+                    --previousCommandSelected;
+                    replaceCommandText(previousCommands.get(previousCommandSelected));
+
+                } else if (manager.getMainKeyPressed() == GLFW.GLFW_KEY_DOWN && previousCommandSelected < previousCommands.size()) {
+                    // Accept -1
+                    ++previousCommandSelected;
+                    if (previousCommandSelected == previousCommands.size())
+                        replaceCommandText("/");
+                    else
+                        replaceCommandText(previousCommands.get(previousCommandSelected));
+
                 }
                 // Todo touche suppr
                 else if ((manager.getMainKeyPressed() == GLFW.GLFW_KEY_BACKSPACE ||
@@ -117,11 +136,6 @@ public class Terminal {
             cursorDisplayed = !cursorDisplayed;
             cursorTimer.start(CURSOR_PERIOD_TIME);
         }
-
-        if (commandTextCpy.length() > 20) {
-            addToResultText(commandTextCpy.toString());
-            clearCommandText();
-        }
     }
 
     private void updateResultPosition(){
@@ -136,6 +150,13 @@ public class Terminal {
         commandText.fitText(commandTextCpy.toString(), maxSize, true);
 
         updateCursorPosition(cursorPosition + chr.length());
+    }
+
+    private void replaceCommandText(String newStr){
+        commandTextCpy.replace(0, commandTextCpy.length(), newStr);
+        commandText.setText(commandTextCpy.toString());
+
+        updateCursorPosition(commandTextCpy.toString().length() - 1);
     }
 
     private void removeCharAtPosition(int index){
@@ -169,21 +190,33 @@ public class Terminal {
         return commandTextCpy.toString();
     }
 
+    public Terminal saveCommand(){
+        previousCommands.add(commandTextCpy.toString());
+
+        return this;
+    }
+
     public Terminal clearCommandText() {
         commandTextCpy.replace(0, commandTextCpy.length(), "/");
         commandText.fitText(commandTextCpy.toString(), maxSize, true);
         updateCursorPosition(0);
 
+        previousCommandSelected = previousCommands.size();
+
         return this;
     }
 
-    public void clearResultText(){
+    public Terminal clearResultText(){
         resultText.setText(BASE_RESULT_MESSAGE);
+
+        return this;
     }
 
-    public void addToResultText(String text){
+    public Terminal addToResultText(String text){
         resultText.setText(resultText.text().substring(0, resultText.text().length() - BASE_RESULT_MESSAGE.length())
                 + text + "\n" + BASE_RESULT_MESSAGE);
+
+        return this;
     }
 
     public void display(){
