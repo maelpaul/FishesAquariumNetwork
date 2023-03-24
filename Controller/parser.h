@@ -14,8 +14,9 @@ struct command {
 * @param struct command * command : a pointer pointing to the sctruct to complete
 * @param char** imput : the input string (e.g add view 52 5x5+5+5)
 * @param argc : the number of arguments given (is reduced by 1 because it includes the ./xxx name)
+* @returns : 1 if the input is correct, 0 otherwise
 */
-void parse_command(struct command * command, char** input, int argc);
+int parse_command(struct command * command, char** argv, int argc);
 
 /* This function frees a 'command struct'
 *

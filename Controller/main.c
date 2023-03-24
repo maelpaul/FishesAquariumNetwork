@@ -16,9 +16,7 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
-    parse_command(command, argv, argc);
-    
-    print_command(command);
+    if(parse_command(command, argv, argc)){print_command(command);}
     
     free_command(command);
     return EXIT_SUCCESS;
