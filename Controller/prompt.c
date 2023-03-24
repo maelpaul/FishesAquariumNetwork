@@ -3,14 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#define BUFFER_SIZE 100
+#include "parser.h"
 
-int parse_command(char * arg1, char * arg2, char * arg3, char * arg4) {
-    if(strcmp(arg1, "load") == 0) {
-        return 1;
-    }
-    return 0;
-}
+#define BUFFER_SIZE 100
 
 void clear(char * buffer) {
     int i = 0;
@@ -36,21 +31,29 @@ int main(int argc, char *argv[])
     char arg2[BUFFER_SIZE];
     char arg3[BUFFER_SIZE];
     char arg4[BUFFER_SIZE];
+
     while (1) {
+        struct command * command = malloc(sizeof(struct command));
+    
+        init_command(command);
+
         clear(buffer);
         clear(arg1);
         clear(arg2);
         clear(arg3);
         clear(arg4);
+        
         ssize_t a = read(0, buffer, BUFFER_SIZE);
         if (a == -1) {
             perror("read");
             return EXIT_FAILURE;
         }
+        
         char * p = arg1;
         int i = 0;
         int j = 0;
         int c = 0;
+        
         while (buffer[i] != '\n') {
             if (buffer[i] == ' ') {
                 if (c == 0) {
@@ -83,16 +86,29 @@ int main(int argc, char *argv[])
             j++;
         }
         p[j] = '\0';
+        
         char * my_argv[4] = {arg1, arg2, arg3, arg4};
         int my_argc = length(my_argv); 
-        for (int i = 0; i < my_argc; i++) {
-            printf("argv[%d] = %s\n", i, my_argv[i]);
+        if (my_argc < 2) {
+            if (strcmp(arg1, "exit") == 0 || strcmp(arg1, "quit") == 0) {
+                return EXIT_SUCCESS;
+            }
+            printf("failure\n");
+            free_command(command);
+            return EXIT_FAILURE;
         }
+
+        // for (int i = 0; i < my_argc; i++) {
+        //     printf("argv[%d] = %s\n", i, my_argv[i]);
+        // }
+
+        if(parse_command(command, my_argv, my_argc)){print_command(command);}
+    
+        free_command(command);
+        
         if (strcmp(arg1, "exit") == 0 || strcmp(arg1, "quit") == 0) {
             return EXIT_SUCCESS;
         }
-        int r = parse_command(arg1, arg2, arg3, arg4);
-        printf("%d\n", r);
     }
     return EXIT_SUCCESS;
 }
