@@ -47,7 +47,8 @@ int parse_command(struct command * command, char** argv, int argc){
             command->params=malloc(malloc_size);
             command->params[0]=argv[3];
             if(!check_add_wiew_format(argv[4])){
-                 printf("Uncorrect use of \"add view\", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received %s)\n",argv[4]);
+                printf("Uncorrect use of \"add view\", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received %s)\n",argv[4]);
+                return 0;
             };
             command->params[1]=argv[4];
             command->_total_param_len = malloc_size;
@@ -70,7 +71,7 @@ int parse_command(struct command * command, char** argv, int argc){
         }
     }
     else if(strcmp(argv[1],"save") == 0){
-        if(argc-3 != 1){
+        if(argc-2 != 1){
             printf("Uncorrect use of \"save\", there should be 1 argument (received %d) which is the aquarium to save.\n", argc-2);
             return 0;
         }

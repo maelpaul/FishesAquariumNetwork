@@ -1,0 +1,6 @@
+load 54
+load 21
+save 21
+add view 54 400x400+200+200
+add view 54 400x400+200x200
+------
