@@ -80,7 +80,7 @@ public class MenuScene extends Scene {
         terminal.update(mainContext.getKeyboardManager(), mainContext.getSystemInfo());
 
         if (terminal.shouldProcessCommand()){
-            String result = analyser.sendCommand(terminal.getCommandText());
+            String result = analyser.analyseCommand(terminal.getCommandText());
 
             if (result.equals("¤¤clear¤¤"))
                 terminal.clearResultText();

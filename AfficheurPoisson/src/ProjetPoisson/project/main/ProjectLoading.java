@@ -29,7 +29,7 @@ class ProjectLoading {
         InputManager inputManager = context.getInputManager();
 
         ActionConfigurations[] configurations = {
-                new ActionConfigurations(ActionId.ESCAPE, new InputConfiguration[]{new InputConfiguration(GLFW_KEY_ESCAPE, EInputType.Keyboard)}),
+                /*new ActionConfigurations(ActionId.ESCAPE, new InputConfiguration[]{new InputConfiguration(GLFW_KEY_ESCAPE, EInputType.Keyboard)}),
                 new ActionConfigurations(ActionId.MOVE_LEFT, new InputConfiguration[]{new InputConfiguration(GLFW_KEY_A, EInputType.Keyboard)}),
                 new ActionConfigurations(ActionId.MOVE_RIGHT, new InputConfiguration[]{new InputConfiguration(GLFW_KEY_D, EInputType.Keyboard)}),
                 new ActionConfigurations(ActionId.MOVE_FORWARD, new InputConfiguration[]{new InputConfiguration(GLFW_KEY_W, EInputType.Keyboard)}),
@@ -41,7 +41,7 @@ class ProjectLoading {
                 new ActionConfigurations(ActionId.SELECT_UP, new InputConfiguration[]{new InputConfiguration(GLFW_KEY_W, EInputType.Keyboard)}),
                 new ActionConfigurations(ActionId.SELECT_DOWN, new InputConfiguration[]{new InputConfiguration(GLFW_KEY_S, EInputType.Keyboard)}),
                 new ActionConfigurations(ActionId.LEFT_CLICK, new InputConfiguration[]{new InputConfiguration(GLFW_MOUSE_BUTTON_1, EInputType.Mouse)}),
-                new ActionConfigurations(ActionId.RIGHT_CLICK, new InputConfiguration[]{new InputConfiguration(GLFW_MOUSE_BUTTON_2, EInputType.Mouse)}),
+                new ActionConfigurations(ActionId.RIGHT_CLICK, new InputConfiguration[]{new InputConfiguration(GLFW_MOUSE_BUTTON_2, EInputType.Mouse)}),*/
         };
 
         inputManager.init(configurations);
