@@ -1,0 +1,49 @@
+tested command : " load 54 ", result :
+command name : load
+number of arguments : 1
+- argument 0 : 54
+
+tested command : " load 54 54 ", result :
+Uncorrect use of "load", there should be 1 argument (received 2) which is the aquarium to load.
+tested command : " load ", result :
+failure
+tested command : " save 54 ", result :
+command name : save
+number of arguments : 1
+- argument 0 : 54
+
+tested command : " save 54 562 ", result :
+Uncorrect use of "save", there should be 1 argument (received 2) which is the aquarium to save.
+tested command : " save ", result :
+failure
+tested command : " show aquarium ", result :
+command name : show
+number of arguments : 1
+- argument 0 : aquarium
+
+tested command : " show aquarium 52 ", result :
+Uncorrect use of "show", there should be 1 argument (received 2) which is the aquarium to show.
+tested command : " show aquarium 552 52 ", result :
+Uncorrect use of "show", there should be 1 argument (received 3) which is the aquarium to show.
+tested command : " show ", result :
+failure
+tested command : " add view 54 400x400+200+200 ", result :
+command name : add view
+number of arguments : 2
+- argument 0 : 54
+- argument 1 : 400x400+200+200
+
+tested command : " add view 54 400x400+200x200 ", result :
+Uncorrect use of "add view", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received 400x400+200x200)
+tested command : " add view 54 400x400x200+200 ", result :
+Uncorrect use of "add view", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received 400x400x200+200)
+tested command : " add view 54 400x400x200x200 ", result :
+Uncorrect use of "add view", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received 400x400x200x200)
+tested command : " add view 54 400+400+200+200 ", result :
+Uncorrect use of "add view", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received 400+400+200+200)
+tested command : " add view 54 400+400+200x200 ", result :
+Uncorrect use of "add view", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received 400+400+200x200)
+tested command : " add view 54 400+400x200+200 ", result :
+Uncorrect use of "add view", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received 400+400x200+200)
+tested command : " add view 54 400+400x200x200 ", result :
+Uncorrect use of "add view", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received 400+400x200x200)
