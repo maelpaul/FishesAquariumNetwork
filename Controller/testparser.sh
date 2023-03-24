@@ -1,25 +1,36 @@
 #!/bin/bash
 
-# Vérifier que le fichier texte contenant les commandes est spécifié en argument
+# Check that the .txt file with all the commands is given in argument
 if [ $# -ne 1 ]
 then
     echo "Usage: $0 <command_file>"
     exit 1
 fi
 
-# Vérifier que le fichier texte existe et est lisible
+# Check if the given .txt file exists and is readable
 if [ ! -r $1 ]
 then
     echo "Error: $1 is not readable"
     exit 1
 fi
 
-# Compiler le fichier C contenant la fonction de parsing de commande
-rm test_parser result.txt
+# Remove result.txt if it exists
+if [ -f result.txt ]
+then
+    rm result.txt
+fi
+
+# Remove test_parser if it exists
+if [ -f test_parser ]
+then
+    rm test_parser
+fi
+
+# Clean and compile test_parser.c in test_parser
 make clean
 make test_parser
 
-# Lire chaque ligne du fichier texte contenant les commandes et les exécuter avec la fonction de parsing de commande
+# Read line by line and execute the parsing function on it
 while read line
 do
     echo "tested command : \"" $line "\", result :">> result.txt
