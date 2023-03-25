@@ -3,18 +3,16 @@ package ProjetPoisson.project.command;
 import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
 import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
 import ProjetPoisson.mightylib.graphics.text.Text;
+import ProjetPoisson.mightylib.inputs.InputManager;
 import ProjetPoisson.mightylib.inputs.KeyboardManager;
 import ProjetPoisson.mightylib.main.SystemInfo;
-import ProjetPoisson.mightylib.physics.collision.CollisionRectangle;
-import ProjetPoisson.mightylib.physics.collision.CollisionVisualisation;
 import ProjetPoisson.mightylib.util.Timer;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
+import ProjetPoisson.project.lib.ActionId;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL;
 
 import java.util.ArrayList;
 
@@ -40,7 +38,7 @@ public class Terminal {
 
     private boolean shouldProcessCommand;
 
-    private ArrayList<String> previousCommands;
+    private final ArrayList<String> previousCommands;
     private int previousCommandSelected;
 
     public Terminal(Vector2f referencePosition, Vector2f maxSize){
@@ -80,29 +78,30 @@ public class Terminal {
         previousCommandSelected = 0;
     }
 
-    public void update(KeyboardManager manager, SystemInfo info){
+    public void update(InputManager manager, SystemInfo info){
         boolean textUpdate = false;
         shouldProcessCommand = false;
 
-        if (manager.keyPressed(GLFW.GLFW_KEY_V) && manager.getKeyState(GLFW.GLFW_KEY_LEFT_CONTROL)){
+        KeyboardManager keyboardManager = manager.getKeyboardManager();
+
+        if (manager.inputPressed(ActionId.TEXT_INPUT_PASTE)){
             addCharToPosition(cursorPosition + 1, info.getClipboardContent());
             textUpdate = true;
-        } else if (manager.getMainKeyPressed() != -1 && manager.keyPressed(manager.getMainKeyPressed())) {
-            char c = manager.getCorrespondingCharMainKeyPressed();
+        } else if (keyboardManager.getMainKeyPressed() != -1 && keyboardManager.keyPressed(keyboardManager.getMainKeyPressed())) {
+            char c = keyboardManager.getCorrespondingCharMainKeyPressed();
 
             if (c == ((char)-1)) {
-                if (manager.getMainKeyPressed() == GLFW.GLFW_KEY_DELETE){
+                if (manager.inputPressed(ActionId.TEXT_INPUT_RIGHT_DELETE)){
                     removeCharAtPosition(cursorPosition + 1);
                     updateCursorPosition(cursorPosition + 1);
-                } else if ((manager.getMainKeyPressed() == GLFW.GLFW_KEY_RIGHT) && cursorPosition < commandText.text().length() - 1) {
+                } else if (manager.inputPressed(ActionId.TEXT_CURSOR_RIGHT) && cursorPosition < commandText.text().length() - 1) {
                     updateCursorPosition(cursorPosition + 1);
-                } else if ((manager.getMainKeyPressed() == GLFW.GLFW_KEY_LEFT) && cursorPosition > 0) {
+                } else if (manager.inputPressed(ActionId.TEXT_CURSOR_LEFT) && cursorPosition > 0) {
                     updateCursorPosition(cursorPosition - 1);
-                } else if (manager.getMainKeyPressed() == GLFW.GLFW_KEY_UP && previousCommandSelected > 0) {
+                } else if (manager.inputPressed(ActionId.MENU_PREVIOUS_COMMAND) && previousCommandSelected > 0) {
                     --previousCommandSelected;
                     replaceCommandText(previousCommands.get(previousCommandSelected));
-
-                } else if (manager.getMainKeyPressed() == GLFW.GLFW_KEY_DOWN && previousCommandSelected < previousCommands.size()) {
+                } else if (manager.inputPressed(ActionId.MENU_NEXT_COMMAND) && previousCommandSelected < previousCommands.size()) {
                     // Accept -1
                     ++previousCommandSelected;
                     if (previousCommandSelected == previousCommands.size())
@@ -110,15 +109,10 @@ public class Terminal {
                     else
                         replaceCommandText(previousCommands.get(previousCommandSelected));
 
-                }
-                // Todo touche suppr
-                else if ((manager.getMainKeyPressed() == GLFW.GLFW_KEY_BACKSPACE ||
-                        (manager.keyPressed(GLFW.GLFW_KEY_LEFT_SHIFT) && manager.keyPressed(GLFW.GLFW_KEY_KP_DECIMAL))
-                )  && commandText.text().length() > 1){
+                } else if (manager.inputPressed(ActionId.TEXT_INPUT_LEFT_DELETE) && commandText.text().length() > 1){
                     removeCharAtPosition(cursorPosition);
                     textUpdate = true;
-                } else if (manager.getMainKeyPressed() == GLFW.GLFW_KEY_ENTER
-                        || manager.getMainKeyPressed() == GLFW.GLFW_KEY_KP_ENTER){
+                } else if (manager.inputPressed(ActionId.ENTER_COMMAND)){
                     shouldProcessCommand = true;
                 }
             } else {

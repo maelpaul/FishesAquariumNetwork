@@ -5,7 +5,7 @@ import ProjetPoisson.project.command.ICommand;
 public class StatusCommand implements ICommand {
     @Override
     public String process(String[] args) {
-        return null;
+        return "-> OK : Non connecté";
     }
 
     @Override

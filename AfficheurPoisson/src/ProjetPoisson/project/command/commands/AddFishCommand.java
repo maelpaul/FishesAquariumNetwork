@@ -2,10 +2,10 @@ package ProjetPoisson.project.command.commands;
 
 import ProjetPoisson.project.command.ICommand;
 
-public class ClearCommand implements ICommand {
+public class AddFishCommand implements ICommand {
     @Override
     public String process(String[] args) {
-        return "¤¤clear¤¤";
+        return null;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package ProjetPoisson.mightylib.main;
 
-import ProjetPoisson.mightylib.inputs.ActionConfigurations;
+import ProjetPoisson.mightylib.inputs.inputType.ActionInput;
 import ProjetPoisson.mightylib.inputs.InputManager;
 import ProjetPoisson.mightylib.inputs.KeyboardManager;
 import ProjetPoisson.mightylib.inputs.MouseManager;
@@ -45,7 +45,7 @@ public class ContextManager {
         KeyboardManager keyboardManager = new KeyboardManager(window.getInfo());
         MouseManager mouseManager = new MouseManager(window.getInfo());
         InputManager inputManager = new InputManager(keyboardManager, mouseManager);
-        inputManager.init(new ActionConfigurations[]{});
+        inputManager.init(new ActionInput[]{});
 
         return contexts.put(context, new Context(window, inputManager, keyboardManager, mouseManager)) != null;
     }

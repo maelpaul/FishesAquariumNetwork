@@ -2,7 +2,7 @@ package ProjetPoisson.project.command.commands;
 
 import ProjetPoisson.project.command.ICommand;
 
-public class StartFish implements ICommand {
+public class StartFishCommand implements ICommand {
     @Override
     public String process(String[] args) {
         return null;
