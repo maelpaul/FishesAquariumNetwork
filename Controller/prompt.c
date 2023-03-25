@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
         char * my_argv[4] = {arg1, arg2, arg3, arg4};
         int my_argc = length(my_argv); 
         if (my_argc < 2) {
-            if (strcmp(arg1, "exit") == 0 || strcmp(arg1, "quit") == 0) {
+            if (strcmp(arg1, "exit") == 0 || strcmp(arg1, "quit") == 0 || strcmp(arg1, "q") == 0) {
                 return EXIT_SUCCESS;
             }
             printf("failure\n");
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     
         free_command(command);
         
-        if (strcmp(arg1, "exit") == 0 || strcmp(arg1, "quit") == 0) {
+        if (strcmp(arg1, "exit") == 0 || strcmp(arg1, "quit") == 0 || strcmp(arg1, "q") == 0) {
             return EXIT_SUCCESS;
         }
     }
