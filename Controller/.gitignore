@@ -1,3 +1,6 @@
 *.o
-
-main test_parser result.txt
+main 
+test_parser 
+prompt 
+server
+result.txt
