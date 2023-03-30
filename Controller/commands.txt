@@ -1,6 +1,19 @@
 load 54
-load 21
-save 21
+load 54 54
+load
+save 54
+save 54 562
+save
+show aquarium 
+show aquarium 52
+show aquarium 552 52
+show
 add view 54 400x400+200+200
 add view 54 400x400+200x200
+add view 54 400x400x200+200
+add view 54 400x400x200x200
+add view 54 400+400+200+200
+add view 54 400+400+200x200
+add view 54 400+400x200+200
+add view 54 400+400x200x200
 ------
