@@ -21,10 +21,10 @@ void fish_create(struct fish * fish, int * coords, int * size, char * name, void
 }
 
 void fish_print(struct fish * fish) {
-    printf("%s\n", fish->name);
-    printf("%p\n", fish->path);
-    for (int i = 0; i < 2; ++i) {
-        printf("%d\n", fish->coords[i]);
-        printf("%d\n", fish->size[i]);
-    } 
+    printf("============ Debug ============\n");
+    printf("fish name   : %s\n", fish->name);
+    printf("fish path   : %p\n", fish->path);
+    printf("fish coords : (%d,%d)\n", fish->coords[0],fish->coords[1]);
+    printf("fish size   : (%d,%d)\n", fish->size[0],fish->size[1]);
+    printf("===============================\n");
 }

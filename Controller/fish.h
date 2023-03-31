@@ -8,4 +8,10 @@ struct fish {
     void (*path)(struct fish *);
 };
 
+void fish_init(struct fish * fish);
+
+void fish_create(struct fish * fish, int * coords, int * size, char * name, void (*path)(struct fish *));
+
+void fish_print(struct fish * fish);
+
 #endif
