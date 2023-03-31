@@ -141,6 +141,8 @@ public abstract class Tweening<T> {
     public abstract Tweening<T> initRangeValue(float time, T beginningValue, T range);
     public abstract T value();
 
+    public abstract T goalValue();
+
     protected void startTimerAfterInit(float time){
         this.timer.start(time);
     }
