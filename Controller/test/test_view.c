@@ -1,4 +1,4 @@
-#include "view.h"
+#include "../src/view.h"
 
 #include <stdlib.h>
 

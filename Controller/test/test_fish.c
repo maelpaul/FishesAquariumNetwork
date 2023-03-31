@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fish.h"
+#include "../src/fish.h"
 
 int main(){
     struct fish * fish = malloc(sizeof(struct fish));
