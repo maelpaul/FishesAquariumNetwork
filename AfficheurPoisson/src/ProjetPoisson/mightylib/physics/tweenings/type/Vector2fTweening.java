@@ -61,4 +61,11 @@ public class Vector2fTweening extends Tweening<Vector2f> {
     public Vector2f value() {
         return new Vector2f(computedValue);
     }
+
+    @Override
+    public Vector2f goalValue() {
+        return endingValue;
+    }
+
+
 }

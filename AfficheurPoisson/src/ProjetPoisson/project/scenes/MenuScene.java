@@ -15,6 +15,7 @@ import ProjetPoisson.mightylib.util.math.EDirection;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
+import ProjetPoisson.project.display.Fish;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -22,8 +23,7 @@ import org.lwjgl.glfw.GLFW;
 
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
 
 public class MenuScene extends Scene {
     private Text text;
@@ -33,6 +33,8 @@ public class MenuScene extends Scene {
     private Terminal terminal;
 
     private CommandAnalyser analyser;
+
+    private HashMap<Integer, Fish> fishes;
 
     public void init(String[] args) {
         super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
@@ -76,10 +78,18 @@ public class MenuScene extends Scene {
             Resources.getInstance().createAndInit(Texture.class, fileName, configuration.getPathForFishesResources() + "/" + childPath);
             fishesFileName.add(fileName);
         }
+
+        fishes = new HashMap<>();
+
+        fishes.put(0, new Fish(mainContext.getWindow().getInfo(), fishesFileName.get(0), new Vector2f(0.2f, 0.2f)));
     }
 
     public void update() {
         super.update();
+
+        for (Integer key : fishes.keySet()){
+            fishes.get(key).update();
+        }
 
         KeyboardManager manager = mainContext.getKeyboardManager();
 
@@ -104,6 +114,13 @@ public class MenuScene extends Scene {
                         .clearCommandText();
             }
         }
+
+        if (fishes.get(0).finishedTravel()){
+            Random rand = new Random();
+
+            fishes.get(0).travelToNewPosition(new Vector2f(rand.nextFloat(), rand.nextFloat()), 5);
+
+        }
     }
 
 
@@ -114,6 +131,10 @@ public class MenuScene extends Scene {
         renderer.display();
 
         text.display();
+
+        for (Integer key : fishes.keySet()){
+            fishes.get(key).display();
+        }
 
         terminal.display();
 
@@ -128,5 +149,9 @@ public class MenuScene extends Scene {
 
         text.unload();
         terminal.unload();
+
+        for (Integer key : fishes.keySet()){
+            fishes.get(key).unload();
+        }
     }
 }
