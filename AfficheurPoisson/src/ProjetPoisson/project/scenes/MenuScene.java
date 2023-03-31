@@ -6,6 +6,8 @@ import ProjetPoisson.mightylib.graphics.text.Text;
 import ProjetPoisson.mightylib.inputs.KeyboardManager;
 import ProjetPoisson.mightylib.resources.Resources;
 import ProjetPoisson.mightylib.resources.texture.BasicBindableObject;
+import ProjetPoisson.mightylib.resources.texture.Icon;
+import ProjetPoisson.mightylib.resources.texture.Texture;
 import ProjetPoisson.mightylib.resources.texture.TextureParameters;
 import ProjetPoisson.mightylib.scene.Scene;
 import ProjetPoisson.mightylib.util.math.Color4f;
@@ -22,6 +24,8 @@ import org.lwjgl.glfw.GLFW;
 
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class MenuScene extends Scene {
     private Text text;
@@ -34,6 +38,10 @@ public class MenuScene extends Scene {
 
     public void init(String[] args) {
         super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
+
+        if (Resources.getInstance().isExistingResource(Icon.class, "Kraken"))
+            mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
+
         /// SCENE INFORMATION ///
 
         CommunicationThread runnable = new CommunicationThread();
@@ -69,14 +77,12 @@ public class MenuScene extends Scene {
 
         Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
 
-        System.out.println(configuration.getPathForFishesResources());
-        File folder_configs = new File(configuration.getPathForFishesResources());
-        File[] configs = folder_configs.listFiles(file -> file.isFile());
-        if (configs != null) {
-            for (File config : configs) {
-                String fileName = config.getName();
-                System.out.println(fileName);
-            }
+        ArrayList<String> fishesFileName = new ArrayList<>();
+        File folderFish = new File(configuration.getPathForFishesResources());
+        for (String childPath : Objects.requireNonNull(folderFish.list())) {
+            String fileName = childPath.substring(childPath.lastIndexOf("/") + 1, childPath.lastIndexOf("."));
+            Resources.getInstance().createAndInit(Texture.class, fileName, configuration.getPathForFishesResources() + "/" + childPath);
+            fishesFileName.add(fileName);
         }
     }
 

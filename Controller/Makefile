@@ -1,36 +1,41 @@
 CFLAGS = -Wall -Wextra -std=c99
 
-all : build
+SRC_DIR = src
+TEST_DIR = test
 
-build : parser.o main test_parser prompt
+INC_DIR = -I$(SRC_DIR) -I$(TEST_DIR)
 
-parser.o : parser.c
-	gcc ${CFLAGS} $< -c
+all : build test
 
-main : main.c parser.o
-	gcc ${CFLAGS} $^ -o $@
+build : prompt
 
-test_parser : test_parser.c parser.o
-	gcc ${CFLAGS} $^ -o $@
+test : test_fish test_view
 
-prompt: prompt.c parser.o
-	gcc $(CFLAGS) $^ -o $@
+$(SRC_DIR)/parser.o : $(SRC_DIR)/parser.c
+	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
-server: server.c
-	gcc ${CFLAGS} $^ -o $@
+$(SRC_DIR)/fish.o : $(SRC_DIR)/fish.c
+	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
-fish.o : fish.c
-	gcc ${CFLAGS} $< -c
+$(SRC_DIR)/view.o : $(SRC_DIR)/view.c
+	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
-test_view : test_view.c view.o
-	gcc ${CFLAGS} $^ -o $@
+$(SRC_DIR)/aquarium.o : $(SRC_DIR)/aquarium.c
+	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
-View.o : view.c
-	gcc ${CFLAGS} $< -c
+prompt: $(SRC_DIR)/prompt.c $(SRC_DIR)/parser.o
+	gcc $(CFLAGS) ${INC_DIR} $^ -o $@
 
-aquarium.o : aquarium.c
-	gcc ${CFLAGS} $< -c
+server: $(SRC_DIR)/server.c
+	gcc ${CFLAGS} ${INC_DIR} $^ -o $@
+
+test_fish : $(SRC_DIR)/fish.o
+	gcc ${CFLAGS} ${INC_DIR} $(TEST_DIR)/test_fish.c $^ -o $@
+
+test_view : $(SRC_DIR)/view.o
+	gcc ${CFLAGS} ${INC_DIR} $(TEST_DIR)/test_view.c $^ -o $@
 
 clean :
-	rm *.o
-	rm -f main server test_parser test_view prompt
+	rm -f $(TST_DIR)/*.o
+	rm -f $(SRC_DIR)/*.o
+	rm -f main server test_parser test_view prompt test_fish
