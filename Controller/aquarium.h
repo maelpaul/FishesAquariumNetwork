@@ -3,7 +3,9 @@
 
 struct view {
     struct fish * fishes;
+    int fishes_len;
     struct view * views;
+    int view_len;
     int size[2];
     char * name;
 };
