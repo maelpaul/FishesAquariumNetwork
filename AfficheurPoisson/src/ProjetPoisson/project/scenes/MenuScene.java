@@ -7,6 +7,7 @@ import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
 import ProjetPoisson.mightylib.graphics.text.Text;
 import ProjetPoisson.mightylib.inputs.InputManager;
 import ProjetPoisson.mightylib.inputs.KeyboardManager;
+import ProjetPoisson.mightylib.resources.Resources;
 import ProjetPoisson.mightylib.resources.texture.BasicBindableObject;
 import ProjetPoisson.mightylib.resources.texture.TextureParameters;
 import ProjetPoisson.mightylib.scene.Scene;
@@ -20,6 +21,7 @@ import ProjetPoisson.mightylib.physics.tweenings.ETweeningBehaviour;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningOption;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningType;
 import ProjetPoisson.mightylib.physics.tweenings.type.FloatTweening;
+import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.lib.ActionId;
@@ -27,6 +29,8 @@ import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+
+import java.io.File;
 
 public class MenuScene extends Scene {
     private Text text;
@@ -64,6 +68,18 @@ public class MenuScene extends Scene {
         terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.y * 0.5f,windowSize.y * 0.5f));
 
         analyser = new CommandAnalyser();
+
+        Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
+
+        System.out.println(configuration.getPathForFishesResources());
+        File folder_configs = new File(configuration.getPathForFishesResources());
+        File[] configs = folder_configs.listFiles(file -> file.isFile());
+        if (configs != null) {
+            for (File config : configs) {
+                String fileName = config.getName();
+                System.out.println(fileName);
+            }
+        }
     }
 
     public void update() {

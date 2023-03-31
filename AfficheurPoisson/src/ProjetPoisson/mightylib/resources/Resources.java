@@ -56,6 +56,13 @@ public class Resources {
         initialized = true;
     }
 
+    public void createAndInit(String resourceName, Class<?> resourceType, String resourcePath){
+        /*for (ResourceLoader resourceLoader : singletonInstance.Loaders) {
+            if (resourceLoader.getResourceNameType().equals(name)) {
+
+            }
+        }*/
+    }
 
     public static Class<?> getClassFromName(String name){
         for (ResourceLoader resourceLoader : singletonInstance.Loaders){

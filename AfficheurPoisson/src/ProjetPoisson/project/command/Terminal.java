@@ -112,7 +112,7 @@ public class Terminal {
                 } else if (manager.inputPressed(ActionId.TEXT_INPUT_LEFT_DELETE) && commandText.text().length() > 1){
                     removeCharAtPosition(cursorPosition);
                     textUpdate = true;
-                } else if (manager.inputPressed(ActionId.ENTER_COMMAND)){
+                } else if (manager.inputPressed(ActionId.ENTER_COMMAND) && commandText.text().length() != 1){
                     shouldProcessCommand = true;
                 }
             } else {
