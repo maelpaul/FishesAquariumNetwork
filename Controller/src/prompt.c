@@ -8,12 +8,9 @@
 #define BUFFER_SIZE 100
 
 void clear(char * buffer) {
-    int i = 0;
-    while (buffer[i] != '\n' && buffer[i] != '\0') {
+    for (int i = 0; i < BUFFER_SIZE; i++) {
         buffer[i] = '\0';
-        i++;
     }
-    buffer[i] = '\0';
 }
 
 int length(char ** argv) {
@@ -48,6 +45,7 @@ int main()
         ssize_t a = read(0, buffer, BUFFER_SIZE);
         if (a == -1) {
             perror("read");
+            free_command(command);
             return EXIT_FAILURE;
         }
         
@@ -80,8 +78,12 @@ int main()
                     c++;
                 }
                 else {
+                    free_command(command);
                     return EXIT_FAILURE;
                 }
+            }
+            while (buffer[i] == ' ') {
+                i++;
             }
             p[j] = buffer[i];
             i++;
@@ -93,6 +95,7 @@ int main()
         int my_argc = length(my_argv); 
         if (my_argc < 2) {
             if (strcmp(arg1, "exit") == 0 || strcmp(arg1, "quit") == 0 || strcmp(arg1, "q") == 0) {
+                free_command(command);
                 return EXIT_SUCCESS;
             }
             printf("failure\n");
@@ -109,6 +112,7 @@ int main()
         free_command(command);
         
         if (strcmp(arg1, "exit") == 0 || strcmp(arg1, "quit") == 0 || strcmp(arg1, "q") == 0) {
+            free_command(command);
             return EXIT_SUCCESS;
         }
     }
