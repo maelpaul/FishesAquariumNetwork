@@ -77,4 +77,9 @@ public class ConfigurationLoader extends ResourceLoader {
         Configuration configuration = (Configuration) dataType;
         configuration.init(address, id, port, displayTimeout, pathFishesResources);
     }
+
+    @Override
+    public void createAndLoad(Map<String, DataType> data, String resourceName, String resourcePath) {
+        // Todo
+    }
 }

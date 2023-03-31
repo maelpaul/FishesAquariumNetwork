@@ -56,12 +56,13 @@ public class Resources {
         initialized = true;
     }
 
-    public void createAndInit(String resourceName, Class<?> resourceType, String resourcePath){
-        /*for (ResourceLoader resourceLoader : singletonInstance.Loaders) {
-            if (resourceLoader.getResourceNameType().equals(name)) {
-
+    public void createAndInit(Class<?> resourceType, String resourceName, String resourcePath){
+        for (ResourceLoader resourceLoader : singletonInstance.Loaders) {
+            if (resourceType == resourceLoader.getType()) {
+                resourceLoader.createAndLoad(resources.get(resourceType), resourceName, resourcePath);
+                break;
             }
-        }*/
+        }
     }
 
     public static Class<?> getClassFromName(String name){
