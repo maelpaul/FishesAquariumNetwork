@@ -2,6 +2,7 @@
 main 
 test_view
 test_fish
+test_aquarium
 prompt 
 server
 result.txt
