@@ -28,5 +28,6 @@ void fish_print(struct fish * fish) {
     printf("fish path   : %p\n", fish->path);
     printf("fish coords : (%d,%d)\n", fish->coords[0],fish->coords[1]);
     printf("fish size   : (%d,%d)\n", fish->size[0],fish->size[1]);
+    printf("fish dest   : (%d,%d)\n", fish->dest[0],fish->dest[1]);
     printf("===============================\n");
 }
