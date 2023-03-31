@@ -2,7 +2,7 @@ CFLAGS = -Wall -Wextra -std=c99
 
 all : build
 
-build : parser.o main test_parser prompt server
+build : parser.o main test_parser prompt
 
 parser.o : parser.c
 	gcc ${CFLAGS} $< -c
@@ -19,9 +19,18 @@ prompt: prompt.c parser.o
 server: server.c
 	gcc ${CFLAGS} $^ -o $@
 
+fish.o : fish.c
+	gcc ${CFLAGS} $< -c
+
+test_view : test_view.c view.o
+	gcc ${CFLAGS} $^ -o $@
+
+View.o : view.c
+	gcc ${CFLAGS} $< -c
+
+aquarium.o : aquarium.c
+	gcc ${CFLAGS} $< -c
+
 clean :
 	rm *.o
-	rm main
-	rm server
-	rm test_parser
-	rm prompt
+	rm -f main server test_parser test_view prompt

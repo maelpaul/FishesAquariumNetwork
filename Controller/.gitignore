@@ -1,6 +1,6 @@
 *.o
 main 
-test_parser 
+test_parser test_view test_fish
 prompt 
 server
 result.txt

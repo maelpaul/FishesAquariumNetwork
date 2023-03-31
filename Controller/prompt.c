@@ -24,7 +24,7 @@ int length(char ** argv) {
     return i;
 }
 
-int main(int argc, char *argv[])
+int main()
 {
     char buffer[BUFFER_SIZE];
     char arg1[BUFFER_SIZE];
@@ -32,6 +32,8 @@ int main(int argc, char *argv[])
     char arg3[BUFFER_SIZE];
     char arg4[BUFFER_SIZE];
 
+    printf("enter your command :\n");
+    
     while (1) {
         struct command * command = malloc(sizeof(struct command));
     
@@ -102,7 +104,7 @@ int main(int argc, char *argv[])
         //     printf("argv[%d] = %s\n", i, my_argv[i]);
         // }
 
-        if(parse_command(command, my_argv, my_argc)){print_command(command);}
+        if(parse_command(command, my_argv, my_argc)){print_command(command);printf("enter your command :\n");}
     
         free_command(command);
         

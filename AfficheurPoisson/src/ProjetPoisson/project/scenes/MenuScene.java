@@ -1,34 +1,23 @@
 package ProjetPoisson.project.scenes;
 
-import ProjetPoisson.mightylib.graphics.GUI.BackgroundlessButton;
-import ProjetPoisson.mightylib.graphics.GUI.GUIList;
 import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
 import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
 import ProjetPoisson.mightylib.graphics.text.Text;
-import ProjetPoisson.mightylib.inputs.InputManager;
 import ProjetPoisson.mightylib.inputs.KeyboardManager;
 import ProjetPoisson.mightylib.resources.Resources;
 import ProjetPoisson.mightylib.resources.texture.BasicBindableObject;
 import ProjetPoisson.mightylib.resources.texture.TextureParameters;
 import ProjetPoisson.mightylib.scene.Scene;
-import ProjetPoisson.mightylib.sounds.SoundManager;
-import ProjetPoisson.mightylib.sounds.SoundSource;
-import ProjetPoisson.mightylib.sounds.SoundSourceCreationInfo;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
-import ProjetPoisson.mightylib.util.math.MightyMath;
-import ProjetPoisson.mightylib.physics.tweenings.ETweeningBehaviour;
-import ProjetPoisson.mightylib.physics.tweenings.ETweeningOption;
-import ProjetPoisson.mightylib.physics.tweenings.ETweeningType;
-import ProjetPoisson.mightylib.physics.tweenings.type.FloatTweening;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
-import ProjetPoisson.project.lib.ActionId;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+
 
 import java.io.File;
 
@@ -66,6 +55,7 @@ public class MenuScene extends Scene {
                 .setFontSize(40);
 
         terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.y * 0.5f,windowSize.y * 0.5f));
+        Configuration conf = Resources.getInstance().getResource(Configuration.class, "affichage");
 
         analyser = new CommandAnalyser();
 
