@@ -1,7 +1,7 @@
 #ifndef _AQUARIUM_H_
 #define _AQUARIUM_H_
 
-struct view {
+struct aquarium {
     struct fish * fishes;
     int fishes_len;
     struct view * views;
