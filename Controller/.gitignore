@@ -1,6 +1,7 @@
 *.o
 main 
-test_view test_fish
+test_view
+test_fish
 prompt 
 server
 result.txt
