@@ -13,9 +13,11 @@ import ProjetPoisson.mightylib.scene.Scene;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
 import ProjetPoisson.project.client.Configuration;
+import ProjetPoisson.project.client.ServerTcp;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.display.Fish;
+import ProjetPoisson.project.threads.CommunicationThread;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -43,6 +45,12 @@ public class MenuScene extends Scene {
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
         /// SCENE INFORMATION ///
+
+        CommunicationThread runnable = new CommunicationThread();
+        Thread thread = new Thread(runnable);
+        thread.start();
+        runnable.doStop();
+
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);
