@@ -31,8 +31,8 @@ make clean
 make test_parser
 
 # Read line by line and execute the parsing function on it
+./prompt
 while read line
 do
-    echo "tested command : \"" $line "\", result :">> result.txt
-    ./test_parser $line >> result.txt
+    echo "tested command : \"" $line "\""
 done < $1

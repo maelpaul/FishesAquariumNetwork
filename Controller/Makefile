@@ -19,9 +19,15 @@ prompt: prompt.c parser.o
 server: server.c
 	gcc ${CFLAGS} $^ -o $@
 
+fish.o : fish.c
+	gcc ${CFLAGS} $< -c
+
+View.o : view.c
+	gcc ${CFLAGS} $< -c
+
+aquarium.o : aquarium.c
+	gcc ${CFLAGS} $< -c
+
 clean :
 	rm *.o
-	rm main
-	rm server
-	rm test_parser
-	rm prompt
+	rm -f main server test_parser prompt
