@@ -41,4 +41,4 @@ test_aquarium: $(SRC_DIR)/fish.o $(SRC_DIR)/view.o $(SRC_DIR)/aquarium.o
 clean :
 	rm -f $(TST_DIR)/*.o
 	rm -f $(SRC_DIR)/*.o
-	rm -f main server test_parser test_view prompt test_fish test_aquarium
+	rm -f server test_view prompt test_fish test_aquarium

@@ -3,6 +3,8 @@ main
 test_view
 test_fish
 test_aquarium
+test_parser
 prompt 
 server
 result.txt
+../.vscode/
