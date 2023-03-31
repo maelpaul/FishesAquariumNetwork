@@ -1,15 +1,20 @@
 package ProjetPoisson.project.client;
-import java.io.*;
-import java.net.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-public class ClientTcp {
+public class ServerTcp {
     private final Configuration configuration;
-    private Socket socket;
+    private ServerSocket serverSocket;
+    private Socket client;
 
-    public ClientTcp(Configuration configuration){
+    public ServerTcp(Configuration configuration){
         this.configuration = configuration;
     }
 
@@ -17,16 +22,23 @@ public class ClientTcp {
 
     public void tryCreateConnection(){
         try {
-            socket = new Socket(configuration.getAddress(), configuration.getPort());
+            serverSocket = new ServerSocket(configuration.getPort());
         } catch (IOException e) {
-            socket = null;
-            System.out.println("Can't create socket with adress : " + configuration.getAddress()
-                + " and port : " + configuration.getPort());
+            serverSocket = null;
+            System.out.println("Can't create socket with port : " + configuration.getPort());
+        }
+    }
+
+    public void acceptConnexion(){
+        try {
+            client = serverSocket.accept();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public void sendMessage(String data){
-        if (socket == null){
+        if (client == null){
             System.out.println("Can't send message while connection not initialized");
             return;
         }
@@ -34,7 +46,7 @@ public class ClientTcp {
         OutputStream output;
 
         try {
-            output = socket.getOutputStream();
+            output = client.getOutputStream();
             output.write(data.getBytes(ENCODING));
 
             output.close();
@@ -44,7 +56,7 @@ public class ClientTcp {
     }
 
     public String readMessage(){
-        if (socket == null){
+        if (client == null){
             System.out.println("Can't read message while connection not initialized");
             return null;
         }
@@ -53,7 +65,7 @@ public class ClientTcp {
         String message = null;
 
         try {
-            stream = socket.getInputStream();
+            stream = client.getInputStream();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -76,17 +88,18 @@ public class ClientTcp {
     }
 
     public void closeConnection(){
-        if (socket == null){
+        if (client == null){
             System.out.println("Can't close uncreated connection.");
             return;
         }
 
         try {
-            socket.close();
+            client.close();
+            serverSocket.close();
         } catch (IOException e) {
-            socket = null;
+            client = null;
             System.out.println("Error while closing connection\n");
-             e.printStackTrace();
+            e.printStackTrace();
         }
     }
 }

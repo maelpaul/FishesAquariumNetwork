@@ -73,6 +73,10 @@ public class TextureLoader extends ResourceLoader {
     }
 
 
+    public void createAndInit(){
+
+    }
+
     @Override
     public void load(DataType dataType) {
         if (!(dataType instanceof Texture))
