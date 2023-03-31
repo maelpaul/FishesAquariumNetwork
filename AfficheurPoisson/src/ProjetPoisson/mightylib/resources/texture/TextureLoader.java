@@ -16,6 +16,9 @@ import static org.lwjgl.opengl.GL31.GL_TEXTURE_RECTANGLE;
 
 public class TextureLoader extends ResourceLoader {
 
+    private final static String BASIC_PATH = "resources/textures/";
+    private final static String LIST_TEXTURES = BASIC_PATH + "textures.json";
+
     @Override
     public Class<?> getType() {
         return Texture.class;
@@ -28,10 +31,10 @@ public class TextureLoader extends ResourceLoader {
 
     @Override
     public void create(Map<String, DataType> data){
-        JSONObject obj = new JSONObject(FileMethods.readFileAsString("resources/textures/textures.json"));
+        JSONObject obj = new JSONObject(FileMethods.readFileAsString(LIST_TEXTURES));
         obj = obj.getJSONObject("textures");
 
-        Texture texture = new Texture("error", "error.png");
+        Texture texture = new Texture("error", BASIC_PATH + "error.png");
         texture.setAspectTexture(TextureParameters.PIXEL_ART_PARAMETERS);
 
         data.put("error", texture);
@@ -67,14 +70,9 @@ public class TextureLoader extends ResourceLoader {
 
                 data.put(currentNode, currentTexture);
             } else {
-                create(data, node.getJSONObject(currentNode), currentPath + currentNode + "/");
+                create(data, node.getJSONObject(currentNode), BASIC_PATH + currentPath + currentNode + "/");
             }
         } while(arrayNodes.hasNext());
-    }
-
-
-    public void createAndInit(){
-
     }
 
     @Override
@@ -93,5 +91,16 @@ public class TextureLoader extends ResourceLoader {
             System.err.println(texture.getPath() + "\n");
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void createAndLoad(Map<String, DataType> data, String resourceName, String resourcePath) {
+        if (data.containsKey(resourceName))
+            return;
+
+        Texture currentTexture = new Texture(resourceName, resourcePath);
+        data.put(resourceName, currentTexture);
+
+        load(currentTexture);
     }
 }

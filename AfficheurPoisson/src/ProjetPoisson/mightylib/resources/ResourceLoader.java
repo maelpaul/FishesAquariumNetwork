@@ -14,5 +14,5 @@ public abstract class ResourceLoader {
 
     public abstract void load(DataType dataType);
 
-    //public abstract void createAndLoad(Map<String, DataType> data, String resourceName, String resourcePath);
+    public abstract void createAndLoad(Map<String, DataType> data, String resourceName, String resourcePath);
 }
