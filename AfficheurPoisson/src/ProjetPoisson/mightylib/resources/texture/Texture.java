@@ -9,8 +9,6 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL13.*;
 
 public class Texture extends DataType implements IGLBindable {
-    private final static String PATH = "resources/textures/";
-
     private int width;
     private int height;
 
@@ -21,7 +19,7 @@ public class Texture extends DataType implements IGLBindable {
     private int textureType;
 
     public Texture(String name, String path) {
-        super(name, PATH + path);
+        super(name, path);
 
         textureId = -1;
         qualityType = TextureParameters.REALISTIC_PARAMETERS;
