@@ -11,12 +11,16 @@ void view_init(struct view * view){
     view->name=NULL;
 }
 
-void view_create(struct view * view, int * coords, int * size, char * name){
+void view_create(struct view * view, int * coords, int * size, char * name, int aquarium_width, int aquarium_height){
     for(int i=0; i<2; i++){
         view->coords[i]=coords[i];
         view->size[i]=size[i];
     }
     view->name=name;
+    if (view->size[0] > aquarium_width || view->size[1] > aquarium_height){
+        printf("View oversized\n");
+        view_init(view);
+    }
 }
 
 void view_print(struct view * view){
