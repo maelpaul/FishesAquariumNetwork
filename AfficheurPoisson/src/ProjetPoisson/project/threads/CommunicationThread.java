@@ -11,22 +11,26 @@ import java.net.SocketTimeoutException;
 
 
 public  abstract class CommunicationThread implements Runnable {
-    private volatile boolean running;
+    protected volatile boolean running;
     protected String receivedMessage;
     protected String messageToSend;
     public void run() {
+
     }
 
     public boolean didReceiveMessage() {
+        return false;
     }
 
     public String message() {
+        return null;
     }
 
     public void sendMessage(String message) {
     }
 
     public boolean didProcessedMessage() {
+        return false;
     }
 
     public void doStop() {

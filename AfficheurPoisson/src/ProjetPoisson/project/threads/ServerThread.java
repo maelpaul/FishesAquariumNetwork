@@ -12,14 +12,13 @@ import java.net.SocketTimeoutException;
 
 public class ServerThread extends CommunicationThread{
         private ServerTcp server;
-        public void ServerThread() {
+        public ServerThread() {
             this.running = true;
         }
         public void ServerSetup(){
             Configuration conf_server = Resources.getInstance().getResource(Configuration.class, "server");
             ServerTcp server = new ServerTcp(conf_server);
             server.tryCreateConnection();
-            server.acceptConnexion();
             this.server = server;
         }
 
@@ -28,10 +27,13 @@ public class ServerThread extends CommunicationThread{
         }
         public void run() {
             while(running){
+                //System.out.println("HAHAHA1");
+                /*
                 server.sendMessage("SERVER SHEEESH");
                 if (didReceiveMessage()){
                     System.out.println("MESSAGE RECEIVED" + receivedMessage);
                 }
+                 */
             }
         }
 

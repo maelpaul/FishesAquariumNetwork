@@ -3,20 +3,18 @@ package ProjetPoisson.project.threads;
 import ProjetPoisson.mightylib.resources.Resources;
 import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.client.Configuration;
-import ProjetPoisson.project.client.ClientTcp;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-public class ClientThread {
+public class ClientThread extends CommunicationThread{
     protected ClientTcp client;
-    public void ClientThread() {
+    public ClientThread() {
         this.running = true;
     }
-    public void ServerSetup(){
+    public void ClientSetup(){
         Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
         ClientTcp client = new ClientTcp(conf_client);
-        client.tryCreateConnection();
         client.tryCreateConnection();
         this.client = client;
     }
@@ -26,11 +24,15 @@ public class ClientThread {
     }
     public void run() {
         while(running){
-            server.sendMessage("SERVER SHEEESH");
+            //System.out.println("HAHAHA2");
+            /*
+            client.sendMessage("CLIENT SHEESH");
             if (didReceiveMessage()){
                 System.out.println("MESSAGE RECEIVED" + receivedMessage);
             }
+             */
         }
+
     }
 
     public boolean didReceiveMessage() {

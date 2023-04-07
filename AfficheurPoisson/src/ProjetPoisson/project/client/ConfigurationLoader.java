@@ -47,7 +47,7 @@ public class ConfigurationLoader extends ResourceLoader {
             return;
         }
 
-        System.out.println("Loading configuration: " + dataType.getDataName()); // Add this line
+        System.out.println("Loading configuration: " + dataType.getDataName());
 
         char symbol = '=';
         BufferedReader reader;

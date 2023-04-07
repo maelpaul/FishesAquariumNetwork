@@ -19,6 +19,8 @@ import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.display.Fish;
 import ProjetPoisson.project.threads.CommunicationThread;
+import ProjetPoisson.project.threads.ServerThread;
+import ProjetPoisson.project.threads.ClientThread;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -46,31 +48,15 @@ public class MenuScene extends Scene {
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
         /// SCENE INFORMATION ///
+        ServerThread serverThreadTemplate = new ServerThread();
+        serverThreadTemplate.ServerSetup();
+        Thread serverThread = new Thread(serverThreadTemplate);
+        serverThread.start();
 
-        Resources resources = Resources.getInstance();
-        Configuration conf_server = resources.getResource(Configuration.class, "server");
-        ServerTcp server = new ServerTcp(conf_server);
-        server.tryCreateConnection();
-        server.acceptConnexion();
-
-        Configuration conf_client = resources.getResource(Configuration.class, "client");
-        ClientTcp client = new ClientTcp(conf_client);
-        client.tryCreateConnection();
-
-        String messageToSend = "SHEESH!!!!!!";
-        System.out.println("Client: Send message - " + messageToSend);
-        client.sendMessage(messageToSend);
-        String receivedResponse = client.readMessage();
-        System.out.println("Client: Receive response - " + receivedResponse);
-
-        client.closeConnection();
-        serverThread.doStop();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        ClientThread clientThreadTemplate = new ClientThread();
+        clientThreadTemplate.ClientSetup();
+        Thread clientThread = new Thread(clientThreadTemplate);
+        clientThread.start();
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);
