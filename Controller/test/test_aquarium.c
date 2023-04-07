@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../src/fish.h"
-#include "../src/view.h"
-#include "../src/aquarium.h"
+#include "fish.h"
+#include "view.h"
+#include "aquarium.h"
 
 int main(){
     struct aquarium * aquarium = malloc(sizeof(struct aquarium));

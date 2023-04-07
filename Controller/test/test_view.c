@@ -1,6 +1,7 @@
-#include "../src/view.h"
-
 #include <stdlib.h>
+
+#include "view.h"
+
 
 int main(int argc, char** argv){
     (void)argc;

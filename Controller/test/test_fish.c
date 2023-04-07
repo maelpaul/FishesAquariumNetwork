@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../src/fish.h"
+#include "fish.h"
 
 void RandomWayPoint(struct fish * fish) {
     fish->dest[0] = rand() % 100;
