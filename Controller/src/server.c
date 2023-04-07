@@ -12,6 +12,8 @@
 int main()
 {
     struct config conf;
+    char buffer[256];
+    int n;
 
     load_config("controller.cfg", &conf);
 
@@ -22,7 +24,6 @@ int main()
     printf("Display timeout value: %d\n", conf.display_timeout_value);
     printf("Fish update interval: %d\n", conf.fish_update_interval);
 
-    /*
     // server and socket file descriptor
     int server_fd, newsockfd;
     //TCP port
@@ -56,7 +57,35 @@ int main()
     if ((newsockfd = accept(server_fd, (struct sockaddr *)&serv_addr, (socklen_t*)&addrlen)) < 0) {
         perror("Erreur lors de l'acceptation de la connexion entrante");
         exit(EXIT_FAILURE);
-    }*/
+    }
+
+    // Envoi d'un message au client
+    strcpy(buffer, "Bonjour client !");
+    if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+        perror("Erreur lors de l'envoi du message au client");
+        exit(EXIT_FAILURE);
+    }
+
+    do {
+        // Réception de la réponse du client
+        memset(buffer, 0, sizeof(buffer));
+        if ((n = recv(newsockfd, buffer, sizeof(buffer), 0)) < 0) {
+            perror("Erreur lors de la réception de la réponse du client");
+            exit(EXIT_FAILURE);
+        }
+
+        printf("Message du client : %s\n", buffer);
+
+    } while(strcmp(buffer, "log out\n") != 0);
+
+    // Envoi de sortie de connexion au client
+    strcpy(buffer, "Bye");
+    if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+        perror("Erreur lors de l'envoi du message au client");
+        exit(EXIT_FAILURE);
+    }
+
+    close(server_fd);
 
     return 0;
 } 
