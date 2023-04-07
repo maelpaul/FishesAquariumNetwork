@@ -73,7 +73,5 @@ int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium
         }   
     }
 
-    aquarium_print(aquarium);
-
     return 0;
 }

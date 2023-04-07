@@ -18,13 +18,11 @@ int main()
     load_config("controller.cfg", &conf);
 
     struct aquarium aquarium;
-
     load_initial_aquarium_config("aquarium_example.txt", &aquarium);
 
     // server and socket file descriptor
     int server_fd, newsockfd;
-    //TCP port
-    int portno = 12345;
+    int portno = conf.controller_port;
     struct sockaddr_in serv_addr;
     int addrlen = sizeof(serv_addr);
     
