@@ -11,7 +11,7 @@ struct fish {
 
 void fish_init(struct fish * fish);
 
-void fish_create(struct fish * fish, int * coords, int * size, char * name, void (*path)(struct fish *, int, int), int aquarium_width, int aquarium_heigth);
+void fish_create(struct fish * fish, int * coords, int * size, char * name, void (*path)(struct fish *, int, int), int aquarium_width, int aquarium_height);
 
 void fish_print(struct fish * fish);
 

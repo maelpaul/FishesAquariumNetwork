@@ -13,7 +13,7 @@ int main(){
     int size5[2] = {1000,1000};
     aquarium_create(aquarium, size5, "Aquarium");
     int aquarium_width = get_aquarium_width(aquarium);
-    int aquarium_heigth = get_aquarium_height(aquarium);
+    int aquarium_height = get_aquarium_height(aquarium);
     
     void (*path)(struct fish *, int, int) = &RandomWayPoint;
 
@@ -21,13 +21,13 @@ int main(){
     fish_init(fish1);
     int size1[2] = {10, 5};
     int coords1[2] = {200, 200};
-    fish_create(fish1, coords1, size1, "Nathan", path, aquarium_width, aquarium_heigth);
+    fish_create(fish1, coords1, size1, "Nathan", path, aquarium_width, aquarium_height);
 
     struct fish * fish2 = malloc(sizeof(struct fish));
     fish_init(fish2);
     int size2[2] = {10, 5};
     int coords2[2] = {200, 200};
-    fish_create(fish2, coords2, size2, "Victor", path, aquarium_width, aquarium_heigth);
+    fish_create(fish2, coords2, size2, "Victor", path, aquarium_width, aquarium_height);
 
     struct view * view1 = malloc(sizeof(struct view));
     view_init(view1);
