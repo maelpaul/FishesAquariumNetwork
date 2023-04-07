@@ -18,8 +18,8 @@ void aquarium_init(struct aquarium * aquarium) {
 
 void aquarium_create(struct aquarium * aquarium, int * size, char * name) {
     aquarium->name = name;
-    aquarium->fishes = malloc(10 * sizeof(struct fish *));
-    aquarium->views = malloc(10 * sizeof(struct view *));
+    aquarium->fishes = malloc(DEFAULT_NUBMER_FISH * sizeof(struct fish *));
+    aquarium->views = malloc(DEFAULT_NUBMER_VIEW * sizeof(struct view *));
     aquarium->fishes_len = 0;
     aquarium->views_len = 0;
     for (int i = 0; i < 2; ++i) {
@@ -28,7 +28,7 @@ void aquarium_create(struct aquarium * aquarium, int * size, char * name) {
 }
 
 void add_fish(struct aquarium * aquarium, struct fish * fish) {
-    if (aquarium->fishes_len < 10) {
+    if (aquarium->fishes_len < DEFAULT_NUBMER_FISH) {
         aquarium->fishes[aquarium->fishes_len] = fish;
         aquarium->fishes_len++;
     }
@@ -40,7 +40,7 @@ void add_fish(struct aquarium * aquarium, struct fish * fish) {
 }
 
 void add_view(struct aquarium * aquarium, struct view * view) {
-    if (aquarium->views_len < 10) {
+    if (aquarium->views_len < DEFAULT_NUBMER_VIEW) {
         aquarium->views[aquarium->views_len] = view;
         aquarium->views_len++;
     }

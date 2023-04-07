@@ -1,6 +1,9 @@
 #ifndef _AQUARIUM_H_
 #define _AQUARIUM_H_
 
+#define DEFAULT_NUBMER_FISH 10
+#define DEFAULT_NUBMER_VIEW 10
+
 struct aquarium {
     struct fish ** fishes;
     int fishes_len;
