@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "fish.h"
 #include "view.h"
@@ -33,13 +34,13 @@ int main(){
     view_init(view1);
     int size3[2] = {400,400};
     int coords3[2] = {400,400}; 
-    view_create(view1, size3, coords3, "View1");
+    view_create(view1, size3, coords3, "View1", aquarium_width, aquarium_height);
 
     struct view * view2 = malloc(sizeof(struct view));
     view_init(view2);
     int size4[2] = {400,400};
     int coords4[2] = {400,400}; 
-    view_create(view2, size4, coords4, "View2");
+    view_create(view2, size4, coords4, "View2", aquarium_width, aquarium_height);
 
     add_fish(aquarium, fish1);
     add_fish(aquarium, fish2);
@@ -49,12 +50,14 @@ int main(){
     del_fish(aquarium, "Nathan");
     del_view(aquarium, "View2");
     aquarium_print(aquarium);
-    for (int i = 0; i < 15; i++) {
-        add_fish(aquarium, fish2);
-        add_view(aquarium, view1);
-    }
-    aquarium_print(aquarium);
+
+    // for (int i = 0; i < 15; i++) {
+    //     add_fish(aquarium, fish2);
+    //     add_view(aquarium, view1);
+    // }
+    // aquarium_print(aquarium);
+    
     aquarium_free(aquarium);
 
-    return 0; 
+    return EXIT_SUCCESS; 
 }

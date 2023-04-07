@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "fish.h"
 
@@ -23,5 +24,5 @@ int main(){
 
     free(fish);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
