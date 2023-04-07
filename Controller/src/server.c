@@ -4,10 +4,54 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <strings.h>
+#include <string.h>
+#include <errno.h>
 
-int main(int argc, char *argv[])
+struct config {
+    int controller_port;
+    int display_timeout_value;
+    int fish_update_interval;
+};
+
+int load_config(const char *filename, struct config *conf)
 {
+    FILE *fp;
+    char line[256], key[256], value[256];
+
+    fp = fopen(filename, "r");
+    if (!fp) {
+        fprintf(stderr, "Failed to open %s\n", filename);
+        return -1;
+    }
+
+    while (fgets(line, sizeof(line), fp)) {
+        if (sscanf(line, "%255s = %255s", key, value) == 2) {
+            if (strcmp(key, "controller-port") == 0) {
+                conf->controller_port = atoi(value);
+            } else if (strcmp(key, "display-timeout-value") == 0) {
+                conf->display_timeout_value = atoi(value);
+            } else if (strcmp(key, "fish-update-interval") == 0) {
+                conf->fish_update_interval = atoi(value);
+            }
+        }
+    }
+
+    fclose(fp);
+
+    return 0;
+}
+
+int main()
+{
+    struct config conf;
+
+    load_config("controller.cfg", &conf);
+
+    /* Some tests*/
+    printf("Controller port: %d\n", conf.controller_port);
+    printf("Display timeout value: %d\n", conf.display_timeout_value);
+    printf("Fish update interval: %d\n", conf.fish_update_interval);
+
     // server and socket file descriptor
     int server_fd, newsockfd;
     //TCP port
