@@ -23,10 +23,13 @@ $(SRC_DIR)/view.o : $(SRC_DIR)/view.c
 $(SRC_DIR)/aquarium.o : $(SRC_DIR)/aquarium.c
 	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
+$(SRC_DIR)/server_utils.o : $(SRC_DIR)/server_utils.c
+	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
+
 prompt: $(SRC_DIR)/prompt.c $(SRC_DIR)/parser.o
 	gcc $(CFLAGS) ${INC_DIR} $^ -o $@
 
-server: $(SRC_DIR)/server.c
+server: $(SRC_DIR)/server.c $(SRC_DIR)/server_utils.o
 	gcc ${CFLAGS} ${INC_DIR} $^ -o $@
 
 test_fish : $(SRC_DIR)/fish.o
