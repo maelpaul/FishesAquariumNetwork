@@ -12,10 +12,10 @@ void fish_init(struct fish * fish) {
     }
 }
 
-void fish_create(struct fish * fish, int * coords, int * size, char * name, void (*path)(struct fish *)) {
+void fish_create(struct fish * fish, int * coords, int * size, char * name, void (*path)(struct fish *, int, int), int aquarium_width, int aquarium_heigth) {
     fish->name = name;
     fish->path = path;
-    (*(fish->path))(fish);
+    (*(fish->path))(fish, aquarium_width, aquarium_heigth);
     for (int i = 0; i < 2; ++i) {
         fish->coords[i] = coords[i];
         fish->size[i] = size[i];

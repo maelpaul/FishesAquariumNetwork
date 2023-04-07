@@ -1,8 +1,8 @@
 #ifndef _AQUARIUM_H_
 #define _AQUARIUM_H_
 
-#define DEFAULT_NUBMER_FISH 10
-#define DEFAULT_NUBMER_VIEW 10
+#define DEFAULT_NUMBER_FISH 10
+#define DEFAULT_NUMBER_VIEW 10
 
 struct aquarium {
     struct fish ** fishes;
@@ -29,6 +29,10 @@ void aquarium_free(struct aquarium * aquarium);
 
 void aquarium_print(struct aquarium * aquarium);
 
-void RandomWayPoint(struct fish * fish);
+int get_aquarium_width(struct aquarium * aquarium);
+
+int get_aquarium_height(struct aquarium * aquarium);
+
+void RandomWayPoint(struct fish * fish, int width, int height);
 
 #endif
