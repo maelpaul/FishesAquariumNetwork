@@ -34,6 +34,10 @@
 		"players" : {
 		},
 		"shaderEffects" : {
+			"displacementMap" : {
+				"file" : "displacementMap.png",
+				"qualityType" : "realistic"
+			}
 		}
 	}
 }

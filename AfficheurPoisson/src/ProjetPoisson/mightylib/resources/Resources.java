@@ -5,7 +5,9 @@ import ProjetPoisson.mightylib.resources.animation.AnimationDataLoader;
 import ProjetPoisson.mightylib.resources.sound.SoundLoader;
 import ProjetPoisson.mightylib.resources.texture.IconLoader;
 import ProjetPoisson.mightylib.resources.texture.TextureLoader;
+import ProjetPoisson.project.client.ConfigurationLoader;
 
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +39,7 @@ public class Resources {
         Loaders.add(new AnimationDataLoader());
         Loaders.add(new FontLoader());
         Loaders.add(new SoundLoader());
+        Loaders.add(new ConfigurationLoader());
 
         initialized = false;
         firstLoad = false;
@@ -78,6 +81,24 @@ public class Resources {
     public <T> T getResource(Class<T> type, String name){
         return type.cast(resources.get(type).get(name));
     }
+
+   /*
+   public <T extends DataType> T getResource(Class<T> type, String resourceName) {
+        HashMap<String, DataType> typedResources = resources.get(type);
+        if (typedResources != null && typedResources.containsKey(resourceName)) {
+            System.out.println("Found resource: " + resourceName);
+            return type.cast(typedResources.get(resourceName));
+        }
+
+        System.err.println("Resource not found: " + resourceName);
+        return null;
+    }
+    */
+
+
+
+
+
 
     public boolean isExistingResource(Class<?> type, String name){
         if (!resources.containsKey(type))

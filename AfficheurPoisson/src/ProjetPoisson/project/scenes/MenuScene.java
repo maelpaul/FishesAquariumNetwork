@@ -1,9 +1,15 @@
 package ProjetPoisson.project.scenes;
 
 import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
+import ProjetPoisson.mightylib.graphics.shader.ShaderManager;
 import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
 import ProjetPoisson.mightylib.graphics.text.Text;
 import ProjetPoisson.mightylib.inputs.KeyboardManager;
+import ProjetPoisson.mightylib.main.GameTime;
+import ProjetPoisson.mightylib.physics.tweenings.ETweeningBehaviour;
+import ProjetPoisson.mightylib.physics.tweenings.ETweeningOption;
+import ProjetPoisson.mightylib.physics.tweenings.ETweeningType;
+import ProjetPoisson.mightylib.physics.tweenings.type.FloatTweening;
 import ProjetPoisson.mightylib.resources.Resources;
 import ProjetPoisson.mightylib.resources.texture.BasicBindableObject;
 import ProjetPoisson.mightylib.resources.texture.Icon;
@@ -14,10 +20,13 @@ import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.client.ServerTcp;
+import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.display.Fish;
 import ProjetPoisson.project.threads.CommunicationThread;
+import ProjetPoisson.project.threads.ServerThread;
+import ProjetPoisson.project.threads.ClientThread;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -38,6 +47,9 @@ public class MenuScene extends Scene {
 
     private HashMap<Integer, Fish> fishes;
 
+    private Texture displacementMap;
+    private FloatTweening displacementMapTweening;
+
     public void init(String[] args) {
         super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
 
@@ -45,12 +57,15 @@ public class MenuScene extends Scene {
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
         /// SCENE INFORMATION ///
+        ServerThread serverThreadTemplate = new ServerThread();
+        serverThreadTemplate.ServerSetup();
+        Thread serverThread = new Thread(serverThreadTemplate);
+        serverThread.start();
 
-        CommunicationThread runnable = new CommunicationThread();
-        Thread thread = new Thread(runnable);
-        thread.start();
-        runnable.doStop();
-
+        ClientThread clientThreadTemplate = new ClientThread();
+        clientThreadTemplate.ClientSetup();
+        Thread clientThread = new Thread(clientThreadTemplate);
+        clientThread.start();
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);
@@ -59,7 +74,7 @@ public class MenuScene extends Scene {
 
         Vector2i windowSize = mainContext.getWindow().getInfo().getSizeCopy();
 
-        renderer = new RectangleRenderer("texture2D");
+        renderer = new RectangleRenderer("texture2DDisplacement");
         renderer.switchToTextureMode("background");
         renderer.setSizePix(windowSize.x, windowSize.y);
 
@@ -90,6 +105,14 @@ public class MenuScene extends Scene {
         fishes = new HashMap<>();
 
         fishes.put(0, new Fish(mainContext.getWindow().getInfo(), fishesFileName.get(0), new Vector2f(0.2f, 0.2f)));
+
+        displacementMap = Resources.getInstance().getResource(Texture.class, "displacementMap");
+        ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("displacementMap", 1);
+
+        displacementMapTweening = new FloatTweening();
+        displacementMapTweening.setTweeningValues(ETweeningType.Linear, ETweeningBehaviour.InOut)
+                .setTweeningOption(ETweeningOption.LoopReversed)
+                .initTwoValue(15f, 0f, 15f);
     }
 
     public void update() {
@@ -129,6 +152,10 @@ public class MenuScene extends Scene {
             fishes.get(0).travelToNewPosition(new Vector2f(rand.nextFloat(), rand.nextFloat()), 5);
 
         }*/
+
+        displacementMapTweening.update();
+
+        ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("time", displacementMapTweening.value());
     }
 
 
@@ -136,6 +163,7 @@ public class MenuScene extends Scene {
         super.setVirtualScene();
         clear();
 
+        displacementMap.bind(1);
         renderer.display();
 
         text.display();
@@ -157,6 +185,8 @@ public class MenuScene extends Scene {
 
         text.unload();
         terminal.unload();
+
+        displacementMap.unload();
 
         for (Integer key : fishes.keySet()){
             fishes.get(key).unload();
