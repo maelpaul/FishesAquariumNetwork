@@ -134,7 +134,7 @@ public class MenuScene extends Scene {
 
             if (result != null) {
                 if (result.equals("¤¤clear¤¤"))
-                    terminal.clearResultText();
+                     terminal.clearResultText();
                 else
                     terminal.addToResultText(result);
 
@@ -143,12 +143,12 @@ public class MenuScene extends Scene {
             }
         }
 
-        if (fishes.get(0).finishedTravel()){
+        /*if (fishes.get(0).finishedTravel()){
             Random rand = new Random();
 
             fishes.get(0).travelToNewPosition(new Vector2f(rand.nextFloat(), rand.nextFloat()), 5);
 
-        }
+        }*/
     }
 
 

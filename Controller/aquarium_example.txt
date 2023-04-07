@@ -1,0 +1,5 @@
+Aquarium_width x Aquarium_height
+N1 vue_x x vue_y + vue_width + vue_height
+N2 vue_x x vue_y + vue_width + vue_height
+N3 vue_x x vue_y + vue_width + vue_height
+N4 vue_x x vue_y + vue_width + vue_height
