@@ -36,3 +36,22 @@ int load_config(const char *filename, struct config *conf)
 
     return 0;
 }
+
+int load_initial_aquarium_config(const char *filename){
+    FILE *fp;
+    char line[256], key[256], value[256];
+
+    fp = fopen(filename, "r");
+    if (!fp) {
+        fprintf(stderr, "Failed to open %s\n", filename);
+        return -1;
+    }
+
+    while (fgets(line, sizeof(line), fp)) {
+        if (sscanf(line, "%255s  %255s", key, value) == 2) {
+            printf("%s, %s\n",key,value);
+        }
+    }
+
+    return 0;
+}

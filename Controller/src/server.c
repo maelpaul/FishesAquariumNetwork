@@ -15,11 +15,14 @@ int main()
 
     load_config("controller.cfg", &conf);
 
+    load_initial_aquarium_config("aquarium_example.txt");
+
     /* Some tests*/
     printf("Controller port: %d\n", conf.controller_port);
     printf("Display timeout value: %d\n", conf.display_timeout_value);
     printf("Fish update interval: %d\n", conf.fish_update_interval);
 
+    /*
     // server and socket file descriptor
     int server_fd, newsockfd;
     //TCP port
@@ -53,7 +56,7 @@ int main()
     if ((newsockfd = accept(server_fd, (struct sockaddr *)&serv_addr, (socklen_t*)&addrlen)) < 0) {
         perror("Erreur lors de l'acceptation de la connexion entrante");
         exit(EXIT_FAILURE);
-    }
+    }*/
 
     return 0;
 } 
