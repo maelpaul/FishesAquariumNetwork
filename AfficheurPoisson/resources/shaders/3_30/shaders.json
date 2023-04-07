@@ -25,6 +25,21 @@
 				"model"
 			]
 		},
+		"texture2DDisplacement" : {
+			"files": [
+				"basic/texture2DDisplacementV.glsl",
+				"basic/texture2DDisplacementF.glsl"
+			],
+			"mode" : ["cam2DView"],
+			"links": [
+				"projection",
+				"view",
+				"model",
+				"time",
+				"ourTexture",
+				"displacementMap"
+			]
+		},
 		"colorShape3D": {
 			"files": [
 				"basic/colorShape3DV.glsl",
