@@ -26,8 +26,10 @@ public class ServerTcp {
         } catch (IOException e) {
             serverSocket = null;
             System.out.println("Can't create socket with port : " + configuration.getPort());
+            e.printStackTrace();
         }
     }
+
 
     public void acceptConnexion(){
         try {
@@ -87,7 +89,7 @@ public class ServerTcp {
         return message;
     }
 
-    public void closeConnection(){
+    public void closeConnexion(){
         if (client == null){
             System.out.println("Can't close uncreated connection.");
             return;

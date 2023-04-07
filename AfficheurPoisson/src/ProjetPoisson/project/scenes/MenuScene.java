@@ -14,6 +14,7 @@ import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.client.ServerTcp;
+import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.display.Fish;
@@ -46,10 +47,29 @@ public class MenuScene extends Scene {
 
         /// SCENE INFORMATION ///
 
-        CommunicationThread runnable = new CommunicationThread();
-        Thread thread = new Thread(runnable);
-        thread.start();
-        runnable.doStop();
+        Resources resources = Resources.getInstance();
+        Configuration conf_server = resources.getResource(Configuration.class, "server");
+        ServerTcp server = new ServerTcp(conf_server);
+        server.tryCreateConnection();
+        server.acceptConnexion();
+
+        Configuration conf_client = resources.getResource(Configuration.class, "client");
+        ClientTcp client = new ClientTcp(conf_client);
+        client.tryCreateConnection();
+
+        String messageToSend = "SHEESH!!!!!!";
+        System.out.println("Client: Send message - " + messageToSend);
+        client.sendMessage(messageToSend);
+        String receivedResponse = client.readMessage();
+        System.out.println("Client: Receive response - " + receivedResponse);
+
+        client.closeConnection();
+        serverThread.doStop();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
