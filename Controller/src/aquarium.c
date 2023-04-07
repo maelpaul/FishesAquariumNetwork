@@ -39,13 +39,17 @@ void add_fish(struct aquarium * aquarium, struct fish * fish) {
     }
 }
 
-void add_view(struct aquarium * aquarium, struct view * view) {
+void add_view(struct aquarium * aquarium, int * coords, int * size, char * name) {
     if (aquarium->views_len < DEFAULT_NUMBER_VIEW) {
+        struct view * view = malloc(sizeof(struct view));
+        view_create(view, coords, size, name, aquarium->size[0], aquarium->size[1]);
         aquarium->views[aquarium->views_len] = view;
         aquarium->views_len++;
     }
     else {
         aquarium->views = realloc(aquarium->views, (aquarium->views_len+1) * sizeof(struct view *));
+        struct view * view = malloc(sizeof(struct view));
+        view_create(view, coords, size, name, aquarium->size[0], aquarium->size[1]);
         aquarium->views[aquarium->views_len] = view;
         aquarium->views_len++;
     }

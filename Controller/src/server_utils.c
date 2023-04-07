@@ -37,9 +37,9 @@ int load_config(const char *filename, struct config *conf)
     return 0;
 }
 
-int load_initial_aquarium_config(const char *filename){
+int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium){
     FILE *fp;
-    char line[256], key[256], value[256];
+    char line[256], buf1[256], buf2[256];
 
     fp = fopen(filename, "r");
     if (!fp) {
@@ -47,11 +47,33 @@ int load_initial_aquarium_config(const char *filename){
         return -1;
     }
 
+    int size[2] = {0,0};
+    fgets(line, sizeof(line), fp);
+    sscanf(line, "%255s", buf1);
+    size[0] = atoi(strtok(buf1,"x"));
+    size[1] = atoi(strtok(NULL,"x"));
+    aquarium_init(aquarium);
+    aquarium_create(aquarium, size, "oui");
+
     while (fgets(line, sizeof(line), fp)) {
-        if (sscanf(line, "%255s  %255s", key, value) == 2) {
-            printf("%s, %s\n",key,value);
-        }
+        if (sscanf(line, "%255s %255s", buf1, buf2) == 2) {
+            int tokens[4];
+            char * token = strtok(buf2, "x+");
+            int i=0;
+
+            while (token != NULL) {
+                tokens[i] = atoi(token);
+                i++;
+                token = strtok(NULL, "x+");
+            }
+
+            int coords[2] = {tokens[0],tokens[1]};
+            int size[2] = {tokens[2],tokens[3]};
+            add_view(aquarium, coords, size, buf1);
+        }   
     }
+
+    aquarium_print(aquarium);
 
     return 0;
 }

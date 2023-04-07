@@ -9,4 +9,4 @@ struct config {
 
 int load_config(const char *filename, struct config *conf);
 
-int load_initial_aquarium_config(const char *filename);
+int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium);

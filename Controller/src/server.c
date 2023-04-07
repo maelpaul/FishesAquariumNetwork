@@ -15,13 +15,11 @@ int main()
 
     load_config("controller.cfg", &conf);
 
-    load_initial_aquarium_config("aquarium_example.txt");
+    struct aquarium aquarium;
 
-    /* Some tests*/
-    printf("Controller port: %d\n", conf.controller_port);
-    printf("Display timeout value: %d\n", conf.display_timeout_value);
-    printf("Fish update interval: %d\n", conf.fish_update_interval);
+    load_initial_aquarium_config("aquarium_example.txt", &aquarium);
 
+    
     /*
     // server and socket file descriptor
     int server_fd, newsockfd;
