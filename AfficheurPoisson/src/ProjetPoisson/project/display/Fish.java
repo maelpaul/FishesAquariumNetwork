@@ -33,7 +33,7 @@ public class Fish {
     }
 
     public void update(){
-        if (!goalPosition.finished()){
+        /*if (!goalPosition.finished()){
             goalPosition.update();
 
             if (goalPosition.finished()){
@@ -41,7 +41,7 @@ public class Fish {
             } else {
                 renderer.setPosition(goalPosition.goalValue());
             }
-        }
+        }*/
     }
 
     public boolean finishedTravel(){

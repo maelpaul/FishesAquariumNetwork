@@ -6,59 +6,41 @@
 #include <unistd.h>
 #include <strings.h>
 
-void error(char *msg)
-{
-    perror(msg);
-    exit(1);
-}
-
-
 int main(int argc, char *argv[])
 {
-    int sockfd, newsockfd, portno, clilen;
-    char buffer[256];
-    struct sockaddr_in serv_addr, cli_addr;
-    int n;
-
-    // Case where no port is specified
-    if (argc < 2) {
-        fprintf(stderr,"ERROR, no port is provided\n");
-        exit(1);
-    }
-
+    // server and socket file descriptor
+    int server_fd, newsockfd;
+    //TCP port
+    int portno = 12345;
+    struct sockaddr_in serv_addr;
+    int addrlen = sizeof(serv_addr);
     
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
-        error("ERROR opening socket");
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (server_fd < 0) {
+        perror("Erreur lors de l'ouverture de la socket'");
+        exit(EXIT_FAILURE);
     }
 
-    bzero((char *) &serv_addr, sizeof(serv_addr));
-    portno = atoi(argv[1]);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(portno);
-    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-        error("ERROR on binding");
+
+    if (bind(server_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+        perror("Erreur lors de la liaison du socket");
+        exit(EXIT_FAILURE);
     }
 
-    listen(sockfd,5);
-    clilen = sizeof(cli_addr);
-    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-
-    if (newsockfd < 0) {
-        error("ERROR on accept");
+    // Met le socket en écoute sur le port spécifié
+    if (listen(server_fd, 5) < 0) {
+        perror("Erreur lors de la mise en écoute du socket");
+        exit(EXIT_FAILURE);
     }
 
-    bzero(buffer,256);
-    n = read(newsockfd,buffer,255);
-    if (n < 0) {
-        error("ERROR reading from socket");
-    }
-
-    printf("Here is the message: %s\n",buffer);
-    n = write(newsockfd,"I got your message",18);
-    if (n < 0) {
-        error("ERROR writing to socket");
+    // Accepte une connexion entrante
+    if ((newsockfd = accept(server_fd, (struct sockaddr *)&serv_addr, (socklen_t*)&addrlen)) < 0) {
+        perror("Erreur lors de l'acceptation de la connexion entrante");
+        exit(EXIT_FAILURE);
     }
 
     return 0;
