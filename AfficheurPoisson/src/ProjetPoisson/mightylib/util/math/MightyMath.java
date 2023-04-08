@@ -30,6 +30,10 @@ public class MightyMath {
 		return (x - a) / (b - a) * (d - c) + c;
 	}
 
+	public static float mapLog(float x, float a, float b, float c, float d) {
+		return (float)Math.exp(map((float)Math.log(x), (float)Math.log(a), (float)Math.log(b), (float)Math.log(c), (float)Math.log(d)));
+	}
+
 	public static int sum(int[] table){
 		int i = 0;
 		int sum = 0;

@@ -27,6 +27,8 @@ import org.lwjgl.glfw.GLFW;
 import java.io.File;
 import java.util.*;
 
+import ProjetPoisson.mightylib.util.math.MightyMath;
+
 public class MenuScene extends Scene {
     private Text text;
 
@@ -37,6 +39,8 @@ public class MenuScene extends Scene {
     private CommandAnalyser analyser;
 
     private HashMap<Integer, Fish> fishes;
+
+    private final Random rand = new Random();
 
     public void init(String[] args) {
         super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
@@ -88,14 +92,22 @@ public class MenuScene extends Scene {
         }
 
         fishes = new HashMap<>();
+        int numberFish = 1;
+        float size = MightyMath.mapLog(numberFish, 10, 100, 0.2f, 0.1f);
 
-        fishes.put(0, new Fish(mainContext.getWindow().getInfo(), fishesFileName.get(0), new Vector2f(0.2f, 0.2f)));
+        for (int i = 0; i < numberFish; ++i)
+            fishes.put(i, new Fish(mainContext.getWindow().getInfo(), fishesFileName.get(0), new Vector2f(size, size)));
     }
 
     public void update() {
         super.update();
 
         for (Integer key : fishes.keySet()){
+            if (fishes.get(key).finishedTravel()){
+                Vector2f position = new Vector2f(rand.nextFloat(), rand.nextFloat());
+                fishes.get(key).travelToNewPosition(position, 1 + rand.nextFloat() * 3);
+            }
+
             fishes.get(key).update();
         }
 
@@ -121,13 +133,6 @@ public class MenuScene extends Scene {
                 terminal.saveCommand()
                         .clearCommandText();
             }
-        }
-
-        if (fishes.get(0).finishedTravel()){
-            Random rand = new Random();
-
-            fishes.get(0).travelToNewPosition(new Vector2f(rand.nextFloat(), rand.nextFloat()), 5);
-
         }
     }
 

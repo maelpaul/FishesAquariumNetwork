@@ -4,6 +4,8 @@ import ProjetPoisson.mightylib.graphics.renderer.Renderer;
 import ProjetPoisson.mightylib.graphics.renderer.RendererUtils;
 import ProjetPoisson.mightylib.graphics.renderer.Shape;
 import ProjetPoisson.mightylib.util.math.EDirection;
+import ProjetPoisson.mightylib.util.math.EFlip;
+import ProjetPoisson.mightylib.util.math.ERotation;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -13,10 +15,15 @@ public class RectangleRenderer extends Renderer {
     protected final int positionIndex, textureIndex;
     protected Vector4f texturePosition;
 
+    protected EFlip textureFlip;
+    protected ERotation textureRotation;
+
     public RectangleRenderer(String shaderName) {
         super(shaderName, true, true);
 
         reference = EDirection.LeftUp;
+        textureFlip = EFlip.None;
+        textureRotation = ERotation.None;
 
         texturePosition = new Vector4f(0f, 1f, 0f,1f);
 
@@ -26,7 +33,6 @@ public class RectangleRenderer extends Renderer {
         positionIndex = shape.addVboFloat(calculatePosition(), 2, Shape.STATIC_STORE);
         textureIndex = shape.addVboFloat(texturePos(), 2, Shape.STATIC_STORE);
     }
-
 
     private float[] calculatePosition(){
         return RendererUtils.calculatePositionForSquare(new Vector2f(1, 1), this.reference);
@@ -47,12 +53,7 @@ public class RectangleRenderer extends Renderer {
 
 
     private float[] texturePos(){
-        return new float[]{
-                texturePosition.x, texturePosition.w,
-                texturePosition.x, texturePosition.z,
-                texturePosition.y, texturePosition.z,
-                texturePosition.y, texturePosition.w
-        };
+        return RendererUtils.texturePosition(texturePosition, textureFlip, textureRotation);
     }
 
     // Set size with size of pixel
@@ -75,8 +76,42 @@ public class RectangleRenderer extends Renderer {
         return this;
     }
 
-    public void updateShape(){
-        //shape.updateVbo(calculatePosition(), positionIndex);
+    public Vector2f get2DPosition(){
+        return new Vector2f(position.x, position.y);
+    }
+
+
+    public EFlip getTextureFlip() {
+        return textureFlip;
+    }
+
+    public RectangleRenderer setTextureFlip(EFlip textureFlip) {
+        this.textureFlip = textureFlip;
+
+        return updateShapeTexture();
+    }
+
+    public ERotation getTextureRotation() {
+        return textureRotation;
+    }
+
+    public RectangleRenderer setTextureRotation(ERotation textureRotation) {
+        this.textureRotation = textureRotation;
+
+        return updateShapeTexture();
+    }
+
+
+    public RectangleRenderer updateShapeTexture(){
         shape.updateVbo(texturePos(), textureIndex);
+
+        return this;
+    }
+
+
+    public RectangleRenderer updateShapePosition(){
+        shape.updateVbo(calculatePosition(), positionIndex);
+
+        return this;
     }
 }

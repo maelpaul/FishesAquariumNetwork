@@ -42,14 +42,14 @@ public class Vector2fTweening extends Tweening<Vector2f> {
 
     @Override
     public Vector2fTweening initTwoValue(float time, Vector2f beginningValue, Vector2f endValue) {
-        return initRangeValue(time, beginningValue, endValue.sub(beginningValue));
+        return initRangeValue(time, beginningValue, new Vector2f(endValue).sub(beginningValue));
     }
 
     @Override
     public Vector2fTweening initRangeValue(float time, Vector2f beginningValue, Vector2f range) {
         this.beginningValue = new Vector2f(beginningValue);
         this.valuesRange = new Vector2f(range);
-        this.endingValue = beginningValue.add(range);
+        this.endingValue = new Vector2f(beginningValue).add(range);
 
         this.computedValue = new Vector2f(beginningValue);
 
@@ -64,7 +64,7 @@ public class Vector2fTweening extends Tweening<Vector2f> {
 
     @Override
     public Vector2f goalValue() {
-        return endingValue;
+        return new Vector2f(endingValue);
     }
 
 

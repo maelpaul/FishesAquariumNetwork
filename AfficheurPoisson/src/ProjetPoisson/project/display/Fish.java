@@ -5,62 +5,94 @@ import ProjetPoisson.mightylib.main.WindowInfo;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningBehaviour;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningOption;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningType;
+import ProjetPoisson.mightylib.physics.tweenings.type.FloatTweening;
 import ProjetPoisson.mightylib.physics.tweenings.type.Vector2fTweening;
+import ProjetPoisson.mightylib.util.Timer;
+import ProjetPoisson.mightylib.util.math.EDirection;
+import ProjetPoisson.mightylib.util.math.EFlip;
 import org.joml.Vector2f;
+
+import java.util.Random;
 
 public class Fish {
     private final WindowInfo windowInfo;
 
-    ETweeningBehaviour behaviour = ETweeningBehaviour.InOut;
-    ETweeningType type = ETweeningType.Sinusoidal;
-    ETweeningOption option = ETweeningOption.LoopMirrored;
-
-    Vector2f position;
-    Vector2fTweening goalPosition;
-
+    private final Vector2fTweening goalPosition;
+    private final Timer timer;
     private final RectangleRenderer renderer;
+
+    private final FloatTweening swimMovement;
+    private Vector2f swimVector;
+    private final Random random;
 
     public Fish(WindowInfo windowInfo, String textureName, Vector2f sizePercentage){
         this.windowInfo = windowInfo;
 
+        random = new Random();
+
         renderer = new RectangleRenderer("texture2D");
         renderer.switchToTextureMode(textureName);
         renderer.setSizePix(windowInfo.getVirtualSizeCopy().x * sizePercentage.x,
-                                windowInfo.getSizeCopy().y * sizePercentage.y);
+                                windowInfo.getVirtualSizeCopy().y * sizePercentage.y)
+                .setReference(EDirection.None);
+        //renderer.setPosition(new Vector2f(windowInfo.getVirtualSizeCopy().x, windowInfo.getVirtualSizeCopy().y));
 
         goalPosition = new Vector2fTweening();
-        position = null;
+        timer = new Timer();
+
+        swimMovement = new FloatTweening();
+        swimMovement.setTweeningValues(ETweeningType.Sinusoidal, ETweeningBehaviour.InOut)
+                .setTweeningOption(ETweeningOption.LoopMirrored);
+
+        swimVector = new Vector2f(0, 0);
     }
 
     public void update(){
-        if (!goalPosition.finished()){
+        if (!timer.isFinished() && timer.isStarted()){
             goalPosition.update();
+            swimMovement.update();
+            timer.update();
 
             if (goalPosition.finished()){
-                renderer.setPosition(goalPosition.value());
-            } else {
                 renderer.setPosition(goalPosition.goalValue());
+            } else {
+                renderer.setPosition(goalPosition.value().add(new Vector2f(swimVector).mul(swimMovement.value())));
             }
         }
     }
 
     public boolean finishedTravel(){
-        return goalPosition.finished();
+        return timer.isFinished() || !timer.isStarted();
     }
     public void display(){
         renderer.display();
     }
 
     public void travelToNewPosition(Vector2f positionPercentage, float time){
-        Vector2f position = new Vector2f(windowInfo.getSizeCopy().x * positionPercentage.x,
-                windowInfo.getSizeCopy().y * positionPercentage.y);
+        Vector2f position = new Vector2f(
+                windowInfo.getVirtualSizeCopy().x * positionPercentage.x,
+                windowInfo.getVirtualSizeCopy().y * positionPercentage.y);
 
-        if (this.position == null)
-            this.position = position;
-        else
-            goalPosition.initRangeValue(time, this.position, position)
-                    .setTweeningValues(type, behaviour)
-                    .setTweeningOption(option);
+
+        goalPosition.initTwoValue(time, this.renderer.get2DPosition(), position)
+               .setTweeningValues(ETweeningType.Quadratic, ETweeningBehaviour.InOut)
+               .setTweeningOption(ETweeningOption.Direct);
+
+        timer.start(time);
+
+        renderer.setTextureFlip((position.x < this.renderer.get2DPosition().x)? EFlip.None: EFlip.Vertical);
+
+        float numberTime = 1;
+        while(time / numberTime > 1)
+            numberTime ++;
+
+        swimMovement.initTwoValue(time / numberTime, 0f, 1f);
+
+        swimVector = goalPosition.goalValue()
+                .sub(this.renderer.get2DPosition())
+                .normalize()
+                .perpendicular()
+                .mul(random.nextFloat() * 10 + 20);
     }
 
     public void unload(){
