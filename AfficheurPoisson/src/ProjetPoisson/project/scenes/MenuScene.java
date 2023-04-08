@@ -105,8 +105,8 @@ public class MenuScene extends Scene {
         }
 
         fishes = new HashMap<>();
-        int numberFish = 10;
-        float size = MightyMath.mapLog(numberFish, 10, 100, 0.2f, 0.1f);
+        int numberFish = 100;
+        float size = MightyMath.mapLog(numberFish, 10, 100, 0.17f, 0.15f);
 
         for (int i = 0; i < numberFish; ++i)
             fishes.put(i, new Fish(mainContext.getWindow().getInfo(), fishesFileName.get(0), new Vector2f(size, size)));

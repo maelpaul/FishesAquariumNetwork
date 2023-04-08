@@ -11,6 +11,7 @@ import ProjetPoisson.mightylib.util.Timer;
 import ProjetPoisson.mightylib.util.math.EDirection;
 import ProjetPoisson.mightylib.util.math.EFlip;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import java.util.Random;
 
@@ -20,6 +21,8 @@ public class Fish {
     private final Vector2fTweening goalPosition;
     private final Timer timer;
     private final RectangleRenderer renderer;
+
+    private final FloatTweening sizeTweening;
 
     private final FloatTweening swimMovement;
     private Vector2f swimVector;
@@ -35,6 +38,7 @@ public class Fish {
         renderer.setSizePix(windowInfo.getVirtualSizeCopy().x * sizePercentage.x,
                                 windowInfo.getVirtualSizeCopy().y * sizePercentage.y)
                 .setReference(EDirection.None);
+
         //renderer.setPosition(new Vector2f(windowInfo.getVirtualSizeCopy().x, windowInfo.getVirtualSizeCopy().y));
 
         goalPosition = new Vector2fTweening();
@@ -44,13 +48,23 @@ public class Fish {
         swimMovement.setTweeningValues(ETweeningType.Sinusoidal, ETweeningBehaviour.InOut)
                 .setTweeningOption(ETweeningOption.LoopMirrored);
 
+        sizeTweening = new FloatTweening();
+        sizeTweening.setTweeningValues(ETweeningType.Quadratic, ETweeningBehaviour.InOut)
+                .setTweeningOption(ETweeningOption.LoopReversed);
+
+        float diff = 0.90f + random.nextFloat() * 0.05f;
+
+        sizeTweening.initTwoValue(0.4f + random.nextFloat() * 0.4f,
+                renderer.scale().x * diff, renderer.scale().x * (1 / diff));
+        sizeTweening.initRandomTweening();
+
         swimVector = new Vector2f(0, 0);
     }
 
     public void update(){
         if (!timer.isFinished() && timer.isStarted()){
             goalPosition.update();
-            swimMovement.update();
+            //swimMovement.update();
             timer.update();
 
             if (goalPosition.finished()){
@@ -59,6 +73,13 @@ public class Fish {
                 renderer.setPosition(goalPosition.value().add(new Vector2f(swimVector).mul(swimMovement.value())));
             }
         }
+
+        sizeTweening.update();
+        renderer.setScale(
+                new Vector3f(/*renderer.scale().x*/ sizeTweening.value(),
+                             renderer.scale().y /*sizeTweening.value()*/,
+                             renderer.scale().z)
+        );
     }
 
     public boolean finishedTravel(){
@@ -86,7 +107,7 @@ public class Fish {
         while(time / numberTime > 1)
             numberTime ++;
 
-        swimMovement.initTwoValue(time / numberTime, 0f, 1f);
+        swimMovement.initTwoValue(time / (numberTime * 2), 0.0f, 1f);
 
         swimVector = goalPosition.goalValue()
                 .sub(this.renderer.get2DPosition())

@@ -123,7 +123,7 @@ public final class MainLoop {
     public void exit(int status){
         if (status != ListError.LIBRARIES_LOAD_FAIL){
             // Terminate GLFW and free the error callback
-            unloadLibraries();
+            preUnload();
         }
 
         if (sceneManager != null)
@@ -131,6 +131,8 @@ public final class MainLoop {
 
         if (contextManager != null)
             contextManager.unload();
+
+        afterUnload();
 
         if (status != ListError.NO_ERROR){
             System.err.println("Exit with error "  + status);
@@ -159,9 +161,12 @@ public final class MainLoop {
     }
 
 
-    private void unloadLibraries(){
-        glfwTerminate();
+    private void preUnload(){
+        SoundManager.getInstance().unloadSoundSource();
+    }
 
+    private void afterUnload(){
+        glfwTerminate();
         SoundManager.getInstance().unload();
     }
 }
