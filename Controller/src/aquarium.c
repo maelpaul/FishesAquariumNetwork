@@ -18,8 +18,8 @@ void aquarium_init(struct aquarium * aquarium) {
 
 void aquarium_create(struct aquarium * aquarium, int * size, char * name) {
     aquarium->name = name;
-    aquarium->fishes = malloc(10 * sizeof(struct fish *));
-    aquarium->views = malloc(10 * sizeof(struct view *));
+    aquarium->fishes = malloc(DEFAULT_NUMBER_FISH * sizeof(struct fish *));
+    aquarium->views = malloc(DEFAULT_NUMBER_VIEW * sizeof(struct view *));
     aquarium->fishes_len = 0;
     aquarium->views_len = 0;
     for (int i = 0; i < 2; ++i) {
@@ -28,7 +28,7 @@ void aquarium_create(struct aquarium * aquarium, int * size, char * name) {
 }
 
 void add_fish(struct aquarium * aquarium, struct fish * fish) {
-    if (aquarium->fishes_len < 10) {
+    if (aquarium->fishes_len < DEFAULT_NUMBER_FISH) {
         aquarium->fishes[aquarium->fishes_len] = fish;
         aquarium->fishes_len++;
     }
@@ -39,13 +39,17 @@ void add_fish(struct aquarium * aquarium, struct fish * fish) {
     }
 }
 
-void add_view(struct aquarium * aquarium, struct view * view) {
-    if (aquarium->views_len < 10) {
+void add_view(struct aquarium * aquarium, int * coords, int * size, char * name) {
+    if (aquarium->views_len < DEFAULT_NUMBER_VIEW) {
+        struct view * view = malloc(sizeof(struct view));
+        view_create(view, coords, size, name, aquarium->size[0], aquarium->size[1]);
         aquarium->views[aquarium->views_len] = view;
         aquarium->views_len++;
     }
     else {
         aquarium->views = realloc(aquarium->views, (aquarium->views_len+1) * sizeof(struct view *));
+        struct view * view = malloc(sizeof(struct view));
+        view_create(view, coords, size, name, aquarium->size[0], aquarium->size[1]);
         aquarium->views[aquarium->views_len] = view;
         aquarium->views_len++;
     }
@@ -108,7 +112,15 @@ void aquarium_print(struct aquarium * aquarium) {
     printf("nb_views: %d\n", aquarium->views_len);
 }
 
-void RandomWayPoint(struct fish * fish) {
-    fish->dest[0] = rand() % 100;
-    fish->dest[1] = rand() % 100;    
+int get_aquarium_width(struct aquarium * aquarium) {
+    return aquarium->size[0];
+}
+
+int get_aquarium_height(struct aquarium * aquarium) {
+    return aquarium->size[1];
+}
+
+void RandomWayPoint(struct fish * fish, int width, int height) {
+    fish->dest[0] = rand() % width;
+    fish->dest[1] = rand() % height;    
 }

@@ -1,55 +1,39 @@
 package ProjetPoisson.project.threads;
 
+import ProjetPoisson.mightylib.resources.Resources;
+import ProjetPoisson.project.client.ClientTcp;
+import ProjetPoisson.project.client.Configuration;
+import ProjetPoisson.project.client.ServerTcp;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 
-public class CommunicationThread implements Runnable {
-    private volatile boolean running;
-    private String receivedMessage;
-    private String messageToSend;
-    private boolean processedMessage;
-
-    public CommunicationThread() {
-        this.running = true;
-    }
-
+public  abstract class CommunicationThread implements Runnable {
+    protected volatile boolean running;
+    protected String receivedMessage;
+    protected String messageToSend;
     public void run() {
-        System.err.println("hello");
-        while(true){
 
-        }
     }
-
 
     public boolean didReceiveMessage() {
-        return receivedMessage != null;
+        return false;
     }
 
     public String message() {
-        if (receivedMessage != null) {
-            String tempMessage = receivedMessage;
-            receivedMessage = null;
-            return tempMessage;
-        }
         return null;
     }
 
     public void sendMessage(String message) {
-        messageToSend = message;
     }
 
     public boolean didProcessedMessage() {
-        if (processedMessage) {
-            processedMessage = false;
-            return true;
-        }
         return false;
     }
 
     public void doStop() {
-        this.running = false;
     }
 
 

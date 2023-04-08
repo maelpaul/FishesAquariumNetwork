@@ -26,18 +26,19 @@ public class ConfigurationLoader extends ResourceLoader {
     public void create(Map<String, DataType> data) {
         File folder_configs = new File(CONFIG_FOLDER);
         File[] configs = folder_configs.listFiles(file -> file.isFile());
-
         if (configs != null) {
             for (File config : configs) {
                 String fileName = config.getName();
                 String dataName = fileName.substring(0, fileName.lastIndexOf("."));
                 Configuration new_config = new Configuration(dataName, config.getPath());
                 data.put(dataName, new_config);
+                //System.out.println("Added Configuration: " + dataName);
             }
         } else {
             System.err.println("ERROR CREATE");
         }
     }
+
 
     @Override
     public void load(DataType dataType) {
@@ -45,6 +46,9 @@ public class ConfigurationLoader extends ResourceLoader {
             System.err.println("ERROR LOAD");
             return;
         }
+
+        System.out.println("Loading configuration: " + dataType.getDataName());
+
         char symbol = '=';
         BufferedReader reader;
         String[] values = {"","","","",""};

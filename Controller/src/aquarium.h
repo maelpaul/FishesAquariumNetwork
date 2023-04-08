@@ -1,6 +1,9 @@
 #ifndef _AQUARIUM_H_
 #define _AQUARIUM_H_
 
+#define DEFAULT_NUMBER_FISH 10
+#define DEFAULT_NUMBER_VIEW 10
+
 struct aquarium {
     struct fish ** fishes;
     int fishes_len;
@@ -16,7 +19,7 @@ void aquarium_create(struct aquarium * aquarium, int * size, char * name);
 
 void add_fish(struct aquarium * aquarium, struct fish * fish);
 
-void add_view(struct aquarium * aquarium, struct view * view);
+void add_view(struct aquarium * aquarium, int * coords, int * size, char * name);
 
 void del_fish(struct aquarium * aquarium, char * fish_name);
 
@@ -26,6 +29,10 @@ void aquarium_free(struct aquarium * aquarium);
 
 void aquarium_print(struct aquarium * aquarium);
 
-void RandomWayPoint(struct fish * fish);
+int get_aquarium_width(struct aquarium * aquarium);
+
+int get_aquarium_height(struct aquarium * aquarium);
+
+void RandomWayPoint(struct fish * fish, int width, int height);
 
 #endif
