@@ -6,5 +6,6 @@ test_aquarium
 test_parser
 prompt 
 server
+client_bidon
 result.txt
 ../.vscode/

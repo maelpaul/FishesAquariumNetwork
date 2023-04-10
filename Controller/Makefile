@@ -7,7 +7,7 @@ INC_DIR = -I$(SRC_DIR) -I$(TEST_DIR)
 
 all : build test
 
-build : prompt
+build : prompt server client_bidon
 
 test : test_fish test_view test_aquarium
 
