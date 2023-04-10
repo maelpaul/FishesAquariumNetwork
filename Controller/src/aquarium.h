@@ -17,7 +17,11 @@ void aquarium_init(struct aquarium * aquarium);
 
 void aquarium_create(struct aquarium * aquarium, int * size, char * name);
 
-void add_fish(struct aquarium * aquarium, struct fish * fish);
+int fish_name_check(struct aquarium * aquarium, char * fish_name);
+
+int view_name_check(struct aquarium * aquarium, char * view_name);
+
+void add_fish(struct aquarium * aquarium, int * coords, int * size, char * name, void (*path)(struct fish *, int, int));
 
 void add_view(struct aquarium * aquarium, int * coords, int * size, char * name);
 

@@ -27,31 +27,63 @@ void aquarium_create(struct aquarium * aquarium, int * size, char * name) {
     } 
 }
 
-void add_fish(struct aquarium * aquarium, struct fish * fish) {
-    if (aquarium->fishes_len < DEFAULT_NUMBER_FISH) {
-        aquarium->fishes[aquarium->fishes_len] = fish;
-        aquarium->fishes_len++;
+int fish_name_check(struct aquarium * aquarium, char * fish_name) {
+    for (int i = 0; i < aquarium->fishes_len; i++) {
+        if (strcmp(aquarium->fishes[i]->name, fish_name) == 0) {
+            return 1;
+        }
     }
-    else {
-        aquarium->fishes = realloc(aquarium->fishes, (aquarium->fishes_len+1) * sizeof(struct fish *));
-        aquarium->fishes[aquarium->fishes_len] = fish;
-        aquarium->fishes_len++;
+    return 0;
+}
+
+int view_name_check(struct aquarium * aquarium, char * view_name) {
+    for (int i = 0; i < aquarium->views_len; i++) {
+        if (strcmp(aquarium->views[i]->name, view_name) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void add_fish(struct aquarium * aquarium, int * coords, int * size, char * name, void (*path)(struct fish *, int, int)) {
+    int check = fish_name_check(aquarium, name);
+    if (check == 0) {
+        if (aquarium->fishes_len < DEFAULT_NUMBER_FISH) {
+            struct fish * fish = malloc(sizeof(struct fish));
+            fish_init(fish);
+            fish_create(fish, coords, size, name, path, aquarium->size[0], aquarium->size[1]);
+            aquarium->fishes[aquarium->fishes_len] = fish;
+            aquarium->fishes_len++;
+        }
+        else {
+            aquarium->fishes = realloc(aquarium->fishes, (aquarium->fishes_len+1) * sizeof(struct fish *));
+            struct fish * fish = malloc(sizeof(struct fish));
+            fish_init(fish);
+            fish_create(fish, coords, size, name, path, aquarium->size[0], aquarium->size[1]);
+            aquarium->fishes[aquarium->fishes_len] = fish;
+            aquarium->fishes_len++;
+        }
     }
 }
 
 void add_view(struct aquarium * aquarium, int * coords, int * size, char * name) {
-    if (aquarium->views_len < DEFAULT_NUMBER_VIEW) {
-        struct view * view = malloc(sizeof(struct view));
-        view_create(view, coords, size, name, aquarium->size[0], aquarium->size[1]);
-        aquarium->views[aquarium->views_len] = view;
-        aquarium->views_len++;
-    }
-    else {
-        aquarium->views = realloc(aquarium->views, (aquarium->views_len+1) * sizeof(struct view *));
-        struct view * view = malloc(sizeof(struct view));
-        view_create(view, coords, size, name, aquarium->size[0], aquarium->size[1]);
-        aquarium->views[aquarium->views_len] = view;
-        aquarium->views_len++;
+    int check = view_name_check(aquarium, name);
+    if (check == 0) {
+        if (aquarium->views_len < DEFAULT_NUMBER_VIEW) {
+            struct view * view = malloc(sizeof(struct view));
+            view_init(view);
+            view_create(view, coords, size, name, aquarium->size[0], aquarium->size[1]);
+            aquarium->views[aquarium->views_len] = view;
+            aquarium->views_len++;
+        }
+        else {
+            aquarium->views = realloc(aquarium->views, (aquarium->views_len+1) * sizeof(struct view *));
+            struct view * view = malloc(sizeof(struct view));
+            view_init(view);
+            view_create(view, coords, size, name, aquarium->size[0], aquarium->size[1]);
+            aquarium->views[aquarium->views_len] = view;
+            aquarium->views_len++;
+        }
     }
 }
 

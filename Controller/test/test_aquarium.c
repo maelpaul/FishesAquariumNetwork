@@ -13,50 +13,29 @@ int main(){
     aquarium_init(aquarium);
     int size5[2] = {1000,1000};
     aquarium_create(aquarium, size5, "Aquarium");
-    int aquarium_width = get_aquarium_width(aquarium);
-    int aquarium_height = get_aquarium_height(aquarium);
     
     void (*path)(struct fish *, int, int) = &RandomWayPoint;
 
-    struct fish * fish1 = malloc(sizeof(struct fish));
-    fish_init(fish1);
     int size1[2] = {10, 5};
     int coords1[2] = {200, 200};
-    fish_create(fish1, coords1, size1, "Nathan", path, aquarium_width, aquarium_height);
 
-    struct fish * fish2 = malloc(sizeof(struct fish));
-    fish_init(fish2);
     int size2[2] = {10, 5};
     int coords2[2] = {200, 200};
-    fish_create(fish2, coords2, size2, "Victor", path, aquarium_width, aquarium_height);
 
-    struct view * view1 = malloc(sizeof(struct view));
-    view_init(view1);
     int size3[2] = {400,400};
     int coords3[2] = {400,400}; 
-    view_create(view1, size3, coords3, "View1", aquarium_width, aquarium_height);
 
-    struct view * view2 = malloc(sizeof(struct view));
-    view_init(view2);
     int size4[2] = {400,400};
     int coords4[2] = {400,400}; 
-    view_create(view2, size4, coords4, "View2", aquarium_width, aquarium_height);
-
-    add_fish(aquarium, fish1);
-    add_fish(aquarium, fish2);
-    add_view(aquarium, view1);
-    add_view(aquarium, view2);
+    
+    add_fish(aquarium, coords1, size1, "Nathan", path);
+    add_fish(aquarium, coords2, size2, "Victor", path);
+    add_view(aquarium, coords3, size3, "View1");
+    add_view(aquarium, coords4, size4, "View2");
     aquarium_print(aquarium);
     del_fish(aquarium, "Nathan");
     del_view(aquarium, "View2");
     aquarium_print(aquarium);
-
-    // for (int i = 0; i < 15; i++) {
-    //     add_fish(aquarium, fish2);
-    //     add_view(aquarium, view1);
-    // }
-    // aquarium_print(aquarium);
-    
     aquarium_free(aquarium);
 
     return EXIT_SUCCESS; 
