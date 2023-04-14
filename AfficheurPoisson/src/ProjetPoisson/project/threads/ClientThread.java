@@ -10,12 +10,9 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 public class ClientThread extends CommunicationThread {
     protected ClientTcp client;
-    private final CountDownLatch latch;
-    private boolean readyToSend = false;
 
-    public ClientThread(CountDownLatch latch) {
+    public ClientThread() {
         this.running = true;
-        this.latch = latch;
     }
 
     public void ClientSetup() {
@@ -23,7 +20,6 @@ public class ClientThread extends CommunicationThread {
         Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
         client = new ClientTcp(conf_client);
         client.tryCreateConnection();
-        client.connect();
     }
 
 
@@ -33,46 +29,22 @@ public class ClientThread extends CommunicationThread {
 
     public void run() {
         try {
-            latch.await();
-        } catch (InterruptedException e) {
+            Socket socket = new Socket("localhost", 8888);
+            System.out.println("Connected to server");
+
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            out.println("Hello from client");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String response = in.readLine();
+            System.out.println("Received response from server: " + response);
+
+            socket.close();
+            System.out.println("Disconnected from server");
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
-        while (client == null || !client.isConnected()) {
-            try {
-                client.connect();
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("[Debug] Client: Connected.");
-
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        while (running) {
-            String message = client.readMessage();
-            if (message != null) {
-                System.out.println("Client: " + message);
-                running = false;
-            }
-        }
-        doStop();
     }
-
-
-
-
-
-
-    public void setReadyToSend(boolean ready) {
-        this.readyToSend = ready;
-    }
-
 
     public boolean didReceiveMessage() {
         return receivedMessage != null;
