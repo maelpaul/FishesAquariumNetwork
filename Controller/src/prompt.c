@@ -29,7 +29,7 @@ int main()
     char arg3[BUFFER_SIZE];
     char arg4[BUFFER_SIZE];
 
-    printf("enter your command :\n");
+    printf("Enter your command :\n");
     
     while (1) {
         struct command * command = malloc(sizeof(struct command));
@@ -98,7 +98,7 @@ int main()
                 free_command(command);
                 return EXIT_SUCCESS;
             }
-            printf("failure\n");
+            printf("Failure\n");
             free_command(command);
             return EXIT_FAILURE;
         }
@@ -107,7 +107,7 @@ int main()
         //     printf("argv[%d] = %s\n", i, my_argv[i]);
         // }
 
-        if(parse_command(command, my_argv, my_argc)){print_command(command);printf("enter your command :\n");}
+        if(parse_command(command, my_argv, my_argc)){print_command(command);printf("Enter your command :\n");}
     
         free_command(command);
         

@@ -134,7 +134,7 @@ void aquarium_free(struct aquarium * aquarium) {
 void aquarium_print(struct aquarium * aquarium) {
     printf("------------------------------\n");
     printf("aquarium name: %s\n", aquarium->name);
-    printf("aquarium size : (%d,%d)\n",aquarium->size[0],aquarium->size[1]);
+    printf("aquarium size (width, height): (%d,%d)\n",aquarium->size[0],aquarium->size[1]);
     printf("nb_fishes: %d\n", aquarium->fishes_len); 
     printf("nb_views: %d\n", aquarium->views_len);
     for (int i = 0; i < aquarium->fishes_len; i++) {
