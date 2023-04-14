@@ -14,12 +14,10 @@ import java.util.concurrent.CountDownLatch;
 public class ServerThread extends CommunicationThread{
         private ServerTcp server;
         private volatile boolean listening = false;
-        private final CountDownLatch latch;
-        private final CountDownLatch serverLatch;
         private volatile boolean serverConnected = false;
 
-        public ServerThread(CountDownLatch latch, CountDownLatch serverLatch) {
-            this.running = true;this.latch = latch;listening = true;this.serverLatch = serverLatch;
+        public ServerThread() {
+            this.running = true;listening = true;
         }
         public void ServerSetup(){
             System.out.println("[Debug] Setting up the server...");
@@ -31,45 +29,32 @@ public class ServerThread extends CommunicationThread{
             return listening;
         }
     public void run() {
-            serverConnected = true;
-            serverLatch.countDown();
-
-        listening = true;
-        latch.countDown();
-        while (!serverConnected) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("[Debug] Server Connected.");
-
-        while (!server.hasClient()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("OUPS");
-        server.sendMessage("SHEESH!");
-        System.out.println("[Debug] Server: Message sent.");
-
+        Socket socket = null;
         try {
-            TimeUnit.SECONDS.sleep(5);
-        } catch (InterruptedException e) {
+            socket = new Socket("localhost", 8888);
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("Connected to server");
+        while(running && socket != null) {
+            try {
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                out.println("Hello from client");
 
-        while (running) {
-            String message = server.readMessage();
-            if (message != null) {
-                System.out.println("Server: " + message);
-                running = false;
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String response = in.readLine();
+                System.out.println("Received response from server: " + response);
+                socket.close();
+                System.out.println("Disconnected from server");
+                break;
+            }
+            catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
+
 
 
     public boolean didReceiveMessage() {
