@@ -1,5 +1,5 @@
 package ProjetPoisson.project.threads;
-
+import java.util.concurrent.TimeUnit;
 import ProjetPoisson.project.client.ServerTcp;
 import ProjetPoisson.mightylib.resources.Resources;
 import ProjetPoisson.project.client.ClientTcp;
@@ -9,35 +9,70 @@ import ProjetPoisson.project.client.ServerTcp;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.CountDownLatch;
 
 public class ServerThread extends CommunicationThread{
         private ServerTcp server;
-        public ServerThread() {
-            this.running = true;
+        private volatile boolean listening = false;
+        private final CountDownLatch latch;
+        private final CountDownLatch serverLatch;
+        private volatile boolean serverConnected = false;
+
+        public ServerThread(CountDownLatch latch, CountDownLatch serverLatch) {
+            this.running = true;this.latch = latch;listening = true;this.serverLatch = serverLatch;
         }
         public void ServerSetup(){
+            System.out.println("[Debug] Setting up the server...");
             Configuration conf_server = Resources.getInstance().getResource(Configuration.class, "server");
-            ServerTcp server = new ServerTcp(conf_server);
+            server = new ServerTcp(conf_server);
             server.tryCreateConnection();
-            this.server = server;
         }
+        public boolean isListening() {
+            return listening;
+        }
+    public void run() {
+            serverConnected = true;
+            serverLatch.countDown();
 
-        public ServerTcp getServer(){
-            return this.server;
-        }
-        public void run() {
-            while(running){
-                //System.out.println("HAHAHA1");
-                /*
-                server.sendMessage("SERVER SHEEESH");
-                if (didReceiveMessage()){
-                    System.out.println("MESSAGE RECEIVED" + receivedMessage);
-                }
-                 */
+        listening = true;
+        latch.countDown();
+        while (!serverConnected) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+        System.out.println("[Debug] Server Connected.");
 
-        public boolean didReceiveMessage() {
+        while (!server.hasClient()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("OUPS");
+        server.sendMessage("SHEESH!");
+        System.out.println("[Debug] Server: Message sent.");
+
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        while (running) {
+            String message = server.readMessage();
+            if (message != null) {
+                System.out.println("Server: " + message);
+                running = false;
+            }
+        }
+    }
+
+
+    public boolean didReceiveMessage() {
             return receivedMessage != null;
         }
 
@@ -54,9 +89,13 @@ public class ServerThread extends CommunicationThread{
             messageToSend = message;
         }
 
-        public void doStop() {
-            this.running = false;
+    public void doStop() {
+        this.running = false;
+        if (server != null && server.hasClient()) {
+            server.closeConnexion();
         }
-
-
     }
+
+
+
+}

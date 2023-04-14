@@ -8,6 +8,8 @@ import ProjetPoisson.project.client.ServerTcp;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.CountDownLatch;
+
 
 
 public  abstract class CommunicationThread implements Runnable {
@@ -35,6 +37,5 @@ public  abstract class CommunicationThread implements Runnable {
 
     public void doStop() {
     }
-
 
 }

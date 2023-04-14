@@ -1,6 +1,7 @@
 package ProjetPoisson.project.client;
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -15,36 +16,55 @@ public class ClientTcp {
 
     private final static Charset ENCODING = StandardCharsets.UTF_8;
 
-    public void tryCreateConnection(){
+    public void tryCreateConnection() {
         try {
             socket = new Socket(configuration.getAddress(), configuration.getPort());
+            System.out.println("[Debug] Socket created successfully."); // Add this line
         } catch (IOException e) {
             socket = null;
-            System.out.println("Can't create socket with adress : " + configuration.getAddress()
-                + " and port : " + configuration.getPort());
+            System.out.println("Can't create socket with address : " + configuration.getAddress()
+                    + " and port : " + configuration.getPort());
         }
     }
 
-    public void sendMessage(String data){
-        if (socket == null){
-            System.out.println("Can't send message while connection not initialized");
-            return;
-        }
 
-        OutputStream output;
-
+    public void sendMessage(String message) {
         try {
-            output = socket.getOutputStream();
-            output.write(data.getBytes(ENCODING));
-
-            output.close();
+            if (socket != null && socket.isConnected()) {
+                OutputStream os = socket.getOutputStream();
+                byte[] dataBytes = message.getBytes(StandardCharsets.UTF_8);
+                int dataLength = dataBytes.length;
+                os.write(ByteBuffer.allocate(4).putInt(dataLength).array());
+                os.write(dataBytes);
+                os.flush();
+                System.out.println("[Debug] Client sent message: " + message);
+            } else {
+                System.out.println("Unable to send message: Socket is not connected or is closed.");
+            }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
+    private int readMessageLength(InputStream stream) throws IOException {
+        byte[] lengthBytes = new byte[4];
+        int bytesRead = stream.read(lengthBytes);
+        if (bytesRead != 4) {
+            throw new IOException("Unable to read the message length.");
+        }
+        return ByteBuffer.wrap(lengthBytes).getInt();
+    }
 
-    public String readMessage(){
-        if (socket == null){
+
+
+    public boolean isConnected() {
+        return socket != null && socket.isConnected();
+    }
+
+
+
+
+    public String readMessage() {
+        if (socket == null) {
             System.out.println("Can't read message while connection not initialized");
             return null;
         }
@@ -54,20 +74,15 @@ public class ClientTcp {
 
         try {
             stream = socket.getInputStream();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            int messageLength = readMessageLength(stream);
+            byte[] byteMessage = new byte[messageLength];
+            int bytesRead = stream.read(byteMessage, 0, messageLength);
 
-        try {
-            byte[] byteMessage = stream.readAllBytes();
-
-            message = Base64.getEncoder().encodeToString(byteMessage);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            stream.close();
+            if (bytesRead == messageLength) {
+                message = new String(byteMessage, ENCODING);
+            } else {
+                throw new IOException("Unable to read the complete message.");
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -75,18 +90,40 @@ public class ClientTcp {
         return message;
     }
 
-    public void closeConnection(){
-        if (socket == null){
+
+
+    public void connect() {
+        try {
+            //System.out.println(this.configuration);
+            this.socket = new Socket(configuration.getAddress(), configuration.getPort());
+            System.out.println("[Debug] Connection made successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void closeConnection() {
+        if (socket == null) {
             System.out.println("Can't close uncreated connection.");
             return;
         }
 
         try {
+            socket.shutdownInput();
+            socket.shutdownOutput();
             socket.close();
         } catch (IOException e) {
-            socket = null;
-            System.out.println("Error while closing connection\n");
-             e.printStackTrace();
+            if (e instanceof SocketException && e.getMessage().equals("Socket is closed")) {
+                System.out.println("Socket was already closed.");
+                e.printStackTrace();
+            } else {
+                socket = null;
+                System.out.println("Error while closing connection\n");
+                e.printStackTrace();
+            }
         }
     }
+
 }

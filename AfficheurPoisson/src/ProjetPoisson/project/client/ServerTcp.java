@@ -1,10 +1,9 @@
 package ProjetPoisson.project.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -13,7 +12,8 @@ public class ServerTcp {
     private final Configuration configuration;
     private ServerSocket serverSocket;
     private Socket client;
-
+    private BufferedReader in;
+    private BufferedWriter out;
     public ServerTcp(Configuration configuration){
         this.configuration = configuration;
     }
@@ -30,72 +30,80 @@ public class ServerTcp {
         }
     }
 
+    public boolean hasClient() {
+        return client != null;
+    }
 
-    public void acceptConnexion(){
+    public void acceptConnexion() {
         try {
             client = serverSocket.accept();
+            out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream(), StandardCharsets.UTF_8));
+            in = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void sendMessage(String data){
-        if (client == null){
-            System.out.println("Can't send message while connection not initialized");
-            return;
-        }
-
-        OutputStream output;
-
-        try {
-            output = client.getOutputStream();
-            output.write(data.getBytes(ENCODING));
-
-            output.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void waitForConnection() {
+        while (!hasClient()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public String readMessage(){
-        if (client == null){
+    private void writeMessageLength(OutputStream stream, int length) throws IOException {
+        byte[] lengthBytes = ByteBuffer.allocate(4).putInt(length).array();
+        stream.write(lengthBytes);
+    }
+
+    public void sendMessage(String message) {
+        if (client != null && out != null) {
+            try {
+                out.write(message + "\n");
+                out.flush();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    private int readMessageLength(InputStream stream) throws IOException {
+        byte[] lengthBytes = new byte[4];
+        int bytesRead = stream.read(lengthBytes);
+        if (bytesRead != 4) {
+            throw new IOException("Unable to read the message length.");
+        }
+        return ByteBuffer.wrap(lengthBytes).getInt();
+    }
+
+
+    public String readMessage() {
+        if (client == null) {
             System.out.println("Can't read message while connection not initialized");
             return null;
         }
 
-        InputStream stream = null;
         String message = null;
 
         try {
-            stream = client.getInputStream();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            byte[] byteMessage = stream.readAllBytes();
-
-            message = Base64.getEncoder().encodeToString(byteMessage);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            stream.close();
+            message = in.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         return message;
     }
-
-    public void closeConnexion(){
-        if (client == null){
+    public void closeConnexion() {
+        if (client == null) {
             System.out.println("Can't close uncreated connection.");
             return;
         }
 
         try {
+            client.shutdownInput();
+            client.shutdownOutput();
             client.close();
             serverSocket.close();
         } catch (IOException e) {
@@ -104,4 +112,5 @@ public class ServerTcp {
             e.printStackTrace();
         }
     }
+
 }
