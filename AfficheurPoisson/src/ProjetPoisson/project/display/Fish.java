@@ -28,7 +28,7 @@ public class Fish {
     private Vector2f swimVector;
     private final Random random;
 
-    public Fish(WindowInfo windowInfo, String textureName, Vector2f sizePercentage){
+    public Fish(WindowInfo windowInfo, String textureName, Vector2f positionPercentage, Vector2f sizePercentage){
         this.windowInfo = windowInfo;
 
         random = new Random();
@@ -39,7 +39,8 @@ public class Fish {
                                 windowInfo.getVirtualSizeCopy().y * sizePercentage.y)
                 .setReference(EDirection.None);
 
-        //renderer.setPosition(new Vector2f(windowInfo.getVirtualSizeCopy().x, windowInfo.getVirtualSizeCopy().y));
+        renderer.setPosition(new Vector2f(windowInfo.getVirtualSizeCopy().x * positionPercentage.x,
+                        windowInfo.getVirtualSizeCopy().y * positionPercentage.y));
 
         goalPosition = new Vector2fTweening();
         timer = new Timer();

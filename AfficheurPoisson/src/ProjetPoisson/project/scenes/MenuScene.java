@@ -24,6 +24,7 @@ import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.display.Fish;
+import ProjetPoisson.project.display.FishManager;
 import ProjetPoisson.project.threads.CommunicationThread;
 import ProjetPoisson.project.threads.ServerThread;
 import ProjetPoisson.project.threads.ClientThread;
@@ -47,9 +48,7 @@ public class MenuScene extends Scene {
 
     private CommandAnalyser analyser;
 
-    private HashMap<Integer, Fish> fishes;
-
-    private final Random rand = new Random();
+    private FishManager fishManager;
     private Texture displacementMap;
     private FloatTweening displacementMapTweening;
 
@@ -86,9 +85,6 @@ public class MenuScene extends Scene {
             e.printStackTrace();
         }
 
-
-
-
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);
 
@@ -111,25 +107,15 @@ public class MenuScene extends Scene {
 
         terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.y * 0.5f,windowSize.y * 0.5f));
         Configuration conf = Resources.getInstance().getResource(Configuration.class, "affichage");
-
-        analyser = new CommandAnalyser();
-
         Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
 
-        ArrayList<String> fishesFileName = new ArrayList<>();
-        File folderFish = new File(configuration.getPathForFishesResources());
-        for (String childPath : Objects.requireNonNull(folderFish.list())) {
-            String fileName = childPath.substring(childPath.lastIndexOf("/") + 1, childPath.lastIndexOf("."));
-            Resources.getInstance().createAndInit(Texture.class, fileName, configuration.getPathForFishesResources() + "/" + childPath);
-            fishesFileName.add(fileName);
-        }
-
-        fishes = new HashMap<>();
+        fishManager = new FishManager(mainContext.getWindow().getInfo(), configuration);
         int numberFish = 100;
         float size = MightyMath.mapLog(numberFish, 10, 100, 0.17f, 0.15f);
 
         for (int i = 0; i < numberFish; ++i)
-            fishes.put(i, new Fish(mainContext.getWindow().getInfo(), fishesFileName.get(0), new Vector2f(size, size)));
+            fishManager.addFishes("Fish" + i, new Vector2f(0.5f, 0.5f), new Vector2f(size, size));
+
 
         displacementMap = Resources.getInstance().getResource(Texture.class, "displacementMap");
         ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("displacementMap", 1);
@@ -138,19 +124,15 @@ public class MenuScene extends Scene {
         displacementMapTweening.setTweeningValues(ETweeningType.Linear, ETweeningBehaviour.InOut)
                 .setTweeningOption(ETweeningOption.LoopReversed)
                 .initTwoValue(15f, 0f, 15f);
+
+
+        analyser = new CommandAnalyser(fishManager);
     }
 
     public void update() {
         super.update();
 
-        for (Integer key : fishes.keySet()){
-            if (fishes.get(key).finishedTravel()){
-                Vector2f position = new Vector2f(rand.nextFloat(), rand.nextFloat());
-                fishes.get(key).travelToNewPosition(position, 1 + rand.nextFloat() * 3);
-            }
-
-            fishes.get(key).update();
-        }
+        fishManager.update();
 
         KeyboardManager manager = mainContext.getKeyboardManager();
 
@@ -191,9 +173,7 @@ public class MenuScene extends Scene {
 
         text.display();
 
-        for (Integer key : fishes.keySet()){
-            fishes.get(key).display();
-        }
+        fishManager.display();
 
         terminal.display();
 
@@ -211,8 +191,6 @@ public class MenuScene extends Scene {
 
         displacementMap.unload();
 
-        for (Integer key : fishes.keySet()){
-            fishes.get(key).unload();
-        }
+        fishManager.unload();
     }
 }

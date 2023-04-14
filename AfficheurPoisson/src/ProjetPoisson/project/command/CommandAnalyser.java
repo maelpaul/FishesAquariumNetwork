@@ -1,26 +1,30 @@
 package ProjetPoisson.project.command;
 
 import ProjetPoisson.project.command.commands.*;
+import ProjetPoisson.project.display.Fish;
+import ProjetPoisson.project.display.FishManager;
 
 import java.util.HashMap;
 
 public class CommandAnalyser {
-    private static final int EMPTY_COMMAND = 0;
-    private static final int NO_OPTIONAL_ARGUMENT = 1;
+    public static final int EMPTY_COMMAND = 0;
+    public static final int NO_OPTIONAL_ARGUMENT = 1;
 
-    private static final int COMMAND_TYPE_ARGUMENT = 0;
-    private static final int FIRST_OPTIONAL_ARGUMENT = 1;
+    public static final int COMMAND_TYPE_ARGUMENT = 0;
+    public static final int FIRST_OPTIONAL_ARGUMENT = 1;
 
     HashMap<String, ICommand> relations;
 
-    public CommandAnalyser() {
+    public CommandAnalyser(FishManager manager) {
         relations = new HashMap<>();
         relations.put("help", new HelpCommand());
         relations.put("clear", new ClearCommand());
-        relations.put("addFish", new AddFishCommand());
+        relations.put("addFish", new AddFishCommand(manager));
         relations.put("delFish", new DelFishCommand());
         relations.put("startFish", new StartFishCommand());
         relations.put("status", new StatusCommand());
+
+        // get fish, ls (commande système (pas utilisateur))
     }
 
     public String analyseCommand(String command){
