@@ -17,9 +17,12 @@ int main()
 
     load_config("controller.cfg", &conf);
 
-    struct aquarium aquarium;
-    load_initial_aquarium_config("aquarium_example.txt", &aquarium);
-
+    struct aquarium * aquarium = malloc(sizeof(struct aquarium));
+    aquarium_init(aquarium);
+    load_initial_aquarium_config("aquarium_example.txt", aquarium);
+    aquarium_print(aquarium);
+    aquarium_free(aquarium);
+    
     // server and socket file descriptor
     int server_fd, newsockfd;
     int portno = conf.controller_port;
