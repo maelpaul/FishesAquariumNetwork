@@ -1,5 +1,6 @@
 #include "aquarium.h"
 #include "view.h"
+#include "fish.h"
 
 struct config {
     int controller_port;
