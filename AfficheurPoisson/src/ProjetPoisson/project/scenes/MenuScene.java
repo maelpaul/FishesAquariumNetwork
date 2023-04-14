@@ -1,4 +1,5 @@
 package ProjetPoisson.project.scenes;
+import java.util.concurrent.CountDownLatch;
 
 import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
 import ProjetPoisson.mightylib.graphics.shader.ShaderManager;
@@ -59,15 +60,34 @@ public class MenuScene extends Scene {
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
         /// SCENE INFORMATION ///
-        ServerThread serverThreadTemplate = new ServerThread();
+        CountDownLatch latch = new CountDownLatch(1);
+        CountDownLatch serverLatch = new CountDownLatch(1);
+        ServerThread serverThreadTemplate = new ServerThread(latch,serverLatch);
         serverThreadTemplate.ServerSetup();
         Thread serverThread = new Thread(serverThreadTemplate);
         serverThread.start();
 
-        ClientThread clientThreadTemplate = new ClientThread();
+        while (!serverThreadTemplate.isListening()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        ClientThread clientThreadTemplate = new ClientThread(latch);
         clientThreadTemplate.ClientSetup();
         Thread clientThread = new Thread(clientThreadTemplate);
         clientThread.start();
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);
