@@ -31,13 +31,11 @@ public class ServerThread extends CommunicationThread{
             return listening;
         }
     public void run() {
-            server.acceptConnexion();
             serverConnected = true;
             serverLatch.countDown();
 
         listening = true;
         latch.countDown();
-        System.out.println("[Debug] EIUHIUEHIUFHZIUFHIEZ");
         while (!serverConnected) {
             try {
                 Thread.sleep(100);
@@ -54,7 +52,7 @@ public class ServerThread extends CommunicationThread{
                 e.printStackTrace();
             }
         }
-
+        System.out.println("OUPS");
         server.sendMessage("SHEESH!");
         System.out.println("[Debug] Server: Message sent.");
 
