@@ -52,7 +52,6 @@ int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium
     sscanf(line, "%255s", buf1);
     size[0] = atoi(strtok(buf1,"x"));
     size[1] = atoi(strtok(NULL,"x"));
-    aquarium_init(aquarium);
     aquarium_create(aquarium, size, "oui");
 
     while (fgets(line, sizeof(line), fp)) {
@@ -66,12 +65,13 @@ int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium
                 i++;
                 token = strtok(NULL, "x+");
             }
-
             int coords[2] = {tokens[0],tokens[1]};
             int size[2] = {tokens[2],tokens[3]};
             add_view(aquarium, coords, size, buf1);
         }   
     }
 
+    fclose(fp);
+    
     return 0;
 }

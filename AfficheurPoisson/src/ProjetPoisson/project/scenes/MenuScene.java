@@ -22,8 +22,7 @@ import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.client.ServerTcp;
 import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.command.CommandAnalyser;
-import ProjetPoisson.project.command.Terminal;
-import ProjetPoisson.project.display.Fish;
+import ProjetPoisson.project.command.Terminal;  
 import ProjetPoisson.project.display.FishManager;
 import ProjetPoisson.project.threads.CommunicationThread;
 import ProjetPoisson.project.threads.ServerThread;
@@ -59,31 +58,10 @@ public class MenuScene extends Scene {
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
         /// SCENE INFORMATION ///
-        CountDownLatch latch = new CountDownLatch(1);
-        CountDownLatch serverLatch = new CountDownLatch(1);
-        ServerThread serverThreadTemplate = new ServerThread(latch,serverLatch);
-        serverThreadTemplate.ServerSetup();
-        Thread serverThread = new Thread(serverThreadTemplate);
+        ServerThread serverThread = new ServerThread();
         serverThread.start();
-
-        while (!serverThreadTemplate.isListening()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        ClientThread clientThreadTemplate = new ClientThread(latch);
-        clientThreadTemplate.ClientSetup();
-        Thread clientThread = new Thread(clientThreadTemplate);
+        ClientThread clientThread = new ClientThread();
         clientThread.start();
-
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);

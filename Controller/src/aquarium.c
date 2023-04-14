@@ -90,6 +90,7 @@ void add_view(struct aquarium * aquarium, int * coords, int * size, char * name)
 void del_fish(struct aquarium * aquarium, char * fish_name) {
     for (int i = 0; i < aquarium->fishes_len; i++) {
         if (strcmp(aquarium->fishes[i]->name, fish_name) == 0) {
+            free(aquarium->fishes[i]->name);
             free(aquarium->fishes[i]);
             aquarium->fishes[i] = NULL;
             for (int j = i; j < aquarium->fishes_len-1; j++) {
@@ -104,6 +105,7 @@ void del_fish(struct aquarium * aquarium, char * fish_name) {
 void del_view(struct aquarium * aquarium, char * view_name) {
     for (int i = 0; i < aquarium->views_len; i++) {
         if (strcmp(aquarium->views[i]->name, view_name) == 0) {
+            free(aquarium->views[i]->name);
             free(aquarium->views[i]);
             aquarium->views[i] = NULL;
             for (int j = i; j < aquarium->views_len-1; j++) {
@@ -117,9 +119,11 @@ void del_view(struct aquarium * aquarium, char * view_name) {
 
 void aquarium_free(struct aquarium * aquarium) {
     for (int i = 0; i < aquarium->fishes_len; i++) {
+        free(aquarium->fishes[i]->name);
         free(aquarium->fishes[i]);
     }
     for (int i = 0; i < aquarium->views_len; i++) {
+        free(aquarium->views[i]->name);
         free(aquarium->views[i]);
     }
     free(aquarium->fishes);
@@ -128,7 +132,11 @@ void aquarium_free(struct aquarium * aquarium) {
 }
 
 void aquarium_print(struct aquarium * aquarium) {
-    printf("name: %s\n", aquarium->name);
+    printf("------------------------------\n");
+    printf("aquarium name: %s\n", aquarium->name);
+    printf("aquarium size (width, height): (%d,%d)\n",aquarium->size[0],aquarium->size[1]);
+    printf("nb_fishes: %d\n", aquarium->fishes_len); 
+    printf("nb_views: %d\n", aquarium->views_len);
     for (int i = 0; i < aquarium->fishes_len; i++) {
         printf("fish %d:\n", i);
         fish_print(aquarium->fishes[i]);
@@ -137,11 +145,7 @@ void aquarium_print(struct aquarium * aquarium) {
         printf("view %d:\n", i);
         view_print(aquarium->views[i]);
     }
-    for (int i = 0; i < 2; ++i) {
-        printf("size[%d]: %d\n", i, aquarium->size[i]);
-    }
-    printf("nb_fishes: %d\n", aquarium->fishes_len); 
-    printf("nb_views: %d\n", aquarium->views_len);
+    printf("------------------------------\n");
 }
 
 int get_aquarium_width(struct aquarium * aquarium) {

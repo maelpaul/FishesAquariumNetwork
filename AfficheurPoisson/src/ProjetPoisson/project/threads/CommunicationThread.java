@@ -12,7 +12,7 @@ import java.util.concurrent.CountDownLatch;
 
 
 
-public  abstract class CommunicationThread implements Runnable {
+public  abstract class CommunicationThread extends Thread {
     protected volatile boolean running;
     protected String receivedMessage;
     protected String messageToSend;

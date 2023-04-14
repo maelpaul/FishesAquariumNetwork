@@ -17,9 +17,12 @@ int main()
 
     load_config("controller.cfg", &conf);
 
-    struct aquarium aquarium;
-    load_initial_aquarium_config("aquarium_example.txt", &aquarium);
-
+    struct aquarium * aquarium = malloc(sizeof(struct aquarium));
+    aquarium_init(aquarium);
+    load_initial_aquarium_config("aquarium_example.txt", aquarium);
+    aquarium_print(aquarium);
+    aquarium_free(aquarium);
+    
     // server and socket file descriptor
     int server_fd, newsockfd;
     int portno = conf.controller_port;
@@ -70,6 +73,71 @@ int main()
         }
 
         printf("Message du client : %s\n", buffer);
+
+        // Initialisation et authentification
+        if (!strcmp(buffer, "hello\n")) {
+            // Parcrourir les vues disponibles et attribuer une vue libre, sinon erreur
+        }
+
+        // Demande périodique des poissons
+        char * ask_periodic_verif;
+        strncpy (ask_periodic_verif , buffer, 10);
+        ask_periodic_verif[9] = '\0';   /* null character manually added */
+
+        if (!strcmp(ask_periodic_verif, "getFishes")) {
+            // char fish_list[1024] = "list ";
+            // for (int i = 0; i < aquarium->fishes_len; i++) {
+            //     char fish_info[128];
+            //     sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->size[0]);
+            //     strcat(fish_list, fish_info);
+            // }
+            // strcat(fish_list, "\n");
+            char fish_list[1024] = "list ";
+            if (send(newsockfd, fish_list, strlen(fish_list), 0) < 0) {
+                perror("Erreur lors de l'envoi de la liste des poissons au client");
+                exit(EXIT_FAILURE);
+            }
+
+        }
+
+        // Demande continue de Poisson
+        char * ask_continuous_verif;
+        char * ls;
+        strncpy (ask_continuous_verif , buffer, 21);
+        strncpy (ls , buffer, 2);
+        ask_continuous_verif[21] = '\0';   /* null character manually added */
+        ls[2] = '\0';
+
+        if (!strcmp(ask_continuous_verif, "getFishesContinuously") || !strcmp(ls, "ls")) {
+            // Lister les poissons en continue
+        }
+
+        // Ajout d'un poisson
+        char * add_verif;
+        strncpy (add_verif, buffer, 7);
+        add_verif[7] = '\0';   /* null character manually added */
+
+        if (!strcmp(add_verif, "addFish")) {
+            // Ajouter un poisson
+        }
+
+        // Suppression d'un poisson
+        char * del_verif;
+        strncpy (del_verif, buffer, 7);
+        del_verif[7] = '\0';   /* null character manually added */
+
+        if (!strcmp(del_verif, "delFish")) {
+            // Suppression un poisson
+        }
+
+        // Démarrage d'un poisson
+        char * start_verif;
+        strncpy (start_verif, buffer, 9);
+        start_verif[9] = '\0';   /* null character manually added */
+
+        if (!strcmp(start_verif, "startFish")) {
+            // Démarrage d'un poisson
+        }
 
     } while(strcmp(buffer, "log out\n") != 0);
 
