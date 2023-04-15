@@ -10,8 +10,13 @@ import java.io.File;
 import java.util.*;
 
 public class FishManager {
-    public static final int ADD_SUCCESSFULLY = 0;
-    public static final int ADD_ERROR_NAME_EXISTING = 1;
+    public enum EResult {
+        AddSuccessfully,
+        AddErrorNameExisting,
+
+        DeleteSuccessfully,
+        DeleteErrorNameNotExisting
+    }
 
     private final HashMap<String, Fish> fishes;
     private final ArrayList<String> movementType;
@@ -35,16 +40,26 @@ public class FishManager {
         }
     }
 
-    public int addFishes(String name, Vector2f positionPercentage, Vector2f sizePourcentage){
+    public EResult addFish(String name, Vector2f positionPercentage, Vector2f sizePourcentage, String behaviour){
         if (fishes.containsKey(name))
-            return ADD_ERROR_NAME_EXISTING;
+            return EResult.AddErrorNameExisting;
 
         fishes.put(
                 name,
                 new Fish(info,  fishesFileName.get(0), positionPercentage, sizePourcentage)
         );
 
-        return ADD_SUCCESSFULLY;
+        return EResult.AddSuccessfully;
+    }
+
+    public EResult delFish(String name){
+        if (!fishes.containsKey(name))
+            return EResult.DeleteErrorNameNotExisting;
+
+        fishes.get(name).unload();
+        fishes.remove(name);
+
+        return EResult.DeleteSuccessfully;
     }
 
     public String collectionToStr(String delimiter, int namePerLine, String lineDelimiter, Collection<String> c){
@@ -105,5 +120,10 @@ public class FishManager {
         }
 
         fishes.clear();
+    }
+
+    @Override
+    public String toString(){
+        return "";
     }
 }

@@ -1,5 +1,4 @@
 package ProjetPoisson.project.scenes;
-import java.util.concurrent.CountDownLatch;
 
 import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
 import ProjetPoisson.mightylib.graphics.shader.ShaderManager;
@@ -19,12 +18,9 @@ import ProjetPoisson.mightylib.scene.Scene;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
 import ProjetPoisson.project.client.Configuration;
-import ProjetPoisson.project.client.ServerTcp;
-import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;  
 import ProjetPoisson.project.display.FishManager;
-import ProjetPoisson.project.threads.CommunicationThread;
 import ProjetPoisson.project.threads.ServerThread;
 import ProjetPoisson.project.threads.ClientThread;
 import org.joml.Vector2f;
@@ -32,9 +28,6 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-
-import java.io.File;
-import java.util.*;
 
 import ProjetPoisson.mightylib.util.math.MightyMath;
 
@@ -83,17 +76,16 @@ public class MenuScene extends Scene {
                 .setColor(new Color4f(1, 1, 1, 1))
                 .setFontSize(40);
 
-        terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.y * 0.5f,windowSize.y * 0.5f));
+        terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.x * 0.5f,windowSize.y * 0.5f));
         Configuration conf = Resources.getInstance().getResource(Configuration.class, "affichage");
         Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
 
         fishManager = new FishManager(mainContext.getWindow().getInfo(), configuration);
-        int numberFish = 100;
+        int numberFish = 5;
         float size = MightyMath.mapLog(numberFish, 10, 100, 0.17f, 0.15f);
 
         for (int i = 0; i < numberFish; ++i)
-            fishManager.addFishes("Fish" + i, new Vector2f(0.5f, 0.5f), new Vector2f(size, size));
-
+            fishManager.addFish("Fish" + i, new Vector2f(0.5f, 0.5f), new Vector2f(size, size), "");
 
         displacementMap = Resources.getInstance().getResource(Texture.class, "displacementMap");
         ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("displacementMap", 1);

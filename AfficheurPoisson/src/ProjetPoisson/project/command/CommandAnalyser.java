@@ -15,12 +15,12 @@ public class CommandAnalyser {
 
     HashMap<String, ICommand> relations;
 
-    public CommandAnalyser(FishManager manager) {
+    public CommandAnalyser(FishManager fishManager) {
         relations = new HashMap<>();
         relations.put("help", new HelpCommand());
         relations.put("clear", new ClearCommand());
-        relations.put("addFish", new AddFishCommand(manager));
-        relations.put("delFish", new DelFishCommand());
+        relations.put("addFish", new AddFishCommand(fishManager));
+        relations.put("delFish", new DelFishCommand(fishManager));
         relations.put("startFish", new StartFishCommand());
         relations.put("status", new StatusCommand());
 
@@ -39,7 +39,7 @@ public class CommandAnalyser {
         if (args.length == NO_OPTIONAL_ARGUMENT)
             return relations.get(args[COMMAND_TYPE_ARGUMENT]).process(args);
 
-        if (args[FIRST_OPTIONAL_ARGUMENT].equals("help"))
+        if (args[FIRST_OPTIONAL_ARGUMENT].equals("help") || args[FIRST_OPTIONAL_ARGUMENT].equals("-h"))
             return relations.get(args[COMMAND_TYPE_ARGUMENT]).returnHelp();
 
         return relations.get(args[COMMAND_TYPE_ARGUMENT]).process(args);
