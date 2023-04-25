@@ -149,6 +149,14 @@ int main()
 
         if (!strcmp(del_verif, "delFish")) {
             // Suppression un poisson
+            char * info;
+            memcpy(info, buffer, 256);
+            char delim[] = " ";
+
+            char * verif = strtok(info, delim);
+            char * fish = strtok(NULL, delim);
+
+            controller_del_fish(aquarium, fish);
         }
 
         // Démarrage d'un poisson

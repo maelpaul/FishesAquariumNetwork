@@ -81,7 +81,10 @@ int controller_add_fish(struct aquarium *aquarium, int * coords, int * size, cha
     return 1;
 }
 
-int controller_del_fish(struct aquarium *aquarium, char *fish){}
+int controller_del_fish(struct aquarium *aquarium, char *fish){
+    del_fish(aquarium, fish);
+    return 1;
+}
 
 char * client_connection(struct aquarium *aquarium, char* view_name){
     if(view_name == NULL || view_name_check(aquarium, view_name)){
