@@ -22,7 +22,7 @@ int main(){
     fish_create(fish, coords, size, "Nathan", path, 1000, 1000);
     fish_print(fish);
 
-    free(fish);
+    fish_free(fish);
 
     return EXIT_SUCCESS;
 }

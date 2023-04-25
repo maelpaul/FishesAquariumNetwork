@@ -119,12 +119,10 @@ void del_view(struct aquarium * aquarium, char * view_name) {
 
 void aquarium_free(struct aquarium * aquarium) {
     for (int i = 0; i < aquarium->fishes_len; i++) {
-        free(aquarium->fishes[i]->name);
-        free(aquarium->fishes[i]);
+        fish_free(aquarium->fishes[i]);
     }
     for (int i = 0; i < aquarium->views_len; i++) {
-        free(aquarium->views[i]->name);
-        free(aquarium->views[i]);
+        view_free(aquarium->views[i]);
     }
     free(aquarium->fishes);
     free(aquarium->views);
