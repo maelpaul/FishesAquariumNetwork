@@ -77,13 +77,13 @@ int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium
 }
 
 int controller_add_fish(struct aquarium *aquarium, int * coords, int * size, char * name, void (*path)(struct fish *, int, int)){
-    add_fish(aquarium, coords, size, name, path);
-    return 1;
+    int val = add_fish(aquarium, coords, size, name, path);
+    return val;
 }
 
 int controller_del_fish(struct aquarium *aquarium, char *fish){
-    del_fish(aquarium, fish);
-    return 1;
+    int val = del_fish(aquarium, fish);
+    return val;
 }
 
 char * client_connection(struct aquarium *aquarium, char* view_name){
@@ -103,6 +103,8 @@ char * client_connection(struct aquarium *aquarium, char* view_name){
             }
         }
     }
+    char * ok = "ok";
+    return ok;
 }
 
 char * find_and_attibute_free_view(struct aquarium *aquarium, char* view_name){
@@ -112,9 +114,10 @@ char * find_and_attibute_free_view(struct aquarium *aquarium, char* view_name){
             return aquarium->views[i]->name;                
         }
     }
+    (void) view_name;
     return NULL;
 }
 
 void ping(){}
 
-char * get_fish(struct aquarium *aquarium, char * view_name){}
+char * get_fish(struct aquarium *aquarium, char * fish_name){(void) aquarium; (void) fish_name; char * ok = "ok"; return ok;}

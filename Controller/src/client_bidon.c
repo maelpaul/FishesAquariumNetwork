@@ -44,8 +44,11 @@ int main() {
 
     printf("Message du serveur : %s\n", buffer);
 
+    int val = 1;
+
     do{
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+            val = strcmp(buffer, "log out\n");
             n = write(client_fd, buffer, strlen(buffer));
             if (n < 0) {
                 perror("Erreur lors de l'écriture sur la socket");
@@ -56,16 +59,15 @@ int main() {
             exit(EXIT_FAILURE);
         }
 
-    } while((strcmp(buffer, "log out\n") != 0));
+        memset(buffer, 0, sizeof(buffer));
+        if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
+            perror("Erreur lors de la réception de la réponse du serveur");
+            exit(EXIT_FAILURE);
+        }
 
+        printf("Message du serveur : %s\n", buffer);
 
-    memset(buffer, 0, sizeof(buffer));
-    if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
-        perror("Erreur lors de la réception de la réponse du serveur");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Message du serveur : %s\n", buffer);
+    } while (val != 0);
 
     // Fermeture de la connexion avec le serveur
     close(client_fd);

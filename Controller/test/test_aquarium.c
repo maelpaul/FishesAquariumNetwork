@@ -28,12 +28,12 @@ int main(){
     int size4[2] = {400,400};
     int coords4[2] = {400,400}; 
     
-    add_fish(aquarium, coords1, size1, "Nathan", path);
-    add_fish(aquarium, coords2, size2, "Victor", path);
+    assert(add_fish(aquarium, coords1, size1, "Nathan", path) == 1);
+    assert(add_fish(aquarium, coords2, size2, "Victor", path) == 1);
     add_view(aquarium, coords3, size3, "View1");
     add_view(aquarium, coords4, size4, "View2");
     aquarium_print(aquarium);
-    del_fish(aquarium, "Nathan");
+    assert(del_fish(aquarium, "Nathan") == 1);
     del_view(aquarium, "View2");
     aquarium_print(aquarium);
     aquarium_free(aquarium);

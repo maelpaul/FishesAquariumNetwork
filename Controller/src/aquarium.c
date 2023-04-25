@@ -45,7 +45,8 @@ int view_name_check(struct aquarium * aquarium, char * view_name) {
     return 0;
 }
 
-void add_fish(struct aquarium * aquarium, int * coords, int * size, char * name, void (*path)(struct fish *, int, int)) {
+int add_fish(struct aquarium * aquarium, int * coords, int * size, char * name, void (*path)(struct fish *, int, int)) {
+    int val = aquarium->fishes_len;
     int check = fish_name_check(aquarium, name);
     if (check == 0) {
         if (aquarium->fishes_len < DEFAULT_NUMBER_FISH) {
@@ -64,6 +65,7 @@ void add_fish(struct aquarium * aquarium, int * coords, int * size, char * name,
             aquarium->fishes_len++;
         }
     }
+    return aquarium->fishes_len - val;
 }
 
 void add_view(struct aquarium * aquarium, int * coords, int * size, char * name) {
@@ -87,7 +89,8 @@ void add_view(struct aquarium * aquarium, int * coords, int * size, char * name)
     }
 }
 
-void del_fish(struct aquarium * aquarium, char * fish_name) {
+int del_fish(struct aquarium * aquarium, char * fish_name) {
+    int val = aquarium->fishes_len;
     for (int i = 0; i < aquarium->fishes_len; i++) {
         if (strcmp(aquarium->fishes[i]->name, fish_name) == 0) {
             fish_free(aquarium->fishes[i]);
@@ -99,6 +102,7 @@ void del_fish(struct aquarium * aquarium, char * fish_name) {
             aquarium->fishes_len--;
         }
     }
+    return val - aquarium->fishes_len;
 }
 
 void del_view(struct aquarium * aquarium, char * view_name) {
