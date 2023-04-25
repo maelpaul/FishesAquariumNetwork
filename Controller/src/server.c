@@ -120,7 +120,26 @@ int main()
         add_verif[7] = '\0';   /* null character manually added */
 
         if (!strcmp(add_verif, "addFish")) {
-            // Ajouter un poisson
+            char * info;
+            memcpy(info, buffer, 256);
+            char delim[] = " ";
+
+            /* Cut the buffer to separate the contents.*/
+	        char * verif = strtok(info, delim);
+            char * name = strtok(NULL, delim);
+            char * at = strtok(NULL, delim);
+            char * numbers = strtok(NULL, delim);
+            char * path = strtok(NULL, delim);
+
+            int * coords = atoi(strtok(numbers, ","));
+            int * size = atoi(strtok(NULL, ","));
+            
+            if (!strcmp(path, "RandomWayPoint")) {
+                void (*new_path)(struct fish *, int, int) = &RandomWayPoint;
+                controller_add_fish(aquarium, coords, size, name, new_path);
+            }
+
+	        
         }
 
         // Suppression d'un poisson
@@ -140,6 +159,8 @@ int main()
         if (!strcmp(start_verif, "startFish")) {
             // Démarrage d'un poisson
         }
+
+        // ping
 
     } while(strcmp(buffer, "log out\n") != 0);
 
