@@ -19,6 +19,8 @@ int main(){
     
     assert(view->name == NULL);
 
+    assert(is_view_free(view) == 1);
+
     view_print(view);
 
     int size2[2] = {400,400};
@@ -27,9 +29,17 @@ int main(){
 
     assert(view->name != NULL);
 
+    assert(is_view_free(view) == 1);
+
     view_print(view);
 
-    free(view);
+    change_view_status(view);
+
+    assert(is_view_free(view) == 0);
+
+    view_print(view);
+
+    view_free(view);
 
     return EXIT_SUCCESS;
 }
