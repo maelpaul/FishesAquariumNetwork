@@ -11,3 +11,14 @@ struct config {
 int load_config(const char *filename, struct config *conf);
 
 int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium);
+
+int controller_add_fish(struct aquarium *aquarium, struct fish *fish);
+
+int controller_del_fish(struct aquarium *aquarium, char *fish);
+
+int client_connection(struct aquarium *aquarium, char* view_name);
+
+void ping();
+
+char * get_fish(struct aquarium *aquarium, char * view_name);
+
