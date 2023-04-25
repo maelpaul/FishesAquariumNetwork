@@ -25,6 +25,11 @@ void fish_create(struct fish * fish, int * coords, int * size, char * name, void
     } 
 }
 
+void fish_free(struct fish * fish) {
+    free(fish->name);
+    free(fish);
+}
+
 void fish_print(struct fish * fish) {
     printf("============ Fish ============\n");
     printf("fish name   : %s\n", fish->name);

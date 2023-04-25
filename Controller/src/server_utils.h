@@ -16,7 +16,7 @@ int controller_add_fish(struct aquarium *aquarium, int * coords, int * size, cha
 
 int controller_del_fish(struct aquarium *aquarium, char *fish);
 
-int client_connection(struct aquarium *aquarium, char* view_name);
+char * client_connection(struct aquarium *aquarium, char* view_name);
 
 void ping();
 

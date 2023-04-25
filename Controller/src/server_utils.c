@@ -83,7 +83,34 @@ int controller_add_fish(struct aquarium *aquarium, int * coords, int * size, cha
 
 int controller_del_fish(struct aquarium *aquarium, char *fish){}
 
-int client_connection(struct aquarium *aquarium, char* view_name){}
+char * client_connection(struct aquarium *aquarium, char* view_name){
+    if(view_name == NULL || view_name_check(aquarium, view_name)){
+        find_and_attibute_free_view(aquarium, view_name);
+    }
+    else{
+        for(int i=0 ; i < aquarium->views_len ; i++){
+            if(strcmp(aquarium->views[i]->name,view_name == 0)){
+                if(is_view_free(aquarium->views[i])){
+                    change_view_status(aquarium->views[i]);
+                    return aquarium->views[i]->name;   
+                }
+                else{
+                    find_and_attibute_free_view(aquarium, view_name);
+                }              
+            }
+        }
+    }
+}
+
+char * find_and_attibute_free_view(struct aquarium *aquarium, char* view_name){
+    for(int i=0 ; i < aquarium->views_len ; i++){
+        if(is_view_free(aquarium->views[i])){
+            change_view_status(aquarium->views[i]);
+            return aquarium->views[i]->name;                
+        }
+    }
+    return NULL;
+}
 
 void ping(){}
 

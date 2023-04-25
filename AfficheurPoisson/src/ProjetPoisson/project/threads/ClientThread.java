@@ -28,22 +28,23 @@ public class ClientThread extends CommunicationThread {
     }
 
     public void run() {
+        this.ClientSetup();
+        System.out.println("Client: Connected to server");
+
         try {
-            Socket socket = new Socket("localhost", 8888);
-            System.out.println("Connected to server");
-
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            out.println("Hello from client");
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String response = in.readLine();
-            System.out.println("Received response from server: " + response);
-
-            socket.close();
-            System.out.println("Disconnected from server");
-        } catch (IOException e) {
+            Thread.sleep(500); // Add a delay of 500 milliseconds
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        client.sendMessage("Hello from client");
+        System.out.println("Client: Sent message to server: Hello from client");
+
+        String response = client.readMessage();
+        System.out.println("Received response from server: " + response);
+
+        client.closeConnection();
+        System.out.println("Client: Disconnected from server");
     }
 
     public boolean didReceiveMessage() {

@@ -90,8 +90,7 @@ void add_view(struct aquarium * aquarium, int * coords, int * size, char * name)
 void del_fish(struct aquarium * aquarium, char * fish_name) {
     for (int i = 0; i < aquarium->fishes_len; i++) {
         if (strcmp(aquarium->fishes[i]->name, fish_name) == 0) {
-            free(aquarium->fishes[i]->name);
-            free(aquarium->fishes[i]);
+            fish_free(aquarium->fishes[i]);
             aquarium->fishes[i] = NULL;
             for (int j = i; j < aquarium->fishes_len-1; j++) {
                 aquarium->fishes[j] = aquarium->fishes[j+1];
@@ -105,8 +104,7 @@ void del_fish(struct aquarium * aquarium, char * fish_name) {
 void del_view(struct aquarium * aquarium, char * view_name) {
     for (int i = 0; i < aquarium->views_len; i++) {
         if (strcmp(aquarium->views[i]->name, view_name) == 0) {
-            free(aquarium->views[i]->name);
-            free(aquarium->views[i]);
+            view_free(aquarium->views[i]);
             aquarium->views[i] = NULL;
             for (int j = i; j < aquarium->views_len-1; j++) {
                 aquarium->views[j] = aquarium->views[j+1];
@@ -119,12 +117,10 @@ void del_view(struct aquarium * aquarium, char * view_name) {
 
 void aquarium_free(struct aquarium * aquarium) {
     for (int i = 0; i < aquarium->fishes_len; i++) {
-        free(aquarium->fishes[i]->name);
-        free(aquarium->fishes[i]);
+        fish_free(aquarium->fishes[i]);
     }
     for (int i = 0; i < aquarium->views_len; i++) {
-        free(aquarium->views[i]->name);
-        free(aquarium->views[i]);
+        view_free(aquarium->views[i]);
     }
     free(aquarium->fishes);
     free(aquarium->views);
