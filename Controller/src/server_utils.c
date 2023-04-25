@@ -76,7 +76,10 @@ int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium
     return 0;
 }
 
-int controller_add_fish(struct aquarium *aquarium, struct fish *fish){}
+int controller_add_fish(struct aquarium *aquarium, int * coords, int * size, char * name, void (*path)(struct fish *, int, int)){
+    add_fish(aquarium, coords, size, name, path);
+    return 1;
+}
 
 int controller_del_fish(struct aquarium *aquarium, char *fish){}
 
