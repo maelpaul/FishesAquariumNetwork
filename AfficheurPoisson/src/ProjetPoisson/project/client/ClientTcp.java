@@ -96,7 +96,7 @@ public class ClientTcp {
         try {
             //System.out.println(this.configuration);
             this.socket = new Socket(configuration.getAddress(), configuration.getPort());
-            System.out.println("[Debug] Connection made successfully.");
+            System.out.println("[Debug] Client TCP: Connection made successfully.");
         } catch (IOException e) {
             e.printStackTrace();
         }

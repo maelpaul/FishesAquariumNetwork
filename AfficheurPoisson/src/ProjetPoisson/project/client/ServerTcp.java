@@ -21,6 +21,7 @@ public class ServerTcp {
     private final static Charset ENCODING = StandardCharsets.UTF_8;
 
     public void tryCreateConnection(){
+        System.out.println(configuration.getPort());
         try {
             serverSocket = new ServerSocket(configuration.getPort());
         } catch (IOException e) {
@@ -62,7 +63,10 @@ public class ServerTcp {
     public void sendMessage(String message) {
         if (client != null && out != null) {
             try {
-                out.write(message + "\n");
+                byte[] dataBytes = message.getBytes(StandardCharsets.UTF_8);
+                int dataLength = dataBytes.length;
+                writeMessageLength(client.getOutputStream(), dataLength);
+                out.write(message);
                 out.flush();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -88,7 +92,15 @@ public class ServerTcp {
         String message = null;
 
         try {
-            message = in.readLine();
+            int messageLength = readMessageLength(client.getInputStream());
+            char[] charMessage = new char[messageLength];
+            int bytesRead = in.read(charMessage, 0, messageLength);
+
+            if (bytesRead == messageLength) {
+                message = new String(charMessage);
+            } else {
+                throw new IOException("Unable to read the complete message.");
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
