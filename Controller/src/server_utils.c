@@ -86,7 +86,7 @@ char * client_connection(struct aquarium *aquarium, char* view_name){
     }
     else{
         for(int i=0 ; i < aquarium->views_len ; i++){
-            if(strcmp(aquarium->views[i]->name,view_name == 0)){
+            if(strcmp(aquarium->views[i]->name,view_name) == 0){
                 if(is_view_free(aquarium->views[i])){
                     change_view_status(aquarium->views[i]);
                     return aquarium->views[i]->name;   

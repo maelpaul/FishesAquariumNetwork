@@ -75,8 +75,10 @@ int main()
         printf("Message du client : %s\n", buffer);
 
         // Initialisation et authentification
-        if (!strcmp(buffer, "hello\n")) {
-            // Parcrourir les vues disponibles et attribuer une vue libre, sinon erreur
+        if (!strncmp(buffer,"hello",5)) {
+            char * view_name = "N1";
+            char * attributed_view = client_connection(aquarium, view_name);
+            // message au client
         }
 
         // Demande périodique des poissons
