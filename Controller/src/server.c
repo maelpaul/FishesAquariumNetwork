@@ -95,6 +95,7 @@ int main()
                 view_name = strtok(NULL," ");
                 view_name = strtok(NULL," ");
                 view_name = strtok(NULL," ");
+                view_name = strtok(view_name,"\n");
             }
             char * attributed_view = client_connection(aquarium, view_name);
             if(strcmp(attributed_view,"no greeting")==0){
@@ -105,8 +106,7 @@ int main()
                 }
             }
             else{
-                char * to_send = "greeting ";
-                printf("%s\n",attributed_view);
+                char to_send[64] = "greeting ";
                 strcat(to_send, attributed_view);
                 strcpy(buffer, to_send);
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
