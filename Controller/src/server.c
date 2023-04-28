@@ -251,7 +251,6 @@ int main()
 
         // ping
 
-
         // check des commandes inexistantes
         if (check == 0 && strcmp(buffer, "log out\n") != 0) {
             strcpy(buffer, "Commande inexistante");
