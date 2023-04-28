@@ -231,14 +231,13 @@ int main()
         ping_verif[4] = '\0';   /* null character manually added */
 
         if (!strcmp(ping_verif, "ping")) {
+            check = 1;
             strcpy(buffer, "pong");
             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
         }
-        memset(buffer, 0, sizeof(buffer));
-
 
         // check des commandes inexistantes
         if (check == 0 && strcmp(buffer, "log out\n") != 0) {
