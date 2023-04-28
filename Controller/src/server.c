@@ -86,10 +86,34 @@ int main()
 
         // Initialisation et authentification
         if (!strncmp(buffer,"hello",5)) {
-            char * view_name = "N1";
+            check = 1;
+            char * view_name = NULL;
+            if(strlen(buffer)!=6){
+                char input[256];
+                memcpy(input, buffer, 256);
+                view_name = strtok(input," ");
+                view_name = strtok(NULL," ");
+                view_name = strtok(NULL," ");
+                view_name = strtok(NULL," ");
+            }
             char * attributed_view = client_connection(aquarium, view_name);
-            (void) attributed_view;
-            // message au client
+            if(strcmp(attributed_view,"no greeting")==0){
+                strcpy(buffer, attributed_view);
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else{
+                char * to_send = "greeting ";
+                printf("%s\n",attributed_view);
+                strcat(to_send, attributed_view);
+                strcpy(buffer, to_send);
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                } 
+            }
         }
 
         // Demande périodique des poissons
@@ -229,18 +253,6 @@ int main()
         }
 
         // ping
-        char ping_verif[4];
-        strncpy (ping_verif, buffer, 4);
-        ping_verif[4] = '\0';   /* null character manually added */
-
-        if (!strcmp(ping_verif, "ping")) {
-            check = 1;
-            strcpy(buffer, "pong");
-            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                perror("Erreur lors de l'envoi du message au client");
-                exit(EXIT_FAILURE);
-            }
-        }
 
         // check des commandes inexistantes
         if (check == 0 && strcmp(buffer, "log out\n") != 0) {

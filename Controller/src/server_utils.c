@@ -88,7 +88,7 @@ int controller_del_fish(struct aquarium *aquarium, char *fish){
 
 char * client_connection(struct aquarium *aquarium, char* view_name){
     if(view_name == NULL || view_name_check(aquarium, view_name)){
-        find_and_attibute_free_view(aquarium, view_name);
+        return find_and_attibute_free_view(aquarium);
     }
     else{
         for(int i=0 ; i < aquarium->views_len ; i++){
@@ -98,24 +98,24 @@ char * client_connection(struct aquarium *aquarium, char* view_name){
                     return aquarium->views[i]->name;   
                 }
                 else{
-                    find_and_attibute_free_view(aquarium, view_name);
+                    return find_and_attibute_free_view(aquarium);
                 }              
             }
         }
     }
-    char * ok = "ok";
-    return ok;
+    char * ret = "no greeting";
+    return ret;
 }
 
-char * find_and_attibute_free_view(struct aquarium *aquarium, char* view_name){
+char * find_and_attibute_free_view(struct aquarium *aquarium){
     for(int i=0 ; i < aquarium->views_len ; i++){
         if(is_view_free(aquarium->views[i])){
             change_view_status(aquarium->views[i]);
             return aquarium->views[i]->name;                
         }
     }
-    (void) view_name;
-    return NULL;
+    char * ret = "no greeting";
+    return ret;
 }
 
 char * get_fish(struct aquarium *aquarium, char * fish_name){(void) aquarium; (void) fish_name; char * ok = "ok"; return ok;}
