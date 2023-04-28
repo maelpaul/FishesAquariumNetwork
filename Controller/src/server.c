@@ -6,11 +6,15 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
 #include "server_utils.h"
 
+#define REFRESH_TIME 5
+
 int main()
 {
+    srand(time(NULL));
     struct config conf;
     char buffer[256];
     int n;
@@ -82,10 +86,34 @@ int main()
 
         // Initialisation et authentification
         if (!strncmp(buffer,"hello",5)) {
-            char * view_name = "N1";
+            check = 1;
+            char * view_name = NULL;
+            if(strlen(buffer)!=6){
+                char input[256];
+                memcpy(input, buffer, 256);
+                view_name = strtok(input," ");
+                view_name = strtok(NULL," ");
+                view_name = strtok(NULL," ");
+                view_name = strtok(NULL," ");
+            }
             char * attributed_view = client_connection(aquarium, view_name);
-            (void) attributed_view;
-            // message au client
+            if(strcmp(attributed_view,"no greeting")==0){
+                strcpy(buffer, attributed_view);
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else{
+                char * to_send = "greeting ";
+                printf("%s\n",attributed_view);
+                strcat(to_send, attributed_view);
+                strcpy(buffer, to_send);
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                } 
+            }
         }
 
         // Demande périodique des poissons
@@ -95,14 +123,13 @@ int main()
 
         if (!strcmp(ask_periodic_verif, "getFishes")) {
             check = 1;
-            // char fish_list[1024] = "list ";
-            // for (int i = 0; i < aquarium->fishes_len; i++) {
-            //     char fish_info[128];
-            //     sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->size[0]);
-            //     strcat(fish_list, fish_info);
-            // }
-            // strcat(fish_list, "\n");
             char fish_list[1024] = "list ";
+            for (int i = 0; i < aquarium->fishes_len; i++) {
+                char fish_info[128];
+                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1], REFRESH_TIME);
+                strcat(fish_list, fish_info);
+            }
+            strcat(fish_list, "\n");
             if (send(newsockfd, fish_list, strlen(fish_list), 0) < 0) {
                 perror("Erreur lors de l'envoi de la liste des poissons au client");
                 exit(EXIT_FAILURE);
