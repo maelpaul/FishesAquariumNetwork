@@ -15,6 +15,7 @@
 int main()
 {
     srand(time(NULL));
+    time_t start_time = time(NULL);
     struct config conf;
     char buffer[256];
     int n;
@@ -74,6 +75,14 @@ int main()
 
     do {
         int check = 0;
+
+        time_t new_time = time(NULL);
+        if (difftime(new_time, start_time) >= REFRESH_TIME) {
+            start_time = new_time;
+            for (int i = 0; i < aquarium->fishes_len; i++) {
+                aquarium->fishes[i]->path(aquarium->fishes[i], 1000, 1000);
+            }
+        }
 
         // Réception de la réponse du client
         memset(buffer, 0, sizeof(buffer));
