@@ -69,6 +69,8 @@ int main()
     }
 
     do {
+        int check = 0;
+
         // Réception de la réponse du client
         memset(buffer, 0, sizeof(buffer));
         if ((n = recv(newsockfd, buffer, sizeof(buffer), 0)) < 0) {
@@ -92,13 +94,15 @@ int main()
         ask_periodic_verif[9] = '\0';   /* null character manually added */
 
         if (!strcmp(ask_periodic_verif, "getFishes")) {
+            check = 1;
+            // char fish_list[1024] = "list ";
+            // for (int i = 0; i < aquarium->fishes_len; i++) {
+            //     char fish_info[128];
+            //     sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->size[0]);
+            //     strcat(fish_list, fish_info);
+            // }
+            // strcat(fish_list, "\n");
             char fish_list[1024] = "list ";
-            for (int i = 0; i < aquarium->fishes_len; i++) {
-                char fish_info[128];
-                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->size[0]);
-                strcat(fish_list, fish_info);
-            }
-            strcat(fish_list, "\n");
             if (send(newsockfd, fish_list, strlen(fish_list), 0) < 0) {
                 perror("Erreur lors de l'envoi de la liste des poissons au client");
                 exit(EXIT_FAILURE);
@@ -115,6 +119,7 @@ int main()
         ls[2] = '\0';
 
         if (!strcmp(ask_continuous_verif, "getFishesContinuously") || !strcmp(ls, "ls")) {
+            check = 1;
             // Lister les poissons en continue
         }
 
@@ -124,6 +129,8 @@ int main()
         add_verif[7] = '\0';   /* null character manually added */
 
         if (!strcmp(add_verif, "addFish")) {
+            check = 1;
+
             char info[256];
             memcpy(info, buffer, 256);
             char delim[] = " ";
@@ -180,6 +187,7 @@ int main()
         del_verif[7] = '\0';   /* null character manually added */
 
         if (!strcmp(del_verif, "delFish")) {
+            check = 1;
             // Suppression un poisson
             char info[256];
             memcpy(info, buffer, 256);
@@ -213,6 +221,7 @@ int main()
         start_verif[9] = '\0';   /* null character manually added */
 
         if (!strcmp(start_verif, "startFish")) {
+            check = 1;
             // Démarrage d'un poisson
         }
 
@@ -230,6 +239,15 @@ int main()
         }
         memset(buffer, 0, sizeof(buffer));
 
+
+        // check des commandes inexistantes
+        if (check == 0 && strcmp(buffer, "log out\n") != 0) {
+            strcpy(buffer, "Commande inexistante");
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            } 
+        }
     } while(strcmp(buffer, "log out\n") != 0);
 
     // Envoi de sortie de connexion au client
