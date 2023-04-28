@@ -111,7 +111,7 @@ int main()
         }
 
         // Demande continue de Poisson
-        char ask_continuous_verif[21];
+        char ask_continuous_verif[22];
         char ls[2];
         strncpy (ask_continuous_verif , buffer, 21);
         strncpy (ls , buffer, 2);
@@ -124,7 +124,7 @@ int main()
         }
 
         // Ajout d'un poisson
-        char add_verif[7];
+        char add_verif[8];
         strncpy (add_verif, buffer, 7);
         add_verif[7] = '\0';   /* null character manually added */
 
@@ -182,7 +182,7 @@ int main()
         }
 
         // Suppression d'un poisson
-        char del_verif[7];
+        char del_verif[8];
         strncpy (del_verif, buffer, 7);
         del_verif[7] = '\0';   /* null character manually added */
 
@@ -206,17 +206,24 @@ int main()
                     exit(EXIT_FAILURE);
                 }
             }
-            else {
+            else if (val == 1) {
                 strcpy(buffer, "OK");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 } 
             }
+            else {
+                strcpy(buffer, "NOK : Nom de poisson invalide");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }                 
+            }
         }
 
         // Démarrage d'un poisson
-        char start_verif[9];
+        char start_verif[10];
         strncpy (start_verif, buffer, 9);
         start_verif[9] = '\0';   /* null character manually added */
 
@@ -226,7 +233,7 @@ int main()
         }
 
         // ping
-        char ping_verif[4];
+        char ping_verif[5];
         strncpy (ping_verif, buffer, 4);
         ping_verif[4] = '\0';   /* null character manually added */
 
