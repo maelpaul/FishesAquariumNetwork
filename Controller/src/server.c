@@ -88,26 +88,31 @@ int main()
         if (!strncmp(buffer,"hello",5)) {
             check = 1;
             char * view_name = NULL;
+            int x = 1;
             if(strlen(buffer)!=6){
-                char input[256];
-                memcpy(input, buffer, 256);
-                view_name = strtok(input," ");
-                view_name = strtok(NULL," ");
-                view_name = strtok(NULL," ");
-                view_name = strtok(NULL," ");
-                view_name = strtok(view_name,"\n");
+                x = hello_command_check(buffer, view_name);
             }
-            char * attributed_view = client_connection(aquarium, view_name);
-            if(strcmp(attributed_view,"no greeting")==0){
-                strcpy(buffer, attributed_view);
-                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
+            if(x){
+                char * attributed_view = client_connection(aquarium, view_name);
+                if(strcmp(attributed_view,"no greeting")==0){
+                    strcpy(buffer, attributed_view);
+                    if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                        perror("Erreur lors de l'envoi du message au client");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+                else{
+                    char to_send[64] = "greeting ";
+                    strcat(to_send, attributed_view);
+                    strcpy(buffer, to_send);
+                    if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                        perror("Erreur lors de l'envoi du message au client");
+                        exit(EXIT_FAILURE);
+                    } 
                 }
             }
             else{
-                char to_send[64] = "greeting ";
-                strcat(to_send, attributed_view);
+                char to_send[64] = "incorrect format";
                 strcpy(buffer, to_send);
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");

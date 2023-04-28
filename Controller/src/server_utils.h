@@ -20,5 +20,7 @@ char * client_connection(struct aquarium *aquarium, char* view_name);
 
 char * find_and_attibute_free_view(struct aquarium *aquarium);
 
+int hello_command_check(char * buffer, char * view_name);
+
 char * get_fish(struct aquarium *aquarium, char * fish_name);
 
