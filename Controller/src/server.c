@@ -219,6 +219,26 @@ int main()
 
         // ping
 
+
+        // check des commandes inexistantes
+        char fail[256];
+        strncpy (fail, buffer, 256);
+        start_verif[255] = '\0';   /* null character manually added */
+        char content[256];
+        memcpy(content, buffer, 256);
+        char delim[] = "\n";
+        char * _cmd = strtok(content, delim);
+        char delim2[] = " ";
+        char * cmd = strtok(_cmd, delim2);
+
+        if (strcmp(cmd, "addFish") != 0 && strcmp(cmd, "delFish") != 0 && strcmp(cmd, "startFish") != 0 && strcmp(cmd, "ping") != 0 && strcmp(cmd, "log") != 0) {
+            strcpy(buffer, "Commande inexistante");
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            } 
+        }
+
     } while(strcmp(buffer, "log out\n") != 0);
 
     // Envoi de sortie de connexion au client
