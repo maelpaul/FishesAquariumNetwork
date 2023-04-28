@@ -118,6 +118,4 @@ char * find_and_attibute_free_view(struct aquarium *aquarium, char* view_name){
     return NULL;
 }
 
-void ping(){}
-
 char * get_fish(struct aquarium *aquarium, char * fish_name){(void) aquarium; (void) fish_name; char * ok = "ok"; return ok;}

@@ -92,14 +92,13 @@ int main()
         ask_periodic_verif[9] = '\0';   /* null character manually added */
 
         if (!strcmp(ask_periodic_verif, "getFishes")) {
-            // char fish_list[1024] = "list ";
-            // for (int i = 0; i < aquarium->fishes_len; i++) {
-            //     char fish_info[128];
-            //     sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->size[0]);
-            //     strcat(fish_list, fish_info);
-            // }
-            // strcat(fish_list, "\n");
             char fish_list[1024] = "list ";
+            for (int i = 0; i < aquarium->fishes_len; i++) {
+                char fish_info[128];
+                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->size[0]);
+                strcat(fish_list, fish_info);
+            }
+            strcat(fish_list, "\n");
             if (send(newsockfd, fish_list, strlen(fish_list), 0) < 0) {
                 perror("Erreur lors de l'envoi de la liste des poissons au client");
                 exit(EXIT_FAILURE);
@@ -218,6 +217,18 @@ int main()
         }
 
         // ping
+        char ping_verif[4];
+        strncpy (ping_verif, buffer, 4);
+        ping_verif[4] = '\0';   /* null character manually added */
+
+        if (!strcmp(ping_verif, "ping")) {
+            strcpy(buffer, "pong");
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }
+        }
+        memset(buffer, 0, sizeof(buffer));
 
     } while(strcmp(buffer, "log out\n") != 0);
 
