@@ -130,4 +130,21 @@ char * find_and_attibute_free_view(struct aquarium *aquarium){
     return ret;
 }
 
+int hello_command_check(char * buffer, char * view_name){
+    char input[256];
+    memcpy(input, buffer, 256);
+    view_name = strtok(input," ");
+    view_name = strtok(NULL," ");
+    if(strcmp(view_name,"in")!=0){
+        return 0;
+    }
+    view_name = strtok(NULL," ");
+    if(strcmp(view_name,"as")!=0){
+        return 0;
+    }
+    view_name = strtok(NULL," ");
+    view_name = strtok(view_name,"\n");
+    return 1;
+}
+
 char * get_fish(struct aquarium *aquarium, char * fish_name){(void) aquarium; (void) fish_name; char * ok = "ok"; return ok;}

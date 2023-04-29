@@ -15,6 +15,7 @@
 int main()
 {
     srand(time(NULL));
+    time_t start_time = time(NULL);
     struct config conf;
     char buffer[256];
     int n;
@@ -75,6 +76,14 @@ int main()
     do {
         int check = 0;
 
+        time_t new_time = time(NULL);
+        if (difftime(new_time, start_time) >= REFRESH_TIME) {
+            start_time = new_time;
+            for (int i = 0; i < aquarium->fishes_len; i++) {
+                aquarium->fishes[i]->path(aquarium->fishes[i], 1000, 1000);
+            }
+        }
+
         // Réception de la réponse du client
         memset(buffer, 0, sizeof(buffer));
         if ((n = recv(newsockfd, buffer, sizeof(buffer), 0)) < 0) {
@@ -88,26 +97,31 @@ int main()
         if (!strncmp(buffer,"hello",5)) {
             check = 1;
             char * view_name = NULL;
+            int x = 1;
             if(strlen(buffer)!=6){
-                char input[256];
-                memcpy(input, buffer, 256);
-                view_name = strtok(input," ");
-                view_name = strtok(NULL," ");
-                view_name = strtok(NULL," ");
-                view_name = strtok(NULL," ");
+                x = hello_command_check(buffer, view_name);
             }
-            char * attributed_view = client_connection(aquarium, view_name);
-            if(strcmp(attributed_view,"no greeting")==0){
-                strcpy(buffer, attributed_view);
-                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
+            if(x){
+                char * attributed_view = client_connection(aquarium, view_name);
+                if(strcmp(attributed_view,"no greeting")==0){
+                    strcpy(buffer, attributed_view);
+                    if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                        perror("Erreur lors de l'envoi du message au client");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+                else{
+                    char to_send[64] = "greeting ";
+                    strcat(to_send, attributed_view);
+                    strcpy(buffer, to_send);
+                    if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                        perror("Erreur lors de l'envoi du message au client");
+                        exit(EXIT_FAILURE);
+                    } 
                 }
             }
             else{
-                char * to_send = "greeting ";
-                printf("%s\n",attributed_view);
-                strcat(to_send, attributed_view);
+                char to_send[64] = "incorrect format";
                 strcpy(buffer, to_send);
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
