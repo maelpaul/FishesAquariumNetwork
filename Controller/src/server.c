@@ -172,40 +172,65 @@ int main()
             char * __size = strtok(NULL, delim);
             char * _path = strtok(NULL, delim);
             char * path = strtok(_path, "\n");
-
+            
             char * _coords = strtok(__coords, ",");
             char * _size = strtok(__size, ",");
-            
-            int coords[2];
-            coords[0] = atoi(strtok(_coords, "x"));
-            coords[1] = atoi(strtok(NULL, "x"));
 
-            int size[2];
-            size[0] = atoi(strtok(_size, "x"));
-            size[1] = atoi(strtok(NULL, "x"));
-
-            int val = 0;
-
-            if (!strcmp(path, "RandomWayPoint")) {
-                void (*new_path)(struct fish *, int, int) = &RandomWayPoint;
-                val = controller_add_fish(aquarium, coords, size, name, new_path);
+            int coords[2] = {-1, -1};
+            char * a_c = strtok(_coords, "x");
+            char * b_c = strtok(NULL, "x");
+            if (a_c != NULL && b_c != NULL) {
+                coords[0] = atoi(a_c);
+                coords[1] = atoi(b_c);
             }
 
-            if (val == 0) {
+            int size[2] = {-1, -1};
+            char * a_s = strtok(_size, "x");
+            char * b_s = strtok(NULL, "x");
+            if (a_s != NULL && b_s != NULL) {
+                size[0] = atoi(a_s);
+                size[1] = atoi(b_s);
+            }
+
+            int val = -1;
+            int check_path = 0;
+            
+            if (path != NULL) {
+                if (!strcmp(path, "RandomWayPoint")) {
+                    check_path = 1;
+                    void (*new_path)(struct fish *, int, int) = &RandomWayPoint;
+                    val = controller_add_fish(aquarium, coords, size, name, new_path);
+                }
+            }
+
+            if (check_path == 0 && path != NULL) {
                 strcpy(buffer, "NOK : Modèle de mobilité non supporté");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 }
             }
-            else {
+            else if (val == 0 && check_path == 1) {
+                strcpy(buffer, "NOK : Poisson déjà existant");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else if (val == 1 && check_path == 1) {
                 strcpy(buffer, "OK");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 } 
             }
-	        
+            else {
+                strcpy(buffer, "NOK : Syntaxe invalide");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }                 
+            } 
         }
 
         // Suppression d'un poisson
