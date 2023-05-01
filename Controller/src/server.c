@@ -3,10 +3,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <unistd.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "server_utils.h"
 
@@ -133,27 +133,8 @@ int main()
             }
         }
 
-        // Demande périodique des poissons
-        char ask_periodic_verif[10];
-        strncpy (ask_periodic_verif , buffer, 10);
-        ask_periodic_verif[9] = '\0';   /* null character manually added */
-
-        if (!strcmp(ask_periodic_verif, "getFishes")) {
-            check = 1;
-            char fish_list[1024] = "list ";
-            for (int i = 0; i < aquarium->fishes_len; i++) {
-                char fish_info[128];
-                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
-                strcat(fish_list, fish_info);
-            }
-            strcat(fish_list, "\n");
-            if (send(newsockfd, fish_list, strlen(fish_list), 0) < 0) {
-                perror("Erreur lors de l'envoi de la liste des poissons au client");
-                exit(EXIT_FAILURE);
-            }
-        }
-
         // Demande continue de Poisson
+        int continuous = 0;
         char ask_continuous_verif[22];
         char ls[3];
         strncpy (ask_continuous_verif , buffer, 21);
@@ -162,10 +143,10 @@ int main()
         ls[2] = '\0';
 
         if (!strcmp(ask_continuous_verif, "getFishesContinuously") || !strcmp(ls, "ls")) {
+            continuous = 1;
             check = 1;
             // Lister les poissons en continue
             for (int i = 0; i < 10; ++i) {
-                printf("%d\n", i);
                 char fish_list[1024] = "list ";
                 for (int i = 0; i < aquarium->fishes_len; i++) {
                     char fish_info[128];
@@ -177,7 +158,33 @@ int main()
                     perror("Erreur lors de l'envoi de la liste des poissons au client");
                     exit(EXIT_FAILURE);
                 }
-                sleep(1);
+                if (i != 9) {
+                    sleep(1);
+                    current_time = time(NULL);
+                    controller_update_fishes(aquarium, current_time, REFRESH_TIME);
+                }                
+            }
+        }
+
+        // Demande périodique des poissons
+        if (continuous == 0) {
+            char ask_periodic_verif[10];
+            strncpy (ask_periodic_verif , buffer, 10);
+            ask_periodic_verif[9] = '\0';   /* null character manually added */
+
+            if (!strcmp(ask_periodic_verif, "getFishes")) {
+                check = 1;
+                char fish_list[1024] = "list ";
+                for (int i = 0; i < aquarium->fishes_len; i++) {
+                    char fish_info[128];
+                    sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
+                    strcat(fish_list, fish_info);
+                }
+                strcat(fish_list, "\n");
+                if (send(newsockfd, fish_list, strlen(fish_list), 0) < 0) {
+                    perror("Erreur lors de l'envoi de la liste des poissons au client");
+                    exit(EXIT_FAILURE);
+                }
             }
         }
 
