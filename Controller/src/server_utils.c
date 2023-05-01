@@ -148,3 +148,15 @@ int hello_command_check(char * buffer, char * view_name){
 }
 
 char * get_fish(struct aquarium *aquarium, char * fish_name){(void) aquarium; (void) fish_name; char * ok = "ok"; return ok;}
+
+void controller_update_fishes(struct aquarium * aquarium, time_t command_time, int refresh_time) {
+    update_fishes(aquarium, command_time, refresh_time);
+}
+
+int controller_start_fish(struct aquarium * aquarium, char * fish_name, time_t command_time, int time_to_dest) {
+    if (fish_name != NULL && time_to_dest != 0) {
+        int val = start_fish(aquarium, fish_name, command_time, time_to_dest);
+        return val;
+    }
+    return -1;
+}

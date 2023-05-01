@@ -1,6 +1,8 @@
 #ifndef _AQUARIUM_H_
 #define _AQUARIUM_H_
 
+#include <time.h>
+
 #define DEFAULT_NUMBER_FISH 10
 #define DEFAULT_NUMBER_VIEW 10
 
@@ -38,5 +40,9 @@ int get_aquarium_width(struct aquarium * aquarium);
 int get_aquarium_height(struct aquarium * aquarium);
 
 void RandomWayPoint(struct fish * fish, int width, int height);
+
+int start_fish(struct aquarium * aquarium, char * fish_name, time_t command_time, int time_to_dest);
+
+void update_fishes(struct aquarium * aquarium, time_t command_time, int refresh_time);
 
 #endif

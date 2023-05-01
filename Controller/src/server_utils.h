@@ -1,3 +1,6 @@
+#ifndef _SERVER_UTILS_H_
+#define _SERVER_UTILS_H_
+
 #include "aquarium.h"
 #include "view.h"
 #include "fish.h"
@@ -24,3 +27,8 @@ int hello_command_check(char * buffer, char * view_name);
 
 char * get_fish(struct aquarium *aquarium, char * fish_name);
 
+void controller_update_fishes(struct aquarium * aquarium, time_t command_time, int refresh_time);
+
+int controller_start_fish(struct aquarium * aquarium, char * fish_name, time_t command_time, int time_to_dest);
+
+#endif

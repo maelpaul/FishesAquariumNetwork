@@ -160,3 +160,49 @@ void RandomWayPoint(struct fish * fish, int width, int height) {
     fish->dest[0] = rand() % width;
     fish->dest[1] = rand() % height;    
 }
+
+int start_fish(struct aquarium * aquarium, char * fish_name, time_t command_time, int time_to_dest) {
+    int val = 0;
+    for (int i = 0; i < aquarium->fishes_len; i++) {
+        if (strcmp(aquarium->fishes[i]->name, fish_name) == 0) {
+            val = 1;
+            fish_start(aquarium->fishes[i], command_time, time_to_dest);
+        }
+    }
+    return val;
+}
+
+void update_fishes(struct aquarium * aquarium, time_t command_time, int refresh_time) {
+    for (int i = 0; i < aquarium->fishes_len; i++) {
+        struct fish * fish = aquarium->fishes[i];
+        if (fish->started != 0) {
+            int new_time_to_dest = fish->time_to_dest - (command_time - fish->started_time);
+            if (new_time_to_dest <= 0) {
+                fish->coords[0] = fish->dest[0];
+                fish->coords[1] = fish->dest[1];
+                fish->path(fish, get_aquarium_width(aquarium), get_aquarium_height(aquarium));
+                fish->time_to_dest = refresh_time;
+                fish->started_time = command_time;
+            }
+            else {
+                int x_dist = abs(fish->coords[0] - fish->dest[0]);
+                int y_dist = abs(fish->coords[1] - fish->dest[1]);
+                int x_done = x_dist * (fish->time_to_dest - new_time_to_dest) / fish->time_to_dest;
+                int y_done = y_dist * (fish->time_to_dest - new_time_to_dest) / fish->time_to_dest;
+                if (fish->coords[0] >= fish->dest[0]) {
+                    fish->coords[0] = fish->coords[0] - x_done;
+                }
+                else {
+                    fish->coords[0] = fish->coords[0] + x_done;
+                }
+                if (fish->coords[1] >= fish->dest[1]) {
+                    fish->coords[1] = fish->coords[1] - y_done;
+                }
+                else {
+                    fish->coords[1] = fish->coords[1] + y_done;
+                }
+                fish->time_to_dest = new_time_to_dest;
+            }
+        }
+    }
+}

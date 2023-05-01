@@ -15,7 +15,7 @@
 int main()
 {
     srand(time(NULL));
-    time_t start_time = time(NULL);
+    //time_t start_time = time(NULL);
     struct config conf;
     char buffer[256];
     int n;
@@ -76,13 +76,16 @@ int main()
     do {
         int check = 0;
 
-        time_t new_time = time(NULL);
-        if (difftime(new_time, start_time) >= REFRESH_TIME) {
-            start_time = new_time;
-            for (int i = 0; i < aquarium->fishes_len; i++) {
-                aquarium->fishes[i]->path(aquarium->fishes[i], 1000, 1000);
-            }
-        }
+        // time_t new_time = time(NULL);
+        // if (difftime(new_time, start_time) >= REFRESH_TIME) {
+        //     start_time = new_time;
+        //     for (int i = 0; i < aquarium->fishes_len; i++) {
+        //         aquarium->fishes[i]->path(aquarium->fishes[i], aquarium->size[0], aquarium->size[1]);
+        //     }
+        // }
+
+        time_t current_time = time(NULL);
+        controller_update_fishes(aquarium, current_time, REFRESH_TIME);
 
         // Réception de la réponse du client
         memset(buffer, 0, sizeof(buffer));
@@ -140,7 +143,7 @@ int main()
             char fish_list[1024] = "list ";
             for (int i = 0; i < aquarium->fishes_len; i++) {
                 char fish_info[128];
-                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1], REFRESH_TIME);
+                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
                 strcat(fish_list, fish_info);
             }
             strcat(fish_list, "\n");
@@ -148,12 +151,11 @@ int main()
                 perror("Erreur lors de l'envoi de la liste des poissons au client");
                 exit(EXIT_FAILURE);
             }
-
         }
 
         // Demande continue de Poisson
         char ask_continuous_verif[22];
-        char ls[2];
+        char ls[3];
         strncpy (ask_continuous_verif , buffer, 21);
         strncpy (ls , buffer, 2);
         ask_continuous_verif[21] = '\0';   /* null character manually added */
@@ -162,6 +164,21 @@ int main()
         if (!strcmp(ask_continuous_verif, "getFishesContinuously") || !strcmp(ls, "ls")) {
             check = 1;
             // Lister les poissons en continue
+            for (int i = 0; i < 10; ++i) {
+                printf("%d\n", i);
+                char fish_list[1024] = "list ";
+                for (int i = 0; i < aquarium->fishes_len; i++) {
+                    char fish_info[128];
+                    sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
+                    strcat(fish_list, fish_info);
+                }
+                strcat(fish_list, "\n");
+                if (send(newsockfd, fish_list, strlen(fish_list), 0) < 0) {
+                    perror("Erreur lors de l'envoi de la liste des poissons au client");
+                    exit(EXIT_FAILURE);
+                }
+                sleep(1);
+            }
         }
 
         // Ajout d'un poisson
@@ -296,6 +313,38 @@ int main()
         if (!strcmp(start_verif, "startFish")) {
             check = 1;
             // Démarrage d'un poisson
+            char info[256];
+            memcpy(info, buffer, 256);
+            char delim[] = " ";
+
+            /* Cut the buffer to separate the contents.*/
+	        char * verif = strtok(info, delim);
+            (void) verif;
+            char * _name = strtok(NULL, delim);
+            char * name = strtok(_name, "\n");
+
+            int val = controller_start_fish(aquarium, name, current_time, REFRESH_TIME);
+            if (val == 0) {
+                strcpy(buffer, "NOK : Poisson inexistant");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else if (val == 1) {
+                strcpy(buffer, "OK");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                } 
+            }
+            else {
+                strcpy(buffer, "NOK : Nom de poisson invalide");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }                 
+            }
         }
 
         // ping

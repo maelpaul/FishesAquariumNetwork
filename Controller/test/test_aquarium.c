@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <unistd.h>
 
 #include "fish.h"
 #include "view.h"
@@ -35,6 +36,16 @@ int main(){
     aquarium_print(aquarium);
     assert(del_fish(aquarium, "Nathan") == 1);
     del_view(aquarium, "View2");
+    aquarium_print(aquarium);
+    update_fishes(aquarium, time(NULL), 5);
+    aquarium_print(aquarium);
+    start_fish(aquarium, "Victor", time(NULL), 5);
+    aquarium_print(aquarium);
+    sleep(3);
+    update_fishes(aquarium, time(NULL), 5);
+    aquarium_print(aquarium);
+    sleep(3);
+    update_fishes(aquarium, time(NULL), 5);
     aquarium_print(aquarium);
     aquarium_free(aquarium);
 
