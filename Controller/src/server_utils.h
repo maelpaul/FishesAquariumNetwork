@@ -31,4 +31,5 @@ void controller_update_fishes(struct aquarium * aquarium, time_t command_time, i
 
 int controller_start_fish(struct aquarium * aquarium, char * fish_name, time_t command_time, int time_to_dest);
 
+void controller_aquarium_print(struct aquarium * aquarium, char * to_print);
 #endif
