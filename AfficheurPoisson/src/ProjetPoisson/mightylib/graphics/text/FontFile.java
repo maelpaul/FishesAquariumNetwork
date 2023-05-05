@@ -37,7 +37,7 @@ public class FontFile {
             } while(!values.containsKey("count"));
 
             size = Integer.parseInt(values.get("size"));
-            if (size < 0 )
+            if (size < 0)
                 size *= -1;
 
             String[] tempPadding = values.get("padding").split(",");
@@ -49,7 +49,7 @@ public class FontFile {
                                     Integer.parseInt(tempPadding[2]),
                                     Integer.parseInt(tempPadding[3]));
 
-            lineHeight = (Integer.parseInt(values.get("lineHeight")) - padding.x - padding.z) * 1.0 / size;
+            lineHeight = (Integer.parseInt(values.get("lineHeight"))) * 1.0 / size;
 
             atlasWidth = Integer.parseInt(values.get("scaleW"));
             atlasHeight = Integer.parseInt(values.get("scaleH"));
@@ -69,13 +69,21 @@ public class FontFile {
                 fontChar.setId(id)
                         .setxAtlas((double) (Integer.parseInt(values.get("x")) + padding.w) /*/ atlasWidth*/)
                         .setyAtlas((double) (Integer.parseInt(values.get("y")) + padding.x) /*/ atlasHeight*/)
-                        .setWidth((double) (Integer.parseInt(values.get("width")) - (padding.w - padding.y)) / size)
-                        .setHeight((double) (Integer.parseInt(values.get("height")) - (padding.x - padding.z)) / size)
-                        .setWidthAtlas((double) (Integer.parseInt(values.get("width")) - (padding.w - padding.y)) /*/ atlasWidth*/)
-                        .setHeightAtlas((double) (Integer.parseInt(values.get("height")) - (padding.x - padding.z)) /*/ atlasHeight*/)
-                        .setxOffset((double) (Integer.parseInt(values.get("xoffset")) + padding.w) / size)
-                        .setyOffset((double) (Integer.parseInt(values.get("yoffset")) + padding.x) / size)
-                        .setxAdvance((double) (Integer.parseInt(values.get("xadvance")) - padding.w - padding.y) / size);
+                        .setWidth((double) (Integer.parseInt(values.get("width")) - padding.w - padding.y) / size)
+                        .setHeight((double) (Integer.parseInt(values.get("height")) - padding.x - padding.z) / size)
+                        .setWidthAtlas((double) (Integer.parseInt(values.get("width")) - padding.w - padding.y) /*/ atlasWidth*/)
+                        .setHeightAtlas((double) (Integer.parseInt(values.get("height")) - padding.x - padding.z) /*/ atlasHeight*/)
+                        .setxOffset((double) (Integer.parseInt(values.get("xoffset"))) / size)
+                        .setyOffset((double) (Integer.parseInt(values.get("yoffset"))) / size)
+                        .setxAdvance((double) (Integer.parseInt(values.get("xadvance"))) / size);
+
+                if (fontChar.getxOffset() < 0)
+                    fontChar.setxOffset(-fontChar.getxOffset());
+
+                if (fontChar.getyOffset() < 0)
+                    fontChar.setyOffset(-fontChar.getyOffset());
+
+                System.out.println("sfsdf" + fontChar.getxOffset());
 
                 characters.put(id, fontChar);
             }

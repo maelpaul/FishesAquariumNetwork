@@ -21,7 +21,6 @@ public class Terminal {
     private static final float CURSOR_FIRST_PERIOD_TIME = 1;
     private static final float CURSOR_PERIOD_TIME = 0.5f;
 
-
     private final Vector2f referencePosition;
     private final Vector2f maxSize;
 
@@ -170,7 +169,7 @@ public class Terminal {
 
         cursorPosition = index;
         Vector4f charPosition = commandText.getPositionOfChar(cursorPosition);
-        cursor.setPosition(new Vector2f((int)(charPosition.y) - commandText.getFontSize() * 0.15f, (int)(charPosition.z)));
+        cursor.setPosition(new Vector2f((int)(charPosition.y) - commandText.getFontSize() * 0.05f, (int)(charPosition.z)));
 
         cursorTimer.start(CURSOR_FIRST_PERIOD_TIME);
         cursorDisplayed = true;

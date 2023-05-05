@@ -15,6 +15,7 @@ import ProjetPoisson.mightylib.resources.texture.Icon;
 import ProjetPoisson.mightylib.resources.texture.Texture;
 import ProjetPoisson.mightylib.resources.texture.TextureParameters;
 import ProjetPoisson.mightylib.scene.Scene;
+import ProjetPoisson.mightylib.util.Timer;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
 import ProjetPoisson.project.client.Configuration;
@@ -32,6 +33,10 @@ import org.lwjgl.glfw.GLFW;
 import ProjetPoisson.mightylib.util.math.MightyMath;
 
 public class MenuScene extends Scene {
+    public final static int PING_TIME = 35; // 40 in reality
+
+    private Timer pingTimer;
+
     private Text text;
 
     private RectangleRenderer renderer;
@@ -44,15 +49,19 @@ public class MenuScene extends Scene {
     private Texture displacementMap;
     private FloatTweening displacementMapTweening;
 
+
     public void init(String[] args) {
         super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
+
+        pingTimer = new Timer();
+        pingTimer.start(PING_TIME);
 
         if (Resources.getInstance().isExistingResource(Icon.class, "Kraken"))
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
         /// SCENE INFORMATION ///
-        ServerThread serverThread = new ServerThread();
-        serverThread.start();
+        //ServerThread serverThread = new ServerThread();
+        //serverThread.start();
         ClientThread clientThread = new ClientThread();
         clientThread.start();
 
@@ -129,6 +138,11 @@ public class MenuScene extends Scene {
         }
 
         displacementMapTweening.update();
+        pingTimer.update();
+        if (pingTimer.isFinished()){
+            // DO THINGS
+            pingTimer.resetStart();
+        }
 
         ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("time", displacementMapTweening.value());
     }
@@ -141,9 +155,9 @@ public class MenuScene extends Scene {
         displacementMap.bind(1);
         renderer.display();
 
-        text.display();
-
         fishManager.display();
+
+        text.display();
 
         terminal.display();
 

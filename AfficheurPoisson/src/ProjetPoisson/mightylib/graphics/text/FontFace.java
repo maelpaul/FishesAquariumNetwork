@@ -21,6 +21,13 @@ public class FontFace extends DataType {
         fontFile = new FontFile(PATH + infoPath);
     }
 
+    /**
+     * Compute the size of given text
+     * @param text Text's size to compute
+     * @param fontSize Size of the font
+     *
+     * @return A vector representing the size of the text (in px)
+     */
     public Vector2f computeSize(String text, float fontSize){
         Vector2f result = new Vector2f();
         Vector2f currentCharOffset = new Vector2f();

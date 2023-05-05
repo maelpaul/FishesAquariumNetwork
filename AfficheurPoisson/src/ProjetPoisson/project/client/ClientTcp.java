@@ -74,22 +74,18 @@ public class ClientTcp {
 
         try {
             stream = socket.getInputStream();
-            int messageLength = readMessageLength(stream);
-            byte[] byteMessage = new byte[messageLength];
-            int bytesRead = stream.read(byteMessage, 0, messageLength);
-
-            if (bytesRead == messageLength) {
-                message = new String(byteMessage, ENCODING);
-            } else {
-                throw new IOException("Unable to read the complete message.");
+            byte[] byteMessage = new byte[1024];
+            int bytesRead = stream.read(byteMessage);
+            if (bytesRead == -1) {
+                throw new IOException("End of stream reached before message was fully received.");
             }
+            message = new String(byteMessage, 0, bytesRead, ENCODING);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         return message;
     }
-
 
 
     public void connect() {
