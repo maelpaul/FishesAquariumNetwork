@@ -60,8 +60,8 @@ public class MenuScene extends Scene {
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
         /// SCENE INFORMATION ///
-        ServerThread serverThread = new ServerThread();
-        serverThread.start();
+        //ServerThread serverThread = new ServerThread();
+        //serverThread.start();
         ClientThread clientThread = new ClientThread();
         clientThread.start();
 
