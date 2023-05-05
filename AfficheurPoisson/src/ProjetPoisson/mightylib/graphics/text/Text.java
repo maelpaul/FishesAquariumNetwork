@@ -276,11 +276,11 @@ public class Text extends Renderer {
 
                 fontChar = font.getFontFile().getCharacter(c);
 
-                sizeTemp.x = (float)(fontChar.getWidth() * fontSize);
-                sizeTemp.y = (float)(fontChar.getHeight() * fontSize);
+                sizeTemp.x = (float)((fontChar.getWidth()) * fontSize);
+                sizeTemp.y = (float)((fontChar.getHeight()) * fontSize);
 
-                posTemp.x = (float) (currentCharOffset.x + fontChar.getxOffset() * fontSize - textReference.x + lineAlignmentOffset);
-                posTemp.y = (float)(currentCharOffset.y + fontChar.getyOffset() * fontSize - textReference.y);
+                posTemp.x = (float) (currentCharOffset.x /*+ fontChar.getxOffset() * fontSize*/ - textReference.x + lineAlignmentOffset);
+                posTemp.y = (float)(currentCharOffset.y /*+ fontChar.getyOffset() * fontSize*/ - textReference.y);
 
                 temp.x = (posTemp.x);
                 temp.y = (sizeTemp.x + posTemp.x);
@@ -299,10 +299,10 @@ public class Text extends Renderer {
                 charPositions[charCount * SIZE_COORDINATES + 6] = temp.y;
                 charPositions[charCount * SIZE_COORDINATES + 7] = temp.z;
 
-                temp.x = (float)fontChar.getxAtlas() + 0.5f;
-                temp.y = temp.x + (float)fontChar.getWidthAtlas() + 0.5f;
-                temp.z = (float)fontChar.getyAtlas() - 0.5f;
-                temp.w = temp.z + (float)fontChar.getHeightAtlas() - 0.5f;
+                temp.x = (float)(fontChar.getxAtlas());
+                temp.y = temp.x + (float)(fontChar.getWidthAtlas());
+                temp.z = (float)(fontChar.getyAtlas());
+                temp.w = temp.z + (float)(fontChar.getHeightAtlas());
 
                 texturePosition[charCount * SIZE_COORDINATES] = temp.x;
                 texturePosition[charCount * SIZE_COORDINATES + 1] = temp.z;
