@@ -14,12 +14,13 @@ public class FishManager {
         AddSuccessfully,
         AddErrorNameExisting,
 
+        AddErrorUnknownBehaviour,
+
         DeleteSuccessfully,
         DeleteErrorNameNotExisting
     }
 
     private final HashMap<String, Fish> fishes;
-    private final ArrayList<String> movementType;
     ArrayList<String> fishesFileName = new ArrayList<>();
     private final Random rand = new Random();
 
@@ -29,8 +30,6 @@ public class FishManager {
         this.info = info;
 
         fishes = new HashMap<>();
-        movementType = new ArrayList<>();
-        movementType.add("guided");
 
         File folderFish = new File(configuration.getPathForFishesResources());
         for (String childPath : Objects.requireNonNull(folderFish.list())) {
@@ -44,9 +43,21 @@ public class FishManager {
         if (fishes.containsKey(name))
             return EResult.AddErrorNameExisting;
 
+        Fish.EFishBehaviour current = null;
+
+        for (Fish.EFishBehaviour value : Fish.EFishBehaviour.values()){
+            if (value.name().equals(behaviour)) {
+                current = value;
+                break;
+            }
+        }
+
+        if (current == null)
+            return EResult.AddErrorUnknownBehaviour;
+
         fishes.put(
                 name,
-                new Fish(info,  fishesFileName.get(0), positionPercentage, sizePourcentage)
+                new Fish(info,  fishesFileName.get(0), current, positionPercentage, sizePourcentage)
         );
 
         return EResult.AddSuccessfully;
@@ -91,10 +102,7 @@ public class FishManager {
     }
 
     public String getMovementType (String delimiter, int namePerLine, String lineDelimiter){
-        if (movementType.size() == 0)
-            return null;
-
-        return collectionToStr(delimiter, namePerLine, lineDelimiter, movementType);
+        return collectionToStr(delimiter, namePerLine, lineDelimiter, Fish.GetFishBehaviourList());
     }
 
     public void update(){

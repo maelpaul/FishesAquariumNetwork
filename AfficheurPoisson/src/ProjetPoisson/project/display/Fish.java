@@ -13,9 +13,26 @@ import ProjetPoisson.mightylib.util.math.EFlip;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class Fish {
+
+    public enum EFishBehaviour {
+        Straight, Natural, Teleport;
+    }
+
+    private static final ArrayList<String> list;
+    static {
+        list = new ArrayList<>();
+        for (EFishBehaviour value : EFishBehaviour.values())
+            list.add(value.name());
+    }
+    public static ArrayList<String> GetFishBehaviourList(){
+        return list;
+    }
+
     private final WindowInfo windowInfo;
 
     private final Vector2fTweening goalPosition;
@@ -28,15 +45,19 @@ public class Fish {
     private Vector2f swimVector;
     private final Random random;
 
-    public Fish(WindowInfo windowInfo, String textureName, Vector2f positionPercentage, Vector2f sizePercentage){
+    private final EFishBehaviour behaviour;
+    public EFishBehaviour getBehaviour() { return behaviour; }
+
+    public Fish(WindowInfo windowInfo, String textureName, EFishBehaviour behaviour, Vector2f positionPercentage, Vector2f sizePercentage){
         this.windowInfo = windowInfo;
+        this.behaviour = behaviour;
 
         random = new Random();
 
         renderer = new RectangleRenderer("texture2D");
         renderer.switchToTextureMode(textureName);
         renderer.setSizePix(windowInfo.getVirtualSizeCopy().x * sizePercentage.x,
-                                windowInfo.getVirtualSizeCopy().y * sizePercentage.y)
+                            windowInfo.getVirtualSizeCopy().y * sizePercentage.y)
                 .setReference(EDirection.None);
 
         renderer.setPosition(new Vector2f(windowInfo.getVirtualSizeCopy().x * positionPercentage.x,
@@ -44,6 +65,7 @@ public class Fish {
 
         goalPosition = new Vector2fTweening();
         timer = new Timer();
+
 
         swimMovement = new FloatTweening();
         swimMovement.setTweeningValues(ETweeningType.Sinusoidal, ETweeningBehaviour.InOut)
@@ -65,11 +87,13 @@ public class Fish {
     public void update(){
         if (!timer.isFinished() && timer.isStarted()){
             goalPosition.update();
-            //swimMovement.update();
+            swimMovement.update();
             timer.update();
 
-            if (goalPosition.finished()){
+            if (goalPosition.finished() || behaviour == EFishBehaviour.Teleport) {
                 renderer.setPosition(goalPosition.goalValue());
+            } else if (behaviour == EFishBehaviour.Natural) {
+                renderer.setPosition(goalPosition.value());
             } else {
                 renderer.setPosition(goalPosition.value().add(new Vector2f(swimVector).mul(swimMovement.value())));
             }
@@ -77,7 +101,7 @@ public class Fish {
 
         sizeTweening.update();
         renderer.setScale(
-                new Vector3f(/*renderer.scale().x*/ sizeTweening.value(),
+                new Vector3f(sizeTweening.value(),
                              renderer.scale().y /*sizeTweening.value()*/,
                              renderer.scale().z)
         );
@@ -95,9 +119,18 @@ public class Fish {
                 windowInfo.getVirtualSizeCopy().x * positionPercentage.x,
                 windowInfo.getVirtualSizeCopy().y * positionPercentage.y);
 
+        ETweeningType swimType;
+        switch (behaviour){
+            case Natural:
+                swimType = ETweeningType.Quadratic;
+                break;
+            case Straight:
+            default:
+                swimType = ETweeningType.Linear;
+        }
 
         goalPosition.initTwoValue(time, this.renderer.get2DPosition(), position)
-               .setTweeningValues(ETweeningType.Quadratic, ETweeningBehaviour.InOut)
+               .setTweeningValues(swimType, ETweeningBehaviour.InOut)
                .setTweeningOption(ETweeningOption.Direct);
 
         timer.start(time);
