@@ -91,14 +91,19 @@ int main()
             check = 1;
             strcpy(buffer, "aquarium loaded");
             load_initial_aquarium_config("aquarium_example.txt", aquarium);
-            aquarium_print(aquarium);
+            //aquarium_print(aquarium);
             is_aquarium_loaded=1;
             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
-        }
-
+        } else {
+            strcpy(buffer, "you first need to load the aquarium");
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE); 
+            }
+        }  
     }while(is_aquarium_loaded == 0);
 
     do {
@@ -400,6 +405,21 @@ int main()
         if (!strcmp(ping_verif, "ping")) {
             check = 1;
             strcpy(buffer, "pong");
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+                // show command from prompt
+        char show_verif[5];
+        strncpy (show_verif, buffer, 4);
+        show_verif[4] = '\0';
+        if (!strcmp(show_verif, "show")) {
+            check = 1;
+            char to_send[256] = "";
+            controller_aquarium_print(aquarium, to_send);
+            strcpy(buffer, to_send);
             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);

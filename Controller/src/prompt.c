@@ -141,8 +141,13 @@ int main()
                 perror("Erreur lors de l'écriture sur la socket");
                 exit(EXIT_FAILURE);
             }
-            print_command(command);
-            printf("Enter your command :\n");
+                        
+            memset(buffer, 0, sizeof(buffer));
+                if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
+                    perror("Erreur lors de la réception de la réponse du serveur");
+                    exit(EXIT_FAILURE);
+                }
+            printf(">\n%s\n", buffer);
         }
     
         free_command(command);

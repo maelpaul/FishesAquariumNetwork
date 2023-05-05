@@ -160,3 +160,30 @@ int controller_start_fish(struct aquarium * aquarium, char * fish_name, time_t c
     }
     return -1;
 }
+
+void controller_aquarium_print(struct aquarium * aquarium, char * to_print){
+    char buffer [sizeof(int)*16+1];
+    sprintf(buffer, "%d", aquarium->size[0]);
+    strcat(to_print, buffer);
+    strcat(to_print, "x");
+    sprintf(buffer, "%d", aquarium->size[1]);
+    strcat(to_print, buffer);
+    strcat(to_print, "\n");
+    for(int i=0 ; i<aquarium->views_len ; i++){
+        strcat(to_print, aquarium->views[i]->name);
+        strcat(to_print, " ");
+        sprintf(buffer, "%d", aquarium->views[i]->coords[0]);
+        strcat(to_print, buffer);
+        strcat(to_print, "x");
+        sprintf(buffer, "%d", aquarium->views[i]->coords[1]);
+        strcat(to_print, buffer);
+        strcat(to_print, "+");
+        sprintf(buffer, "%d", aquarium->views[i]->size[0]);
+        strcat(to_print, buffer);
+        strcat(to_print, "+");
+        sprintf(buffer, "%d", aquarium->views[i]->size[1]);
+        strcat(to_print, buffer);
+        strcat(to_print, "\n");
+    }
+    strcat(to_print, "\0");
+}
