@@ -29,22 +29,18 @@ public class ClientThread extends CommunicationThread {
 
     public void run() {
         this.ClientSetup();
-        System.out.println("Client: Connected to server");
-
         try {
-            Thread.sleep(500); // Add a delay of 500 milliseconds
+            Thread.sleep(1000); // Add a delay of 500 milliseconds
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        client.sendMessage("Hello from client");
-        System.out.println("Client: Sent message to server: Hello from client");
+        client.sendMessage("addFish PoissonRouge at 90x40, 10x4, RandomWayPoint");
 
         String response = client.readMessage();
         System.out.println("Received response from server: " + response);
-
+        client.sendMessage("Azy je me casse");
         client.closeConnection();
-        System.out.println("Client: Disconnected from server");
     }
 
     public boolean didReceiveMessage() {
