@@ -81,6 +81,8 @@ public class AddFishCommand implements ICommand {
                 return "  -> OK : Aucun poisson enregistré !\n";
 
             return "  -> OK : Liste des noms de poissons :\n" + result;
+        } else if (option.equals("b")){
+
         }
 
         return "  -> NOK : Option inconnue, faites \"addFish help\" pour plus d'aide";
@@ -100,6 +102,6 @@ public class AddFishCommand implements ICommand {
         return "  -> help(addFish) : \n" +
                 "    addFish NAME at WIDTHxHEIGHT, XxY, BEHAVIOUR : ajoute un poisson\n" +
                 "    addFish -d : affiche la liste des types de déplacements\n" +
-                "    addFish -n : affiche la liste des noms utilisés\n";
+                "    addFish -n : affiche la liste des noms utilisés";
     }
 }
