@@ -24,8 +24,6 @@ int main()
 
     struct aquarium * aquarium = malloc(sizeof(struct aquarium));
     aquarium_init(aquarium);
-    load_initial_aquarium_config("aquarium_example.txt", aquarium);
-    aquarium_print(aquarium);
     
     // server and socket file descriptor
     int server_fd, newsockfd;
@@ -73,8 +71,37 @@ int main()
         exit(EXIT_FAILURE);
     }
 
+    int check = 0;
+    int is_aquarium_loaded = 0;
+
+    do{
+        // command from prompt
+
+        // reception
+        memset(buffer, 0, sizeof(buffer));
+        if ((n = recv(newsockfd, buffer, sizeof(buffer), 0)) < 0) {
+            perror("Erreur lors de la réception de la réponse du client");
+            exit(EXIT_FAILURE);
+        }
+
+        char load_verif[5];
+        strncpy (load_verif, buffer, 4);
+        load_verif[4] = '\0';
+        if (!strcmp(load_verif, "load")) {
+            check = 1;
+            strcpy(buffer, "aquarium loaded");
+            load_initial_aquarium_config("aquarium_example.txt", aquarium);
+            aquarium_print(aquarium);
+            is_aquarium_loaded=1;
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+    }while(is_aquarium_loaded == 0);
+
     do {
-        int check = 0;
 
         // time_t new_time = time(NULL);
         // if (difftime(new_time, start_time) >= REFRESH_TIME) {
@@ -95,7 +122,18 @@ int main()
         }
 
         printf("Message du client : %s\n", buffer);
-
+                // command from prompt
+        char load_verif[5];
+        strncpy (load_verif, buffer, 4);
+        load_verif[4] = '\0';
+        if (!strcmp(load_verif, "load")) {
+            check = 1;
+            strcpy(buffer, "oui");
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }
+        }
         // Initialisation et authentification
         if (!strncmp(buffer,"hello",5)) {
             check = 1;
