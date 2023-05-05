@@ -130,15 +130,6 @@ int main()
         
         char * my_argv[4] = {arg1, arg2, arg3, arg4};
         int my_argc = length(my_argv); 
-        if (my_argc < 2) {
-            if (strcmp(arg1, "exit") == 0 || strcmp(arg1, "quit") == 0 || strcmp(arg1, "q") == 0) {
-                free_command(command);
-                return EXIT_SUCCESS;
-            }
-            printf("Failure\n");
-            free_command(command);
-            return EXIT_FAILURE;
-        }
 
         // for (int i = 0; i < my_argc; i++) {
         //     printf("argv[%d] = %s\n", i, my_argv[i]);
