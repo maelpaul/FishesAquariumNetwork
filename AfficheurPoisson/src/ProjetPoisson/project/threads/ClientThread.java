@@ -40,7 +40,7 @@ public class ClientThread extends CommunicationThread {
         String response = client.readMessage();
         System.out.println("Received response from server: " + response);
         client.sendMessage("Azy je me casse");
-        client.closeConnection();
+        //client.closeConnection();
     }
 
     public boolean didReceiveMessage() {
