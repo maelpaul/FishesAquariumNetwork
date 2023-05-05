@@ -215,7 +215,7 @@ int main()
                 char fish_list[1024] = "list ";
                 for (int i = 0; i < aquarium->fishes_len; i++) {
                     char fish_info[128];
-                    sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
+                    sprintf(fish_info, "> [%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
                     strcat(fish_list, fish_info);
                 }
                 strcat(fish_list, "\n");
@@ -280,28 +280,28 @@ int main()
             }
 
             if (check_path == 0 && path != NULL) {
-                strcpy(buffer, "NOK : Modèle de mobilité non supporté");
+                strcpy(buffer, "> NOK : Modèle de mobilité non supporté");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 }
             }
             else if (val == 0 && check_path == 1) {
-                strcpy(buffer, "NOK : Poisson déjà existant");
+                strcpy(buffer, "> NOK : Poisson déjà existant");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 }
             }
             else if (val == 1 && check_path == 1) {
-                strcpy(buffer, "OK");
+                strcpy(buffer, "> OK");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 } 
             }
             else {
-                strcpy(buffer, "NOK : Syntaxe invalide");
+                strcpy(buffer, "> NOK : Syntaxe invalide");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
@@ -328,21 +328,21 @@ int main()
 
             int val = controller_del_fish(aquarium, fish);
             if (val == 0) {
-                strcpy(buffer, "NOK : Poisson inexistant");
+                strcpy(buffer, "> NOK : Poisson inexistant");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 }
             }
             else if (val == 1) {
-                strcpy(buffer, "OK");
+                strcpy(buffer, "> OK");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 } 
             }
             else {
-                strcpy(buffer, "NOK : Nom de poisson invalide");
+                strcpy(buffer, "> NOK : Nom de poisson invalide");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
