@@ -104,8 +104,6 @@ int main()
 
     do {
         int check = 0;
-        
-        controller_update_fishes(aquarium, REFRESH_TIME);
 
         // Réception de la réponse du client
         memset(buffer, 0, sizeof(buffer));
@@ -115,7 +113,7 @@ int main()
         }
 
         printf("Message du client : %s\n", buffer);
-                // command from prompt
+        // command from prompt
         char load_verif[5];
         strncpy (load_verif, buffer, 4);
         load_verif[4] = '\0';
@@ -180,10 +178,11 @@ int main()
             check = 1;
             // Lister les poissons en continue
             for (int i = 0; i < 10; ++i) {
-                char fish_list[1024] = "list ";
+                controller_update_fishes(aquarium, REFRESH_TIME);
+                char fish_list[1024] = "> list ";
                 for (int i = 0; i < aquarium->fishes_len; i++) {
                     char fish_info[128];
-                    sprintf(fish_info, "> [%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
+                    sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
                     strcat(fish_list, fish_info);
                 }
                 strcat(fish_list, "\n");
@@ -193,7 +192,6 @@ int main()
                 }
                 if (i != 9) {
                     sleep(1);
-                    controller_update_fishes(aquarium, REFRESH_TIME);
                 }                
             }
         }
@@ -206,10 +204,11 @@ int main()
 
             if (!strcmp(ask_periodic_verif, "getFishes")) {
                 check = 1;
-                char fish_list[1024] = "list ";
+                controller_update_fishes(aquarium, REFRESH_TIME);
+                char fish_list[1024] = "> list ";
                 for (int i = 0; i < aquarium->fishes_len; i++) {
                     char fish_info[128];
-                    sprintf(fish_info, "> [%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
+                    sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
                     strcat(fish_list, fish_info);
                 }
                 strcat(fish_list, "\n");
