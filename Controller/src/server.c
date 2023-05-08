@@ -85,16 +85,51 @@ int main()
         strncpy (load_verif, buffer, 4);
         load_verif[4] = '\0';
         if (!strcmp(load_verif, "load")) {
-            strcpy(buffer, "> aquarium loaded");
-            load_initial_aquarium_config("aquarium_example.txt", aquarium);
-            //aquarium_print(aquarium);
-            is_aquarium_loaded=1;
-            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                perror("Erreur lors de l'envoi du message au client");
-                exit(EXIT_FAILURE);
+            char info[256];
+            memcpy(info, buffer, 256);
+            char delim[] = " ";
+
+            char * verif = strtok(info, delim);
+            (void) verif;
+            char * _aquarium_name = strtok(NULL, delim);
+            char * aquarium_name = strtok(_aquarium_name, "\n");
+
+            if (aquarium_name == NULL) {
+                strcpy(buffer, "> NOK : invalid aquarium name");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else if (!strcmp(aquarium_name, "aquarium")) {
+                strcpy(buffer, "> OK : aquarium loaded (");
+                load_initial_aquarium_config("aquarium_example.txt", aquarium);
+                int nb_views = aquarium->views_len;
+                char len[10];
+                sprintf(len, "%d ", nb_views);
+                strcat(buffer, len);
+                if (nb_views == 0 || nb_views == 1) {
+                    strcat(buffer, "display view)!");
+                }
+                else {
+                    strcat(buffer, "display views)!");    
+                }
+                //aquarium_print(aquarium);
+                is_aquarium_loaded=1;
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else {
+                strcpy(buffer, "> NOK : aquarium not existing");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
             }
         } else {
-            strcpy(buffer, "> you first need to load the aquarium");
+            strcpy(buffer, "> NOK : you first need to load the aquarium");
             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE); 
@@ -113,18 +148,46 @@ int main()
         }
 
         printf("Message du client : %s\n", buffer);
+
         // command from prompt
         char load_verif[5];
         strncpy (load_verif, buffer, 4);
         load_verif[4] = '\0';
         if (!strcmp(load_verif, "load")) {
             check = 1;
-            strcpy(buffer, "> aquarium already loaded");
-            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                perror("Erreur lors de l'envoi du message au client");
-                exit(EXIT_FAILURE);
+            
+            char info[256];
+            memcpy(info, buffer, 256);
+            char delim[] = " ";
+
+            char * verif = strtok(info, delim);
+            (void) verif;
+            char * _aquarium_name = strtok(NULL, delim);
+            char * aquarium_name = strtok(_aquarium_name, "\n");
+
+            if (aquarium_name == NULL) {
+                strcpy(buffer, "> NOK : invalid aquarium name");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else if (!strcmp(aquarium_name, "aquarium")) {
+                strcpy(buffer, "> OK : aquarium already loaded");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else {
+                strcpy(buffer, "> NOK : aquarium not existing");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
             }
         }
+
         // Initialisation et authentification
         if (!strncmp(buffer,"hello",5)) {
             check = 1;
@@ -442,10 +505,36 @@ int main()
 
         if (!strcmp(ping_verif, "ping")) {
             check = 1;
-            strcpy(buffer, "> pong");
-            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                perror("Erreur lors de l'envoi du message au client");
-                exit(EXIT_FAILURE);
+
+            char info[256];
+            memcpy(info, buffer, 256);
+            char delim[] = " ";
+
+            char * verif = strtok(info, delim);
+            (void) verif;
+            char * _channel = strtok(NULL, delim);
+            char * channel = strtok(_channel, "\n");
+
+            if (channel == NULL) {
+                strcpy(buffer, "> NOK : numéro de port invalide");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else if (!strcmp(channel, "12345")) {
+                strcpy(buffer, "> pong 12345");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else {
+                strcpy(buffer, "> NOK : mauvais numéro de port");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
             }
         }
 
@@ -455,18 +544,44 @@ int main()
         show_verif[4] = '\0';
         if (!strcmp(show_verif, "show")) {
             check = 1;
-            char to_send[256] = "> ";
-            controller_aquarium_print(aquarium, to_send);
-            strcpy(buffer, to_send);
-            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                perror("Erreur lors de l'envoi du message au client");
-                exit(EXIT_FAILURE);
+
+            char info[256];
+            memcpy(info, buffer, 256);
+            char delim[] = " ";
+
+            char * verif = strtok(info, delim);
+            (void) verif;
+            char * _aquarium_name = strtok(NULL, delim);
+            char * aquarium_name = strtok(_aquarium_name, "\n");
+
+            if (aquarium_name == NULL) {
+                strcpy(buffer, "> NOK : invalid aquarium name");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else if (!strcmp(aquarium_name, "aquarium")) {
+                char to_send[256] = "> OK : \n";
+                controller_aquarium_print(aquarium, to_send);
+                strcpy(buffer, to_send);
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else {
+                strcpy(buffer, "> NOK : aquarium not existing");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
             }
         }
 
         // check des commandes inexistantes
         if (check == 0 && strcmp(buffer, "log out\n") != 0) {
-            strcpy(buffer, "> Commande inexistante");
+            strcpy(buffer, "> NOK : Commande inexistante");
             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
