@@ -392,6 +392,49 @@ int main()
             }
         }
 
+        // statut
+        char status_verif[7];
+        strncpy (status_verif, buffer, 6);
+        status_verif[6] = '\0';   /* null character manually added */
+
+        if (!strcmp(status_verif, "status")) {
+            check = 1;
+            controller_update_fishes(aquarium, REFRESH_TIME);
+            // Affichage statut
+            int nb_fishes = aquarium->fishes_len;
+            char len[10];
+            sprintf(len, "%d ", nb_fishes);
+            char info[1024] = "> OK : Connecté au contrôleur, ";
+            strcat(info, len);
+
+            if (nb_fishes == 0 || nb_fishes == 1) {
+                char info2[100] = "poisson trouvé";
+                strcat(info, info2);
+            }
+            else {
+                char info2[100] = "poissons trouvés";
+                strcat(info, info2);
+            }
+            strcat(info, "\n");
+
+            for (int i = 0; i < aquarium->fishes_len; i++) {
+                char fish_info[128];
+                sprintf(fish_info, "Fish %s at %dx%d, %dx%d ", aquarium->fishes[i]->name, aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1]);
+                if (aquarium->fishes[i]->started == 1) {
+                    strcat(fish_info, "started");
+                }
+                else {
+                    strcat(fish_info, "notStarted");
+                }
+                strcat(fish_info, "\n");
+                strcat(info, fish_info);
+            }
+            if (send(newsockfd, info, strlen(info), 0) < 0) {
+                perror("Erreur lors de l'envoi de la liste des poissons au client");
+                exit(EXIT_FAILURE);
+            }
+        }
+
         // ping
         char ping_verif[5];
         strncpy (ping_verif, buffer, 4);
