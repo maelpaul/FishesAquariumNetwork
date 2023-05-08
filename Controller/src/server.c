@@ -14,8 +14,6 @@
 
 int main()
 {
-    srand(time(NULL));
-    //time_t start_time = time(NULL);
     struct config conf;
     char buffer[256];
     int n;
@@ -107,16 +105,7 @@ int main()
     do {
         int check = 0;
         
-        // time_t new_time = time(NULL);
-        // if (difftime(new_time, start_time) >= REFRESH_TIME) {
-        //     start_time = new_time;
-        //     for (int i = 0; i < aquarium->fishes_len; i++) {
-        //         aquarium->fishes[i]->path(aquarium->fishes[i], aquarium->size[0], aquarium->size[1]);
-        //     }
-        // }
-
-        time_t current_time = time(NULL);
-        controller_update_fishes(aquarium, current_time, REFRESH_TIME);
+        controller_update_fishes(aquarium, REFRESH_TIME);
 
         // Réception de la réponse du client
         memset(buffer, 0, sizeof(buffer));
@@ -204,8 +193,7 @@ int main()
                 }
                 if (i != 9) {
                     sleep(1);
-                    current_time = time(NULL);
-                    controller_update_fishes(aquarium, current_time, REFRESH_TIME);
+                    controller_update_fishes(aquarium, REFRESH_TIME);
                 }                
             }
         }
@@ -374,7 +362,7 @@ int main()
             char * _name = strtok(NULL, delim);
             char * name = strtok(_name, "\n");
 
-            int val = controller_start_fish(aquarium, name, current_time, REFRESH_TIME);
+            int val = controller_start_fish(aquarium, name, REFRESH_TIME);
             if (val == 0) {
                 strcpy(buffer, "> NOK : Poisson inexistant");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
@@ -388,6 +376,13 @@ int main()
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 } 
+            }
+            else if (val == 2) {
+                strcpy(buffer, "> NOK : Poisson déjà démaré");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }                 
             }
             else {
                 strcpy(buffer, "> NOK : Nom de poisson invalide");

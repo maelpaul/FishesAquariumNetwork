@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include "aquarium.h"
 #include "fish.h"
 #include "view.h"
@@ -161,18 +162,26 @@ void RandomWayPoint(struct fish * fish, int width, int height) {
     fish->dest[1] = rand() % height;    
 }
 
-int start_fish(struct aquarium * aquarium, char * fish_name, time_t command_time, int time_to_dest) {
+int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest) {
     int val = 0;
     for (int i = 0; i < aquarium->fishes_len; i++) {
         if (strcmp(aquarium->fishes[i]->name, fish_name) == 0) {
-            val = 1;
-            fish_start(aquarium->fishes[i], command_time, time_to_dest);
+            if (aquarium->fishes[i]->started == 0) {
+                val = 1;
+                fish_start(aquarium->fishes[i], time_to_dest);
+            }
+            else {
+                val = 2;
+            }
         }
     }
     return val;
 }
 
-void update_fishes(struct aquarium * aquarium, time_t command_time, int refresh_time) {
+void update_fishes(struct aquarium * aquarium, int refresh_time) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    time_t command_time = tv.tv_sec;
     for (int i = 0; i < aquarium->fishes_len; i++) {
         struct fish * fish = aquarium->fishes[i];
         if (fish->started != 0) {

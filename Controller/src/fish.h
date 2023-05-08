@@ -22,6 +22,6 @@ void fish_free(struct fish * fish);
 
 void fish_print(struct fish * fish);
 
-void fish_start(struct fish * fish, time_t command_time, int time_to_dest);
+void fish_start(struct fish * fish, int time_to_dest);
 
 #endif
