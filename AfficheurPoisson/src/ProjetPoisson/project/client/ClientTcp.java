@@ -10,6 +10,8 @@ public class ClientTcp {
     private final Configuration configuration;
     private Socket socket;
 
+    private boolean TryingConnection;
+
     public ClientTcp(Configuration configuration){
         this.configuration = configuration;
     }
@@ -18,8 +20,10 @@ public class ClientTcp {
 
     public void tryCreateConnection() {
         try {
+            TryingConnection = true;
             socket = new Socket(configuration.getAddress(), configuration.getPort());
-            System.out.println("[Debug] Socket created successfully."); // Add this line
+            //System.out.println("[Debug] Socket created successfully.");
+            TryingConnection = false;
         } catch (IOException e) {
             socket = null;
             System.out.println("Can't create socket with address : " + configuration.getAddress()
@@ -27,6 +31,9 @@ public class ClientTcp {
         }
     }
 
+    public boolean isTryingConnection() {
+        return TryingConnection;
+    }
 
     public void sendMessage(String message) {
         try {
@@ -37,7 +44,7 @@ public class ClientTcp {
                 os.write(ByteBuffer.allocate(4).putInt(dataLength).array());
                 os.write(dataBytes);
                 os.flush();
-                System.out.println("[Debug] Client sent message: " + message);
+                //System.out.println("[Debug] Client sent message: " + message);
             } else {
                 System.out.println("Unable to send message: Socket is not connected or is closed.");
             }
@@ -83,7 +90,7 @@ public class ClientTcp {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+        message = message + "\n";
         return message;
     }
 
@@ -92,7 +99,7 @@ public class ClientTcp {
         try {
             //System.out.println(this.configuration);
             this.socket = new Socket(configuration.getAddress(), configuration.getPort());
-            System.out.println("[Debug] Client TCP: Connection made successfully.");
+            //System.out.println("[Debug] Client TCP: Connection made successfully.");
         } catch (IOException e) {
             e.printStackTrace();
         }
