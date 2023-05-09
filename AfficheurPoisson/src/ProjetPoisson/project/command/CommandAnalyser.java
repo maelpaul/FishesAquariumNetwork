@@ -1,5 +1,6 @@
 package ProjetPoisson.project.command;
 
+import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.command.commands.*;
 import ProjetPoisson.project.display.Fish;
 import ProjetPoisson.project.display.FishManager;
@@ -15,14 +16,14 @@ public class CommandAnalyser {
 
     HashMap<String, ICommand> relations;
 
-    public CommandAnalyser(FishManager fishManager) {
+    public CommandAnalyser(ClientTcp client, FishManager fishManager) {
         relations = new HashMap<>();
         relations.put("help", new HelpCommand());
         relations.put("clear", new ClearCommand());
         relations.put("addFish", new AddFishCommand(fishManager));
         relations.put("delFish", new DelFishCommand(fishManager));
         relations.put("startFish", new StartFishCommand());
-        relations.put("status", new StatusCommand());
+        relations.put("status", new StatusCommand(client));
 
         // get fish, ls (commande système (pas utilisateur))
     }
