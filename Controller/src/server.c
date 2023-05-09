@@ -94,14 +94,7 @@ int main()
             char * _aquarium_name = strtok(NULL, delim);
             char * aquarium_name = strtok(_aquarium_name, "\n");
 
-            if (aquarium_name == NULL) {
-                strcpy(buffer, "> NOK : invalid aquarium name");
-                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            else if (!strcmp(aquarium_name, "aquarium")) {
+            if (!strcmp(aquarium_name, "aquarium")) {
                 strcpy(buffer, "> OK : aquarium loaded (");
                 load_initial_aquarium_config("aquarium_example.txt", aquarium);
                 int nb_views = aquarium->views_len;
@@ -172,14 +165,7 @@ int main()
             char * _aquarium_name = strtok(NULL, delim);
             char * aquarium_name = strtok(_aquarium_name, "\n");
 
-            if (aquarium_name == NULL) {
-                strcpy(buffer, "> NOK : invalid aquarium name");
-                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            else if (!strcmp(aquarium_name, "aquarium")) {
+            if (!strcmp(aquarium_name, "aquarium")) {
                 strcpy(buffer, "> OK : aquarium already loaded");
                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
@@ -561,14 +547,7 @@ int main()
             char * _aquarium_name = strtok(NULL, delim);
             char * aquarium_name = strtok(_aquarium_name, "\n");
 
-            if (aquarium_name == NULL) {
-                strcpy(buffer, "> NOK : invalid aquarium name");
-                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            else if (!strcmp(aquarium_name, "aquarium")) {
+            if (!strcmp(aquarium_name, "aquarium")) {
                 char to_send[256] = "> OK : \n";
                 controller_aquarium_print(aquarium, to_send);
                 strcpy(buffer, to_send);
