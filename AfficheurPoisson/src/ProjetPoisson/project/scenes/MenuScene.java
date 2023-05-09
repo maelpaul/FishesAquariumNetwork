@@ -65,6 +65,8 @@ public class MenuScene extends Scene {
         ClientThread clientThread = new ClientThread();
         clientThread.start();
 
+        clientThread.sendMessage("hello");
+
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);
 
@@ -113,14 +115,6 @@ public class MenuScene extends Scene {
         super.update();
 
         fishManager.update();
-
-        KeyboardManager manager = mainContext.getKeyboardManager();
-
-        for (char letter = 'a'; letter <= 'z'; ++letter){
-            if (manager.keyPressed(GLFW.GLFW_KEY_A + (letter - 'A'))){
-                System.out.println(letter);
-            }
-        }
 
         terminal.update(mainContext.getInputManager(), mainContext.getSystemInfo());
 

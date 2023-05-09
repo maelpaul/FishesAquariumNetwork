@@ -83,8 +83,6 @@ public class FontFile {
                 if (fontChar.getyOffset() < 0)
                     fontChar.setyOffset(-fontChar.getyOffset());
 
-                System.out.println("sfsdf" + fontChar.getxOffset());
-
                 characters.put(id, fontChar);
             }
 
