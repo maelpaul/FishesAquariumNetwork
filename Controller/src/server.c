@@ -146,8 +146,15 @@ int main()
             perror("Erreur lors de la réception de la réponse du client");
             exit(EXIT_FAILURE);
         }
-
-        printf("Message du client : %s\n", buffer);
+        int test = 0;
+        for(long unsigned int i=0;i<5;i++){
+            if (buffer[test]=='\0'){
+                test++;
+            }
+        }
+        if (test<=2) {
+            printf("Message du client : %s\n", buffer);
+        }
 
         // command from prompt
         char load_verif[5];

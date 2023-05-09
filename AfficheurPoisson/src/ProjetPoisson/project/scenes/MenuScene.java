@@ -18,6 +18,7 @@ import ProjetPoisson.mightylib.scene.Scene;
 import ProjetPoisson.mightylib.util.Timer;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
+import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;  
@@ -62,8 +63,29 @@ public class MenuScene extends Scene {
         /// SCENE INFORMATION ///
         //ServerThread serverThread = new ServerThread();
         //serverThread.start();
-        ClientThread clientThread = new ClientThread();
-        clientThread.start();
+        //ClientThread clientThread = new ClientThread();
+        //clientThread.start();
+
+        Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
+        ClientTcp client = new ClientTcp(conf_client);
+        client.tryCreateConnection();
+        client.sendMessage("load aquarium");
+        String response = client.readMessage();
+        System.out.println("Received response from server: " + response);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        client.sendMessage("addFish PoissonRouge at 90x40, 10x4, RandomWayPoint");
+        String response2 = client.readMessage();
+        System.out.println("Received response from server: " + response2);
+        client.sendMessage("addFish PoissonRouge2 at 200x30, 10x4, RandomWayPoint");
+        String response3 = client.readMessage();
+        System.out.println("Received response from server: " + response3);
+        //client.sendMessage("ls");
+        client.sendMessage("addFish PoissonRouge3 at 135x82, 12x3, RandomWayPoint");
+        client.closeConnection();
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);

@@ -36,11 +36,17 @@ public class ClientThread extends CommunicationThread {
         }
 
         client.sendMessage("addFish PoissonRouge at 90x40, 10x4, RandomWayPoint");
-
+        client.sendMessage("addFish PoissonRouge2 at 200x30, 10x4, RandomWayPoint");
         String response = client.readMessage();
         System.out.println("Received response from server: " + response);
-        client.sendMessage("Azy je me casse");
-        //client.closeConnection();
+        //client.sendMessage("ls");
+        client.sendMessage("addFish PoissonRouge3 at 135x82, 12x3, RandomWayPoint");
+        try {
+            Thread.sleep(2000); // Add a delay of 500 milliseconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        client.closeConnection();
     }
 
     public boolean didReceiveMessage() {
