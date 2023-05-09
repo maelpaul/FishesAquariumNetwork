@@ -25,6 +25,7 @@ public class ClientTcp {
             //System.out.println("[Debug] Socket created successfully.");
             TryingConnection = false;
         } catch (IOException e) {
+            TryingConnection = false;
             socket = null;
             System.out.println("Can't create socket with address : " + configuration.getAddress()
                     + " and port : " + configuration.getPort());

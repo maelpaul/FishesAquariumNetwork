@@ -50,6 +50,8 @@ public class MenuScene extends Scene {
     private Texture displacementMap;
     private FloatTweening displacementMapTweening;
 
+    private ClientTcp client;
+
 
     public void init(String[] args) {
         super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
@@ -66,17 +68,72 @@ public class MenuScene extends Scene {
         //ClientThread clientThread = new ClientThread();
         //clientThread.start();
 
+        Vector2i windowSize = mainContext.getWindow().getInfo().getSizeCopy();
+        terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.x * 0.5f,windowSize.y * 0.5f));
+
         Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
-        ClientTcp client = new ClientTcp(conf_client);
+        client = new ClientTcp(conf_client);
         client.tryCreateConnection();
+
+        main3DCamera.setPos(new Vector3f(0, 0, 0));
+        setClearColor(52, 189, 235, 1f);
+
+        /// RENDERERS ///
+
+        renderer = new RectangleRenderer("texture2DDisplacement");
+        renderer.switchToTextureMode("background");
+        renderer.setSizePix(windowSize.x, windowSize.y);
+
+        text = new Text();
+        text.setText("Aquarium poisson")
+                .setFont("bahnschrift")
+                .setAlignment(ETextAlignment.Center)
+                .setReference(EDirection.None)
+                .setPosition(new Vector2f(windowSize.x * 0.5f, windowSize.y * 0.2f))
+                .setColor(new Color4f(1, 1, 1, 1))
+                .setFontSize(40);
+
+        Configuration conf = Resources.getInstance().getResource(Configuration.class, "affichage");
+        Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
+
+        fishManager = new FishManager(mainContext.getWindow().getInfo(), configuration);
+        /*int numberFish = 6;
+        float size = MightyMath.mapLog(numberFish, 10, 100, 0.17f, 0.15f);
+
+        for (int i = 0; i < numberFish; ++i)
+            fishManager.addFish("Fish" + i, new Vector2f(0.5f, 0.5f), new Vector2f(size, size),
+                    (i % 3 == 0) ? "Straight" :  (i % 3 == 1) ?  "Teleport" : "Natural");*/
+
+        displacementMap = Resources.getInstance().getResource(Texture.class, "displacementMap");
+        ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("displacementMap", 1);
+
+        displacementMapTweening = new FloatTweening();
+        displacementMapTweening.setTweeningValues(ETweeningType.Linear, ETweeningBehaviour.InOut)
+                .setTweeningOption(ETweeningOption.LoopReversed)
+                .initTwoValue(15f, 0f, 15f);
+
+
+        analyser = new CommandAnalyser(client, fishManager);
+    }
+
+    public void tryEntryConnection(){
+        client.tryCreateConnection();
+        System.out.println("NOW");
+        try {
+            Thread.sleep(2500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        client.tryCreateConnection();
+
         client.sendMessage("load aquarium");
-        String response = client.readMessage();
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        System.out.println("Received response from server: " + response);
+        terminal.addToResultText(client.readMessage());
+        //System.out.println("Received response from server: " + response);
         client.sendMessage("show aquarium");
         String response2 = client.readMessage();
         System.out.println("Received response from server: " + response2);
@@ -94,56 +151,17 @@ public class MenuScene extends Scene {
         }
         client.closeConnection();
 
-        clientThread.sendMessage("hello");
-
-        main3DCamera.setPos(new Vector3f(0, 0, 0));
-        setClearColor(52, 189, 235, 1f);
-
-        /// RENDERERS ///
-
-        Vector2i windowSize = mainContext.getWindow().getInfo().getSizeCopy();
-
-        renderer = new RectangleRenderer("texture2DDisplacement");
-        renderer.switchToTextureMode("background");
-        renderer.setSizePix(windowSize.x, windowSize.y);
-
-        text = new Text();
-        text.setText("Aquarium poisson")
-                .setFont("bahnschrift")
-                .setAlignment(ETextAlignment.Center)
-                .setReference(EDirection.None)
-                .setPosition(new Vector2f(windowSize.x * 0.5f, windowSize.y * 0.2f))
-                .setColor(new Color4f(1, 1, 1, 1))
-                .setFontSize(40);
-
-        terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.x * 0.5f,windowSize.y * 0.5f));
-        Configuration conf = Resources.getInstance().getResource(Configuration.class, "affichage");
-        Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
-
-        fishManager = new FishManager(mainContext.getWindow().getInfo(), configuration);
-        int numberFish = 6;
-        float size = MightyMath.mapLog(numberFish, 10, 100, 0.17f, 0.15f);
-
-        for (int i = 0; i < numberFish; ++i)
-            fishManager.addFish("Fish" + i, new Vector2f(0.5f, 0.5f), new Vector2f(size, size),
-                    (i % 3 == 0) ? "Straight" :  (i % 3 == 1) ?  "Teleport" : "Natural");
-
-        displacementMap = Resources.getInstance().getResource(Texture.class, "displacementMap");
-        ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("displacementMap", 1);
-
-        displacementMapTweening = new FloatTweening();
-        displacementMapTweening.setTweeningValues(ETweeningType.Linear, ETweeningBehaviour.InOut)
-                .setTweeningOption(ETweeningOption.LoopReversed)
-                .initTwoValue(15f, 0f, 15f);
-
-
-        analyser = new CommandAnalyser(fishManager);
+        // client.sendMessage("hello");
     }
 
     public void update() {
         super.update();
-
         fishManager.update();
+
+        System.out.println(client.isConnected() + " " + client.isTryingConnection());
+        if (!client.isConnected() && !client.isTryingConnection()) {
+            client.tryCreateConnection();
+        }
 
         terminal.update(mainContext.getInputManager(), mainContext.getSystemInfo());
 
