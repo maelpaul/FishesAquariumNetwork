@@ -141,7 +141,7 @@ int main()
                 perror("Erreur lors de l'écriture sur la socket");
                 exit(EXIT_FAILURE);
             }
-            
+                        
             memset(buffer, 0, sizeof(buffer));
                 if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
                     perror("Erreur lors de la réception de la réponse du serveur");

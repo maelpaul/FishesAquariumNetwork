@@ -27,9 +27,10 @@ int hello_command_check(char * buffer, char * view_name);
 
 char * get_fish(struct aquarium *aquarium, char * fish_name);
 
-void controller_update_fishes(struct aquarium * aquarium, time_t command_time, int refresh_time);
+void controller_update_fishes(struct aquarium * aquarium, int refresh_time);
 
-int controller_start_fish(struct aquarium * aquarium, char * fish_name, time_t command_time, int time_to_dest);
+int controller_start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest);
 
 void controller_aquarium_print(struct aquarium * aquarium, char * to_print);
+
 #endif

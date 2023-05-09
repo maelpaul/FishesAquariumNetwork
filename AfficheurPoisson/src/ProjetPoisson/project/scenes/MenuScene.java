@@ -18,6 +18,7 @@ import ProjetPoisson.mightylib.scene.Scene;
 import ProjetPoisson.mightylib.util.Timer;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
+import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;  
@@ -62,8 +63,36 @@ public class MenuScene extends Scene {
         /// SCENE INFORMATION ///
         //ServerThread serverThread = new ServerThread();
         //serverThread.start();
-        ClientThread clientThread = new ClientThread();
-        clientThread.start();
+        //ClientThread clientThread = new ClientThread();
+        //clientThread.start();
+
+        Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
+        ClientTcp client = new ClientTcp(conf_client);
+        client.tryCreateConnection();
+        client.sendMessage("load aquarium");
+        String response = client.readMessage();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        System.out.println("Received response from server: " + response);
+        client.sendMessage("show aquarium");
+        String response2 = client.readMessage();
+        System.out.println("Received response from server: " + response2);
+        client.sendMessage("addFish PoissonRouge2 at 200x30, 10x4, RandomWayPoint");
+        String response3 = client.readMessage();
+        System.out.println("Received response from server: " + response3);
+        String response4 = client.readMessage();
+        client.sendMessage("status");
+        System.out.println("Received response from server: " + response4);
+        client.sendMessage("ping 12345");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        client.closeConnection();
 
         clientThread.sendMessage("hello");
 

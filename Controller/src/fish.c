@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 void fish_init(struct fish * fish) {
     fish->name = NULL;
@@ -49,7 +50,10 @@ void fish_print(struct fish * fish) {
     printf("==============================\n");
 }
 
-void fish_start(struct fish * fish, time_t command_time, int time_to_dest) {
+void fish_start(struct fish * fish, int time_to_dest) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    time_t command_time = tv.tv_sec;
     fish->started = 1;
     fish->started_time = command_time;
     fish->time_to_dest = time_to_dest;
