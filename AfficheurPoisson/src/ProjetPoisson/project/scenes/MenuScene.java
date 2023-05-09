@@ -71,20 +71,27 @@ public class MenuScene extends Scene {
         client.tryCreateConnection();
         client.sendMessage("load aquarium");
         String response = client.readMessage();
-        System.out.println("Received response from server: " + response);
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
-        client.sendMessage("addFish PoissonRouge at 90x40, 10x4, RandomWayPoint");
+        System.out.println("Received response from server: " + response);
+        client.sendMessage("show aquarium");
         String response2 = client.readMessage();
         System.out.println("Received response from server: " + response2);
         client.sendMessage("addFish PoissonRouge2 at 200x30, 10x4, RandomWayPoint");
         String response3 = client.readMessage();
         System.out.println("Received response from server: " + response3);
-        //client.sendMessage("ls");
-        client.sendMessage("addFish PoissonRouge3 at 135x82, 12x3, RandomWayPoint");
+        String response4 = client.readMessage();
+        client.sendMessage("status");
+        System.out.println("Received response from server: " + response4);
+        client.sendMessage("ping 12345");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         client.closeConnection();
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
