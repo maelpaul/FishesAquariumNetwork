@@ -1,156 +1,14 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <errno.h>
-#include <time.h>
-#include <unistd.h>
-#include <pthread.h>
 #include "thread.h"
 
-#include "server_utils.h"
-
-#define REFRESH_TIME 5
-#define NB_CLIENTS 8
-
-int main()
+int client(void * client_arg)
 {
-    struct config conf;
+
+    struct client_arg * args = (struct client_arg *) client_arg;
     char buffer[256];
     int n;
 
-    load_config("controller.cfg", &conf);
-
-    struct aquarium * aquarium = malloc(sizeof(struct aquarium));
-    aquarium_init(aquarium);
-    
-    // server and socket file descriptor
-    int server_fd, newsockfd;
-    int portno = conf.controller_port;
-    struct sockaddr_in serv_addr;
-    int addrlen = sizeof(serv_addr);
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
-
-    if (server_fd < 0) {
-        perror("Erreur lors de l'ouverture de la socket'");
-        exit(EXIT_FAILURE);
-    }
-
-    const int enable = 1;
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
-        perror("setsockopt(SO_REUSEADDR) failed");
-        exit(EXIT_FAILURE);
-    }
-
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(portno);
-
-    if (bind(server_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-        perror("Erreur lors de la liaison du socket");
-        exit(EXIT_FAILURE);
-    }
-
-    // pthread_create sur la fonction découte 
-
-    // Met le socket en écoute sur le port spécifié
-    if (listen(server_fd, 5) < 0) {
-        perror("Erreur lors de la mise en écoute du socket");
-        exit(EXIT_FAILURE);
-    }
-
-    // Accepte une connexion entrante
-    if ((newsockfd = accept(server_fd, (struct sockaddr *)&serv_addr, (socklen_t*)&addrlen)) < 0) {
-        perror("Erreur lors de l'acceptation de la connexion entrante");
-        exit(EXIT_FAILURE);
-    }
-
-    // Envoi d'un message au client
-    strcpy(buffer, "> Bonjour client !");
-    if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-        perror("Erreur lors de l'envoi du message au client");
-        exit(EXIT_FAILURE);
-    }
-
-    int is_aquarium_loaded = 0;
-
-    do{
-        // command from prompt
-
-        // main 
-        // initialize donnés
-        // creation thread listening
-        // prompt -> autre fichier
-        // close et forcer les threads à quitter
-
-        // threads clients
-
-
-        // reception
-        memset(buffer, 0, sizeof(buffer));
-        if ((n = recv(newsockfd, buffer, sizeof(buffer), 0)) < 0) {
-            perror("Erreur lors de la réception de la réponse du client");
-            exit(EXIT_FAILURE);
-        }
-
-        char load_verif[5];
-        strncpy (load_verif, buffer, 4);
-        load_verif[4] = '\0';
-        if (!strcmp(load_verif, "load")) {
-            char info[256];
-            memcpy(info, buffer, 256);
-            char delim[] = " ";
-
-            char * verif = strtok(info, delim);
-            (void) verif;
-            char * _aquarium_name = strtok(NULL, delim);
-            char * aquarium_name = strtok(_aquarium_name, "\n");
-
-            if (!strcmp(aquarium_name, "aquarium")) {
-                strcpy(buffer, "> OK : aquarium loaded (");
-                load_initial_aquarium_config("aquarium_example.txt", aquarium);
-                int nb_views = aquarium->views_len;
-                char len[10];
-                sprintf(len, "%d ", nb_views);
-                strcat(buffer, len);
-                if (nb_views == 0 || nb_views == 1) {
-                    strcat(buffer, "display view)!");
-                }
-                else {
-                    strcat(buffer, "display views)!");    
-                }
-                //aquarium_print(aquarium);
-                is_aquarium_loaded=1;
-                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            else {
-                strcpy(buffer, "> NOK : aquarium not existing");
-                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
-                }
-            }
-        } else {
-            strcpy(buffer, "> NOK : you first need to load the aquarium");
-            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                perror("Erreur lors de l'envoi du message au client");
-                exit(EXIT_FAILURE); 
-            }
-        }  
-    }while(is_aquarium_loaded == 0);
-
-    pthread_t thread[NB_CLIENTS];
-    int thread_sockets[8];
-    struct client_args * client_args = {newsockfd, aquarium};
-
-    for (int i = 0; i < NB_CLIENTS; i++) {
-        pthread_create(&thread[i], NULL, client, client_args);
-    }
+    int newsockfd = args->newsockfd;
+    struct aquarium * aquarium = args->aquarium;
 
     do {
         int check = 0;
@@ -597,15 +455,10 @@ int main()
         }
     } while(strcmp(buffer, "log out\n") != 0);
 
-    // Envoi de sortie de connexion au client
-    strcpy(buffer, "> Bye");
-    if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-        perror("Erreur lors de l'envoi du message au client");
-        exit(EXIT_FAILURE);
-    }
-
-    aquarium_free(aquarium);
-    close(server_fd);
-
     return 0;
-} 
+}
+
+int client_bidon(int newsockfd, struct aquarium * aquarium)
+{
+    return 0;
+}
