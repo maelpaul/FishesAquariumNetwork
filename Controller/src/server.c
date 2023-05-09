@@ -587,9 +587,89 @@ int main()
             }
         }
 
+        // del view command from prompt
+        char del_view_verif[9];
+        strncpy (del_view_verif, buffer, 9);
+        del_view_verif[8] = '\0';
+        if (!strcmp(del_view_verif, "del view")) {
+            check = 1;
+            char info[256];
+            memcpy(info, buffer, 256);
+            char delim[] = " ";
+
+            char * view_name = strtok(info, delim);
+            view_name = strtok(NULL, delim);
+            view_name = strtok(NULL, "\n");
+            
+            int removed = 0;
+            for(int i=0; i<aquarium->views_len; i++){
+                if(strcmp(aquarium->views[i]->name,view_name)==0){
+                    del_view(aquarium, view_name);
+                    removed = 1;
+                    char to_send[256] = "> OK : view ";
+                    strcat(to_send, view_name);
+                    strcat(to_send, " deleted.");
+                    strcpy(buffer, to_send);
+                    if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                        perror("Erreur lors de l'envoi du message au client");
+                        exit(EXIT_FAILURE);
+                    }
+                    break;
+                }
+            }
+            if(!removed){
+                strcpy(buffer, "> NOK : view not existing");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+
+        // add view command from prompt
+        char add_view_verif[9];
+        strncpy (add_view_verif, buffer, 9);
+        add_view_verif[8] = '\0';
+        if (!strcmp(add_view_verif, "add view")) {
+            check = 1;
+            char info[256];
+            
+            memcpy(info, buffer, 256);
+            char delim[] = " ";
+
+            char * view_name = strtok(info, delim);
+            view_name = strtok(NULL, delim);
+            view_name = strtok(NULL, delim);
+            int coords[2];
+            coords[0]=atoi(strtok(NULL,"x"));
+            coords[1]=atoi(strtok(NULL,"+"));
+            int size[2];
+            size[0]=atoi(strtok(NULL,"+"));
+            size[1]=atoi(strtok(NULL,"\n"));
+
+            if(view_name_check(aquarium, view_name)){
+                strcpy(buffer, "> NOK : View already exists");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                } 
+            }
+            else{
+                add_view(aquarium, coords, size, view_name);
+                char to_send[256] = "> OK : view ";
+                strcat(to_send, view_name);
+                strcat(to_send, " added.");
+                strcpy(buffer, to_send);
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+
         // check des commandes inexistantes
         if (check == 0 && strcmp(buffer, "log out\n") != 0) {
-            strcpy(buffer, "> NOK : Commande inexistante");
+            strcpy(buffer, "> NOK : Inexisting command");
             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
