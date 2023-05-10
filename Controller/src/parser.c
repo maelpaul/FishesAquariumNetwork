@@ -49,7 +49,7 @@ int parse_command(struct command * command, char** argv, int argc){
 
     if(strcmp(argv[0], "help") == 0){
         printf("> You can use \"load\", \"save, \"show\", \"add view\" or \"del view\" command\n");
-        return 1;
+        return 0;
 
     } else if(strcmp(argv[0], "load") == 0){
         result = check_command(command, argv, argc, "load", COMMAND_LOAD_START_ARG, COMMAND_LOAD_ARG_SIZE);
@@ -75,8 +75,7 @@ int parse_command(struct command * command, char** argv, int argc){
             printf("> Incorrect use of \"add view\", there should be 2 arguments (received %d) which are the name of the view and its size\n", argc - 2);
 
         return result;
-    }
-    else if(strcmp(argv[0], "del") == 0 && strcmp(argv[1], "view") == 0){
+    } else if(strcmp(argv[0], "del") == 0 && strcmp(argv[1], "view") == 0){
         result = check_command(command, argv, argc, "del view", COMMAND_DEL_VIEW_START_ARG, COMMAND_DEL_VIEW_ARG_SIZE);
         if (!result)
             printf("> Incorrect use of \"del view\", there should be 1 argument (received %d) which is the name of the view to remove.\n", argc-2);
@@ -90,7 +89,7 @@ int parse_command(struct command * command, char** argv, int argc){
         return result;
     }
 
-    printf("> Unknown command : should be \"load\", \"save, \"show\", \"add view\" or \"del view\" (received %s)", argv[1]);
+    printf("> Unknown command : should be \"load\", \"save, \"show\", \"add view\" or \"del view\" (received %s)\n", argv[1]);
 
     return 0;
 }
