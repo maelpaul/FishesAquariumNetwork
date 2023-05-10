@@ -4,97 +4,89 @@
 #include <string.h>
 #include <stdio.h>
 
-int parse_command(struct command * command, char** argv, int argc){
-    if(strcmp(argv[0],"load") == 0){
-        if(argc-1 != 1){
-            printf("> Incorrect use of \"load\", there should be 1 argument (received %d) which is the aquarium to load.\n", argc-1);
-            return 0;
+#define COMMAND_LOAD_START_ARG 1
+#define COMMAND_SHOW_START_ARG 1
+#define COMMAND_ADD_VIEW_START_ARG 2
+#define COMMAND_DEL_VIEW_START_ARG 2
+#define COMMAND_SAVE_START_ARG 1
+
+#define COMMAND_LOAD_ARG_SIZE 1
+#define COMMAND_SHOW_ARG_SIZE 1
+#define COMMAND_ADD_VIEW_ARG_SIZE 2
+#define COMMAND_DEL_VIEW_ARG_SIZE 1
+#define COMMAND_SAVE_ARG_SIZE 1
+
+void init_command(struct command * command){
+    command->command_name = NULL;
+    command->nb_params = 0;
+    command->params = NULL;
+    command->_total_param_len = 0;
+}
+
+int check_command(struct command * command, char** argv, int argc, char * command_name, int start_arg, int arg_size){
+    if (argc == start_arg + arg_size){
+        command->command_name = command_name;
+        command->nb_params = arg_size;
+
+        int malloc_size = command->nb_params * sizeof(char*);
+        command->params = malloc(malloc_size);
+
+        // Copy args
+        for (int i = 0; i < arg_size; ++i){
+            command->params[i] = argv[start_arg + i];
         }
-        else{
-            command->command_name="load";
-            command->nb_params = 1;
-            int malloc_size = command->nb_params * sizeof(char*);
-            command->params=malloc(malloc_size);
-            command->params[0]=argv[1];
-            command->_total_param_len = malloc_size;
-            return 1;
-        }
+
+        command->_total_param_len = malloc_size;
+
+        return 1;
     }
-    else if(strcmp(argv[0],"show") == 0){
-        if(argc-1 != 1){
-            printf("> Incorrect use of \"show\", there should be 1 argument (received %d) which is the aquarium to show.\n", argc-1);
-            return 0;
-        }
-        else{
-            command->command_name="show";
-            command->nb_params = 1;
-            int malloc_size = command->nb_params * sizeof(char*);
-            command->params=malloc(malloc_size);
-            command->params[0]=argv[1];
-            command->_total_param_len = malloc_size;
-            return 1;
-        }
-    }
-    else if(strcmp(argv[0],"add") == 0 && strcmp(argv[1],"view") == 0){
-        if(argc-2 != 2){
-            printf("> Incorrect use of \"add view\", there should be 2 arguments (received %d) which are the name of the view and its size\n", argc-2);
-            return 0;
-        }
-        else{
-            command->command_name="add view";
-            command->nb_params = 2;
-            int malloc_size = command->nb_params * sizeof(char*);
-            command->params=malloc(malloc_size);
-            command->params[0]=argv[2];
-            if(!check_add_wiew_format(argv[3])){
-                printf("> Incorrect use of \"add view\", the second argument should respect the following format : VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received %s)\n",argv[3]);
-                return 0;
-            };
-            command->params[1]=argv[3];
-            command->_total_param_len = malloc_size;
-            return 1;
-        }
-    }
-    else if(strcmp(argv[0],"del") == 0){
-        if(argc-2 != 1){
-            printf("> Incorrect use of \"del view\", there should be 1 argument (received %d) which is the name of the view to remove.\n", argc-2);
-            return 0;
-        }
-        else{
-            command->command_name="del view";
-            command->nb_params = 1;
-            int malloc_size = command->nb_params * sizeof(char*);
-            command->params=malloc(malloc_size);
-            command->params[0]=argv[2];
-            command->_total_param_len = malloc_size;
-            return 1;
-        }
-    }
-    else if(strcmp(argv[0],"save") == 0){
-        if(argc-1 != 1){
-            printf("> Incorrect use of \"save\", there should be 1 argument (received %d) which is the aquarium to save.\n", argc-2);
-            return 0;
-        }
-        else{
-            command->command_name="save";
-            command->nb_params = 1;
-            int malloc_size = command->nb_params * sizeof(char*);
-            command->params=malloc(malloc_size);
-            command->params[0]=argv[1];
-            command->_total_param_len = malloc_size;
-            return 1;
-        }
-    }
-    else{
-        printf("> Unknown command : should be \"load\", \"save, \"show\", \"add view\" or \"del view\" (received %s)",argv[1]);
-        return 0;
-    }
+
     return 0;
 }
 
-void free_command(struct command * command){
-    free(command->params);
-    free(command);
+int parse_command(struct command * command, char** argv, int argc){
+    int result = 0;
+
+    if(strcmp(argv[0], "help") == 0){
+        printf("> You can use \"load\", \"save, \"show\", \"add view\" or \"del view\" command\n");
+
+    } else if(strcmp(argv[0], "load") == 0){
+        result = check_command(command, argv, argc, "load", COMMAND_LOAD_START_ARG, COMMAND_LOAD_ARG_SIZE);
+        if (!result)
+            printf("> Incorrect use of \"load\", there should be 1 argument (received %d) which is the aquarium to load.\n", argc-1);
+        
+
+    } else if(strcmp(argv[0], "show") == 0){
+        result = check_command(command, argv, argc, "show", COMMAND_SHOW_START_ARG, COMMAND_SHOW_ARG_SIZE);
+        if (!result)
+            printf("> Incorrect use of \"show\", there should be 1 argument (received %d) which is the aquarium to show.\n", argc-1);
+        
+
+    } else if (strcmp(argv[0], "add") == 0 && strcmp(argv[1], "view") == 0){
+        if(!check_add_wiew_format(argv[3])){
+            printf("> Incorrect use of \"add view\", the second argument should respect the following format :" 
+                "VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received %s)\n",argv[3]);
+            return 0;
+        };
+
+        result = check_command(command, argv, argc, "add view", COMMAND_ADD_VIEW_START_ARG, COMMAND_ADD_VIEW_ARG_SIZE);
+        if (!result)
+            printf("> Incorrect use of \"add view\", there should be 2 arguments (received %d) which are the name of the view and its size\n", argc - 2);
+
+    }
+    else if(strcmp(argv[0], "del") == 0 && strcmp(argv[1], "view") == 0){
+        result = check_command(command, argv, argc, "del view", COMMAND_DEL_VIEW_START_ARG, COMMAND_DEL_VIEW_ARG_SIZE);
+        if (!result)
+            printf("> Incorrect use of \"del view\", there should be 1 argument (received %d) which is the name of the view to remove.\n", argc-2);
+        
+    } else if(strcmp(argv[0], "save") == 0) {
+        result = check_command(command, argv, argc, "save", COMMAND_SAVE_START_ARG, COMMAND_SAVE_ARG_SIZE);
+        if (!result)
+            printf("> Incorrect use of \"save\", there should be 1 argument (received %d) which is the aquarium to save.\n", argc-1);
+    }
+
+    printf("> Unknown command : should be \"load\", \"save, \"show\", \"add view\" or \"del view\" (received %s)", argv[1]);
+    return result;
 }
 
 void print_command(struct command * command){
@@ -107,39 +99,38 @@ void print_command(struct command * command){
     printf("===============================\n");
 }
 
-void init_command(struct command * command){
-    command->command_name = NULL;
-    command->nb_params = 0;
-    command->params = NULL;
-    command->_total_param_len = 0;
-}
 
 int check_add_wiew_format(char * input){
     size_t i = 0;
-    int times_founded = 0;
-    int plus_founded = 0;
-    while(i <  strlen(input)){
-        if(input[i] == 'x'){times_founded+=1;}
-        else if(input[i] == '+'){plus_founded+=1;}
-        else{
-            if(input[i] != '1' 
-            && input[i] != '2' 
-            && input[i] != '3' 
-            && input[i] != '4' 
-            && input[i] != '5' 
-            && input[i] != '6' 
-            && input[i] != '7' 
-            && input[i] != '8' 
-            && input[i] != '9' 
-            && input[i] != '0')
-            {return 0;}
+    int times_number = 0;
+    int plus_number = 0;
+
+    while (i < strlen(input)){
+        if(input[i] == 'x') {         
+            times_number += 1;
+
+            if(plus_number != 0)
+                return 0;
+            
+        } else if(input[i] == '+')    
+            plus_number += 1;
+        else {
+            if(input[i] < '0' || input[i] > '9')
+                return 0;
         }
 
-        if(input[i] == 'x' && plus_founded != 0){
-            return 0;
-        }
+
         i++;
     }
-    if(times_founded == 1 && plus_founded == 2){return 1;}
-    else{return 0;}
+
+    if(times_number == 1 && plus_number == 2)
+        return 1;
+        
+    return 0;
+}
+
+
+void free_command(struct command * command){
+    free(command->params);
+    free(command);
 }
