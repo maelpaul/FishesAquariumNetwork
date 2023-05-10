@@ -33,6 +33,7 @@ int check_command(struct command * command, char** argv, int argc, char * comman
 
         // Copy args
         for (int i = 0; i < arg_size; ++i){
+            
             command->params[i] = argv[start_arg + i];
         }
 
@@ -54,7 +55,7 @@ int parse_command(struct command * command, char** argv, int argc){
     } else if(strcmp(argv[0], "load") == 0){
         result = check_command(command, argv, argc, "load", COMMAND_LOAD_START_ARG, COMMAND_LOAD_ARG_SIZE);
         if (!result)
-            printf("> Incorrect use of \"load\", there should be 1 argument (received %d) which is the aquarium to load.\n", argc-1);
+            printf("> Incorrect use of \"load\", there should be 1 argument (received %d) which is the aquarium to load.\n", argc - 1);
         return result;
 
     } else if(strcmp(argv[0], "show") == 0){
@@ -78,18 +79,18 @@ int parse_command(struct command * command, char** argv, int argc){
     } else if(strcmp(argv[0], "del") == 0 && strcmp(argv[1], "view") == 0){
         result = check_command(command, argv, argc, "del view", COMMAND_DEL_VIEW_START_ARG, COMMAND_DEL_VIEW_ARG_SIZE);
         if (!result)
-            printf("> Incorrect use of \"del view\", there should be 1 argument (received %d) which is the name of the view to remove.\n", argc-2);
+            printf("> Incorrect use of \"del view\", there should be 1 argument (received %d) which is the name of the view to remove.\n", argc - 2);
         
         return result;
     } else if(strcmp(argv[0], "save") == 0) {
         result = check_command(command, argv, argc, "save", COMMAND_SAVE_START_ARG, COMMAND_SAVE_ARG_SIZE);
         if (!result)
-            printf("> Incorrect use of \"save\", there should be 1 argument (received %d) which is the aquarium to save.\n", argc-1);
+            printf("> Incorrect use of \"save\", there should be 1 argument (received %d) which is the aquarium to save.\n", argc - 1);
 
         return result;
     }
 
-    printf("> Unknown command : should be \"load\", \"save, \"show\", \"add view\" or \"del view\" (received %s)\n", argv[1]);
+    printf("> Unknown command : should be \"load\", \"save, \"show\", \"add view\" or \"del view\" (received %s)\n", argv[0]);
 
     return 0;
 }

@@ -4,7 +4,6 @@ import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
 import ProjetPoisson.mightylib.graphics.shader.ShaderManager;
 import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
 import ProjetPoisson.mightylib.graphics.text.Text;
-import ProjetPoisson.mightylib.inputs.KeyboardManager;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningBehaviour;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningOption;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningType;
@@ -23,20 +22,23 @@ import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;  
 import ProjetPoisson.project.display.FishManager;
-import ProjetPoisson.project.threads.ServerThread;
-import ProjetPoisson.project.threads.ClientThread;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
-
-
-import ProjetPoisson.mightylib.util.math.MightyMath;
 
 public class MenuScene extends Scene {
+    public enum EConnectionState {
+        Starting,
+        SendLoad,
+        ReceiveLoad,
+
+    }
+
     public final static int PING_TIME = 35; // 40 in reality
+    public final static int ATTEMPT_CONNECTION_TIME = 2; // 40 in reality
 
     private Timer pingTimer;
+    private Timer attemptConnexionTimer;
 
     private Text text;
 
@@ -51,6 +53,7 @@ public class MenuScene extends Scene {
     private FloatTweening displacementMapTweening;
 
     private ClientTcp client;
+    private boolean clientInitialized;
 
 
     public void init(String[] args) {
@@ -58,6 +61,10 @@ public class MenuScene extends Scene {
 
         pingTimer = new Timer();
         pingTimer.start(PING_TIME);
+        pingTimer.stop();
+
+        attemptConnexionTimer = new Timer();
+        attemptConnexionTimer.start(ATTEMPT_CONNECTION_TIME);
 
         if (Resources.getInstance().isExistingResource(Icon.class, "Kraken"))
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
@@ -74,6 +81,7 @@ public class MenuScene extends Scene {
         Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
         client = new ClientTcp(conf_client);
         client.tryCreateConnection();
+        clientInitialized = false;
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);
@@ -116,18 +124,21 @@ public class MenuScene extends Scene {
         analyser = new CommandAnalyser(client, fishManager);
     }
 
-    public void tryEntryConnection(){
-        client.tryCreateConnection();
-        System.out.println("NOW");
-        try {
-            Thread.sleep(2500);
+    public void initializeConnection(){
+        /*try {
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
-        client.tryCreateConnection();
+        }*/
 
-        client.sendMessage("load aquarium");
-        try {
+        client.sendMessage("hello in as N1");
+        terminal.addToResultText(client.readMessage());
+
+        client.sendMessage("hello");
+        terminal.addToResultText(client.readMessage());
+
+        clientInitialized = true;
+        /*try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -148,8 +159,8 @@ public class MenuScene extends Scene {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
-        client.closeConnection();
+        }*/
+
 
         // client.sendMessage("hello");
     }
@@ -158,9 +169,19 @@ public class MenuScene extends Scene {
         super.update();
         fishManager.update();
 
-        System.out.println(client.isConnected() + " " + client.isTryingConnection());
-        if (!client.isConnected() && !client.isTryingConnection()) {
-            client.tryCreateConnection();
+        if (client.isConnected()){
+            if (!clientInitialized) {
+                initializeConnection();
+                attemptConnexionTimer.stop();
+            }
+        } else {
+            attemptConnexionTimer.update();
+
+            if (!client.isTryingConnection() && attemptConnexionTimer.isFinished()) {
+                System.out.println("lauch aquarium");
+                client.tryCreateConnection();
+                attemptConnexionTimer.resetStart();
+            }
         }
 
         terminal.update(mainContext.getInputManager(), mainContext.getSystemInfo());
@@ -214,6 +235,9 @@ public class MenuScene extends Scene {
 
         text.unload();
         terminal.unload();
+
+        if (client.isConnected())
+            client.closeConnection();
 
         displacementMap.unload();
 
