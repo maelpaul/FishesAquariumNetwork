@@ -45,22 +45,23 @@ int check_command(struct command * command, char** argv, int argc, char * comman
 }
 
 int parse_command(struct command * command, char** argv, int argc){
-    int result = 0;
+    int result;
 
     if(strcmp(argv[0], "help") == 0){
         printf("> You can use \"load\", \"save, \"show\", \"add view\" or \"del view\" command\n");
+        return 1;
 
     } else if(strcmp(argv[0], "load") == 0){
         result = check_command(command, argv, argc, "load", COMMAND_LOAD_START_ARG, COMMAND_LOAD_ARG_SIZE);
         if (!result)
             printf("> Incorrect use of \"load\", there should be 1 argument (received %d) which is the aquarium to load.\n", argc-1);
-        
+        return result;
 
     } else if(strcmp(argv[0], "show") == 0){
         result = check_command(command, argv, argc, "show", COMMAND_SHOW_START_ARG, COMMAND_SHOW_ARG_SIZE);
         if (!result)
             printf("> Incorrect use of \"show\", there should be 1 argument (received %d) which is the aquarium to show.\n", argc-1);
-        
+        return result;
 
     } else if (strcmp(argv[0], "add") == 0 && strcmp(argv[1], "view") == 0){
         if(!check_add_wiew_format(argv[3])){
@@ -73,20 +74,25 @@ int parse_command(struct command * command, char** argv, int argc){
         if (!result)
             printf("> Incorrect use of \"add view\", there should be 2 arguments (received %d) which are the name of the view and its size\n", argc - 2);
 
+        return result;
     }
     else if(strcmp(argv[0], "del") == 0 && strcmp(argv[1], "view") == 0){
         result = check_command(command, argv, argc, "del view", COMMAND_DEL_VIEW_START_ARG, COMMAND_DEL_VIEW_ARG_SIZE);
         if (!result)
             printf("> Incorrect use of \"del view\", there should be 1 argument (received %d) which is the name of the view to remove.\n", argc-2);
         
+        return result;
     } else if(strcmp(argv[0], "save") == 0) {
         result = check_command(command, argv, argc, "save", COMMAND_SAVE_START_ARG, COMMAND_SAVE_ARG_SIZE);
         if (!result)
             printf("> Incorrect use of \"save\", there should be 1 argument (received %d) which is the aquarium to save.\n", argc-1);
+
+        return result;
     }
 
     printf("> Unknown command : should be \"load\", \"save, \"show\", \"add view\" or \"del view\" (received %s)", argv[1]);
-    return result;
+
+    return 0;
 }
 
 void print_command(struct command * command){
