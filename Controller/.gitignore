@@ -9,3 +9,4 @@ server
 client_bidon
 result.txt
 ../.vscode/
+.vscode/

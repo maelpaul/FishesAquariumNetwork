@@ -13,8 +13,8 @@
 
 #define REFRESH_TIME 5
 
-struct client_arg {
-    int newsockfd;
+struct client_args {
+    int *client_id;
     struct aquarium * aquarium;
 };
 
