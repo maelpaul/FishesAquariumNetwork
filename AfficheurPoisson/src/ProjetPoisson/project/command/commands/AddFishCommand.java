@@ -70,13 +70,13 @@ public class AddFishCommand implements ICommand {
         String result;
 
         if (option.equals("d")) {
-            result = fishManager.getMovementType(", ", 4, "\n");
+            result = fishManager.getMovementsTypeStr(", ", 4, "\n");
             if (result == null)
                 return "  -> OK : Aucun mouvement enregistré !\n";
 
             return "  -> OK : Liste des types de mouvements :\n" + result;
         } else if (option.equals("n")) {
-            result = fishManager.getName(", ", 4, "\n");
+            result = fishManager.getNamesStr(", ", 4, "\n");
             if (result == null)
                 return "  -> OK : Aucun poisson enregistré !\n";
 

@@ -1,6 +1,8 @@
 package ProjetPoisson.project.display;
 
 import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
+import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
+import ProjetPoisson.mightylib.graphics.text.Text;
 import ProjetPoisson.mightylib.main.WindowInfo;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningBehaviour;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningOption;
@@ -8,6 +10,7 @@ import ProjetPoisson.mightylib.physics.tweenings.ETweeningType;
 import ProjetPoisson.mightylib.physics.tweenings.type.FloatTweening;
 import ProjetPoisson.mightylib.physics.tweenings.type.Vector2fTweening;
 import ProjetPoisson.mightylib.util.Timer;
+import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
 import ProjetPoisson.mightylib.util.math.EFlip;
 import org.joml.Vector2f;
@@ -20,7 +23,7 @@ import java.util.Random;
 public class Fish {
 
     public enum EFishBehaviour {
-        Straight, Natural, Teleport;
+        Straight, Natural, Teleport
     }
 
     private static final ArrayList<String> list;
@@ -44,12 +47,15 @@ public class Fish {
     private final FloatTweening swimMovement;
     private Vector2f swimVector;
     private final Random random;
-
     private final EFishBehaviour behaviour;
+
+    private final Text name;
     public EFishBehaviour getBehaviour() { return behaviour; }
 
-    public Fish(WindowInfo windowInfo, String textureName, EFishBehaviour behaviour, Vector2f positionPercentage, Vector2f sizePercentage){
+    public Fish(WindowInfo windowInfo, String name, String textureName, EFishBehaviour behaviour, Vector2f positionPercentage, Vector2f sizePercentage){
         this.windowInfo = windowInfo;
+        this.name = new Text();
+
         this.behaviour = behaviour;
 
         random = new Random();
@@ -82,6 +88,24 @@ public class Fish {
         sizeTweening.initRandomTweening();
 
         swimVector = new Vector2f(0, 0);
+
+        this.name.setText(name)
+                .setFont("bahnschrift")
+                .setFontSize(15)
+                .setAlignment(ETextAlignment.Center)
+                .setReference(EDirection.Down)
+                .setColor(new Color4f(0, 0,0 , 0));
+    }
+
+
+    public void setShowName(boolean value) {
+        name.color.setA((value) ? 1: 0);
+    }
+
+    public void setPosition(Vector2f newPosition){
+        renderer.setPosition(newPosition);
+
+        name.setPosition(newPosition.add(new Vector2f(0, -renderer.scale().y * 0.5f)));
     }
 
     public void update(){
@@ -91,11 +115,11 @@ public class Fish {
             timer.update();
 
             if (goalPosition.finished() || behaviour == EFishBehaviour.Teleport) {
-                renderer.setPosition(goalPosition.goalValue());
+                setPosition(goalPosition.goalValue());
             } else if (behaviour == EFishBehaviour.Natural) {
-                renderer.setPosition(goalPosition.value());
+                setPosition(goalPosition.value());
             } else {
-                renderer.setPosition(goalPosition.value().add(new Vector2f(swimVector).mul(swimMovement.value())));
+                setPosition(goalPosition.value().add(new Vector2f(swimVector).mul(swimMovement.value())));
             }
         }
 
@@ -112,6 +136,8 @@ public class Fish {
     }
     public void display(){
         renderer.display();
+
+        name.display();
     }
 
     public void travelToNewPosition(Vector2f positionPercentage, float time){
@@ -151,6 +177,7 @@ public class Fish {
     }
 
     public void unload(){
+        this.name.unload();
         renderer.unload();
     }
 }
