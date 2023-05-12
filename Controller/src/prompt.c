@@ -105,19 +105,19 @@ int main()
             my_argv[i] = args[i];
         }
 
-        if(parse_command(command, my_argv, arg_count)){
+        if((strcmp(args[0], "quit") == 0) || parse_command(command, my_argv, arg_count)){
             n = write(client_fd, buffer, strlen(buffer));
             if (n < 0) {
                 perror("Erreur lors de l'écriture sur la socket");
                 exit(EXIT_FAILURE);
             }
-                        
+
             memset(buffer, 0, sizeof(buffer));
             if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
                 perror("Erreur lors de la réception de la réponse du serveur");
                 exit(EXIT_FAILURE);
             }
-            printf(">\n%s\n", buffer);
+            printf("Message du serveur : %s\n", buffer);
         }
         
         if (strcmp(args[0], "exit") == 0 || strcmp(args[0], "quit") == 0 || strcmp(args[0], "q") == 0) {
