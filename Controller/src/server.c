@@ -12,6 +12,7 @@
 
 #include "thread.h"
 #include "server_utils.h"
+#include "command_getfish.h"
 
 #define NB_CLIENTS 8
 #define BUFFER_SIZE 256
