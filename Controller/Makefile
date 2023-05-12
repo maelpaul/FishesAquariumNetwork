@@ -17,6 +17,9 @@ $(SRC_DIR)/parser.o : $(SRC_DIR)/parser.c
 $(SRC_DIR)/thread.o : $(SRC_DIR)/thread.c
 	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
+$(SRC_DIR)/command_fish.o : $(SRC_DIR)/command_fish.c
+	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
+
 $(SRC_DIR)/fish.o : $(SRC_DIR)/fish.c
 	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
@@ -32,7 +35,7 @@ $(SRC_DIR)/server_utils.o : $(SRC_DIR)/server_utils.c
 prompt: $(SRC_DIR)/prompt.c $(SRC_DIR)/parser.o
 	gcc $(CFLAGS) ${INC_DIR} $^ -o $@
 
-server: $(SRC_DIR)/server.c $(SRC_DIR)/server_utils.o $(SRC_DIR)/aquarium.o $(SRC_DIR)/view.o $(SRC_DIR)/fish.o $(SRC_DIR)/thread.o
+server: $(SRC_DIR)/server.c $(SRC_DIR)/server_utils.o $(SRC_DIR)/aquarium.o $(SRC_DIR)/view.o $(SRC_DIR)/fish.o $(SRC_DIR)/thread.o $(SRC_DIR)/command_fish.o
 	gcc ${CFLAGS} ${INC_DIR} $^ -o $@ -lm
 
 client_bidon: $(SRC_DIR)/client_bidon.c
