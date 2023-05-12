@@ -1,7 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "command_getfish.h"
 
 int get_fish_server(char * buffer, struct aquarium * aquarium, int client_id){
