@@ -171,11 +171,7 @@ int main()
     close(server_fd);
 
     return 0;
-
-    
-    
-
-    
+}
     
     
     
@@ -797,7 +793,7 @@ int main()
     //             }
     //         }
     //     }
-
+    /*
         char save_verif[5];
         strncpy (save_verif, buffer, 5);
         save_verif[4] = '\0';
@@ -828,7 +824,7 @@ int main()
                     }
                 }
             }
-
+        
         // check des commandes inexistantes
         if (check == 0 && strcmp(buffer, "log out\n") != 0) {
             strcpy(buffer, "> NOK : Inexisting command");
@@ -841,4 +837,4 @@ int main()
     } while(strcmp(buffer, "log out\n") != 0);
 
     // Envoi de sortie de connexion au client
-} 
+} */
