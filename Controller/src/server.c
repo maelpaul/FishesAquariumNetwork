@@ -256,6 +256,7 @@ void *thread_client(void *arg) {
 int main()
 {
     struct config conf;
+    char buffer[BUFFER_SIZE];
 
     load_config("controller.cfg", &conf);
 
@@ -332,6 +333,13 @@ int main()
         else {
             // Le nombre maximal de clients est atteint
             printf("Le serveur est occupé. Impossible de gérer un nouveau client.\n");
+            
+            strcpy(buffer, "> Bye");
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }
+
             close(newsockfd);
         }
 
