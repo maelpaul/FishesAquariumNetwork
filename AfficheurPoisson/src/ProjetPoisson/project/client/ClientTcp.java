@@ -10,6 +10,12 @@ public class ClientTcp {
     private final Configuration configuration;
     private Socket socket;
 
+    private long lastHeartbeat;
+    private static final int HEARTBEAT_INTERVAL_MS = 10000;
+    private static final int HEARTBEAT_TIMEOUT_MS = 15000;
+
+    private volatile boolean running = true;
+
     private boolean TryingConnection;
 
     public ClientTcp(Configuration configuration){
@@ -53,27 +59,15 @@ public class ClientTcp {
             e.printStackTrace();
         }
     }
-    private int readMessageLength(InputStream stream) throws IOException {
-        byte[] lengthBytes = new byte[4];
-        int bytesRead = stream.read(lengthBytes);
-        if (bytesRead != 4) {
-            throw new IOException("Unable to read the message length.");
-        }
-        return ByteBuffer.wrap(lengthBytes).getInt();
-    }
-
 
 
     public boolean isConnected() {
         return socket != null && socket.isConnected();
     }
 
-
-
-
     public String readMessage() {
-        if (socket == null) {
-            System.out.println("Can't read message while connection not initialized");
+        if (socket == null || !socket.isConnected()) {
+            System.out.println("Can't read message while connection not initialized or disconnected");
             return null;
         }
 
@@ -84,23 +78,53 @@ public class ClientTcp {
             stream = socket.getInputStream();
             byte[] byteMessage = new byte[1024];
             int bytesRead = stream.read(byteMessage);
+
             if (bytesRead == -1) {
                 throw new IOException("End of stream reached before message was fully received.");
             }
+
             message = new String(byteMessage, 0, bytesRead, ENCODING);
+            lastHeartbeat = System.currentTimeMillis(); // Update heartbeat when message is successfully read
+
+        } catch (EOFException | SocketException e) {
+            System.out.println("Connection lost with the server. (EOF or SocketException)");
+            closeConnection();
+            return "Connection lost with the server.";
+        } catch (SocketTimeoutException e) {
+            System.out.println("Socket read timed out. Connection may be lost.");
+            closeConnection(); // Close connection on timeout
+            return "Connection lost with the server.";
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("An error occurred while reading message from the server.");
+            e.printStackTrace();
         }
+
         message = message + "\n";
         return message;
     }
 
+    private void heartbeatLoop() {
+        while (running) {
+            if (System.currentTimeMillis() - lastHeartbeat > HEARTBEAT_TIMEOUT_MS) {
+                System.out.println("Heartbeat timeout. Closing connection.");
+                closeConnection();
+            }
+
+            try {
+                Thread.sleep(HEARTBEAT_INTERVAL_MS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public void connect() {
         try {
-            //System.out.println(this.configuration);
             this.socket = new Socket(configuration.getAddress(), configuration.getPort());
-            //System.out.println("[Debug] Client TCP: Connection made successfully.");
+            this.socket.setSoTimeout(HEARTBEAT_INTERVAL_MS);
+            lastHeartbeat = System.currentTimeMillis(); // Initialize lastHeartbeat at the time of connection
+            new Thread(this::heartbeatLoop).start();
+            startReading();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -108,7 +132,9 @@ public class ClientTcp {
 
 
 
+
     public void closeConnection() {
+        running = false; // Stop the heartbeat loop
         if (socket == null) {
             System.out.println("Can't close uncreated connection.");
             return;
@@ -121,7 +147,6 @@ public class ClientTcp {
         } catch (IOException e) {
             if (e instanceof SocketException && e.getMessage().equals("Socket is closed")) {
                 System.out.println("Socket was already closed.");
-                e.printStackTrace();
             } else {
                 socket = null;
                 System.out.println("Error while closing connection\n");
@@ -130,4 +155,13 @@ public class ClientTcp {
         }
     }
 
+
+    public void startReading() {
+        new Thread(() -> {
+            while (running) { // Only read messages while running
+                //System.out.println("HAHAHA");
+                readMessage();
+            }
+        }).start();
+    }
 }
