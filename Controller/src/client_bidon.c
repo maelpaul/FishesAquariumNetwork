@@ -44,6 +44,12 @@ int main() {
 
     printf("Message du serveur : %s\n", buffer);
 
+    if (strcmp(buffer, "> Bye") == 0) {
+        // Fermeture de la connexion avec le serveur
+        close(client_fd);
+        return 0;
+    }
+
     int val = 1;
     int check_ls = 0;
 

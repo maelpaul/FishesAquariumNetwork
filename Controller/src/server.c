@@ -12,8 +12,8 @@
 
 #include "server_utils.h"
 #include "command_fish.h"
+#include "command_getfish.h"
 
-#define REFRESH_TIME 5
 #define NB_CLIENTS 8
 #define BUFFER_SIZE 256
 
@@ -175,6 +175,7 @@ void *thread_prompt(void *arg) {
     pthread_mutex_lock(&mutex_aquarium);
     aquarium_free(aquarium);
     pthread_mutex_unlock(&mutex_aquarium);
+    printf("Fermeture du serveur...\n");
     assert(close(server_fd) == 0);
     exit(EXIT_SUCCESS);
 
@@ -266,6 +267,7 @@ void *thread_client(void *arg) {
 int main()
 {
     struct config conf;
+    char buffer[BUFFER_SIZE];
 
     load_config("controller.cfg", &conf);
 
@@ -342,6 +344,13 @@ int main()
         else {
             // Le nombre maximal de clients est atteint
             printf("Le serveur est occupé. Impossible de gérer un nouveau client.\n");
+            
+            strcpy(buffer, "> Bye");
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }
+
             close(newsockfd);
         }
 

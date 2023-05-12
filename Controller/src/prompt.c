@@ -120,7 +120,7 @@ int main()
             printf("Message du serveur : %s\n", buffer);
         }
         
-        if (strcmp(args[0], "exit") == 0 || strcmp(args[0], "quit") == 0 || strcmp(args[0], "q") == 0) {
+        if (strcmp(buffer, "> Bye") == 0) {
             should_continue = 0;
         }
             

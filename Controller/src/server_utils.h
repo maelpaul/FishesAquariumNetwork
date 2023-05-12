@@ -5,6 +5,8 @@
 #include "view.h"
 #include "fish.h"
 
+#define REFRESH_TIME 5
+
 struct config {
     int controller_port;
     int display_timeout_value;
