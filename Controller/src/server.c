@@ -7,12 +7,13 @@
 #include <errno.h>
 #include <time.h>
 #include <unistd.h>
-#include <pthread.h>
 #include <assert.h>
 
 #include "server_utils.h"
 #include "command_fish.h"
 #include "command_getfish.h"
+#include "prompt_commands.h"
+
 
 #define NB_CLIENTS 8
 #define BUFFER_SIZE 256
@@ -62,70 +63,8 @@ void *thread_prompt(void *arg) {
             perror("Erreur lors de la réception de la réponse du client");
             exit(EXIT_FAILURE);
         }
-        int test = 0;
-        for(long unsigned int i=0;i<5;i++){
-            if (buffer[test]=='\0'){
-                test++;
-            }
-        }
-        if (test<=2) {
-            printf("Message du prompt (%d) : %s\n", client_number, buffer);
-        }
-
-        char load_verif[5];
-        strncpy (load_verif, buffer, 4);
-        load_verif[4] = '\0';
-
-        if (!strcmp(load_verif, "load")) {
-            char info[256];
-            memcpy(info, buffer, 256);
-            char delim[] = " ";
-
-            char * verif = strtok(info, delim);
-            (void) verif;
-            char * _aquarium_name = strtok(NULL, delim);
-            char * aquarium_name = strtok(_aquarium_name, "\n");
-
-            if (!strcmp(aquarium_name, "aquarium")) {
-                strcpy(buffer, "> OK : aquarium loaded (");
-                pthread_mutex_lock(&mutex_aquarium);
-                load_initial_aquarium_config("aquarium_example.txt", aquarium);
-                pthread_mutex_unlock(&mutex_aquarium);
-                int nb_views = aquarium->views_len;
-                char len[10];
-                sprintf(len, "%d ", nb_views);
-                strcat(buffer, len);
-
-                if (nb_views == 0 || nb_views == 1) {
-                    strcat(buffer, "display view)!");
-                }
-                else {
-                    strcat(buffer, "display views)!");    
-                }
-
-                is_aquarium_loaded=1;
-
-                if (send(client_id, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            else {
-                strcpy(buffer, "> NOK : aquarium not existing");
-                if (send(client_id, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
-                }
-            }
-        } 
-        else {
-            strcpy(buffer, "> NOK : you first need to load the aquarium");
-            if (send(client_id, buffer, strlen(buffer), 0) < 0) {
-                perror("Erreur lors de l'envoi du message au client");
-                exit(EXIT_FAILURE); 
-            }
-        }  
-    } while(is_aquarium_loaded == 0);
+        prompt_load(buffer, aquarium, client_id, &is_aquarium_loaded, &mutex_aquarium); 
+    } while(!is_aquarium_loaded);
 
     do {
         // Réception de la réponse du client
@@ -624,161 +563,17 @@ int main()
     //         }
     //     }
 
-    //     // show command from prompt
-    //     char show_verif[5];
-    //     strncpy (show_verif, buffer, 4);
-    //     show_verif[4] = '\0';
-    //     if (!strcmp(show_verif, "show")) {
-    //         check = 1;
-
-    //         char info[256];
-    //         memcpy(info, buffer, 256);
-    //         char delim[] = " ";
-
-    //         char * verif = strtok(info, delim);
-    //         (void) verif;
-    //         char * _aquarium_name = strtok(NULL, delim);
-    //         char * aquarium_name = strtok(_aquarium_name, "\n");
-
-    //         if (!strcmp(aquarium_name, "aquarium")) {
-    //             char to_send[256] = "> OK : \n";
-    //             controller_aquarium_print(aquarium, to_send);
-    //             strcpy(buffer, to_send);
-    //             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-    //                 perror("Erreur lors de l'envoi du message au client");
-    //                 exit(EXIT_FAILURE);
-    //             }
-    //         }
-    //         else {
-    //             strcpy(buffer, "> NOK : aquarium not existing");
-    //             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-    //                 perror("Erreur lors de l'envoi du message au client");
-    //                 exit(EXIT_FAILURE);
-    //             }
-    //         }
-    //     }
-
-    //     // del view command from prompt
-    //     char del_view_verif[9];
-    //     strncpy (del_view_verif, buffer, 9);
-    //     del_view_verif[8] = '\0';
-    //     if (!strcmp(del_view_verif, "del view")) {
-    //         check = 1;
-    //         char info[256];
-    //         memcpy(info, buffer, 256);
-    //         char delim[] = " ";
-
-    //         char * view_name = strtok(info, delim);
-    //         view_name = strtok(NULL, delim);
-    //         view_name = strtok(NULL, "\n");
-            
-    //         int removed = 0;
-    //         for(int i=0; i<aquarium->views_len; i++){
-    //             if(strcmp(aquarium->views[i]->name,view_name)==0){
-    //                 del_view(aquarium, view_name);
-    //                 removed = 1;
-    //                 char to_send[256] = "> OK : view ";
-    //                 strcat(to_send, view_name);
-    //                 strcat(to_send, " deleted.");
-    //                 strcpy(buffer, to_send);
-    //                 if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-    //                     perror("Erreur lors de l'envoi du message au client");
-    //                     exit(EXIT_FAILURE);
-    //                 }
-    //                 break;
-    //             }
-    //         }
-    //         if(!removed){
-    //             strcpy(buffer, "> NOK : view not existing");
-    //             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-    //                 perror("Erreur lors de l'envoi du message au client");
-    //                 exit(EXIT_FAILURE);
-    //             }
-    //         }
-    //     }
-
-    //     // add view command from prompt
-    //     char add_view_verif[9];
-    //     strncpy (add_view_verif, buffer, 9);
-    //     add_view_verif[8] = '\0';
-    //     if (!strcmp(add_view_verif, "add view")) {
-    //         check = 1;
-    //         char info[256];
-            
-    //         memcpy(info, buffer, 256);
-    //         char delim[] = " ";
-
-    //         char * view_name = strtok(info, delim);
-    //         view_name = strtok(NULL, delim);
-    //         view_name = strtok(NULL, delim);
-    //         int coords[2];
-    //         coords[0]=atoi(strtok(NULL,"x"));
-    //         coords[1]=atoi(strtok(NULL,"+"));
-    //         int size[2];
-    //         size[0]=atoi(strtok(NULL,"+"));
-    //         size[1]=atoi(strtok(NULL,"\n"));
-
-    //         if(view_name_check(aquarium, view_name)){
-    //             strcpy(buffer, "> NOK : View already exists");
-    //             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-    //                 perror("Erreur lors de l'envoi du message au client");
-    //                 exit(EXIT_FAILURE);
-    //             } 
-    //         }
-    //         else{
-    //             add_view(aquarium, coords, size, view_name);
-    //             char to_send[256] = "> OK : view ";
-    //             strcat(to_send, view_name);
-    //             strcat(to_send, " added.");
-    //             strcpy(buffer, to_send);
-    //             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-    //                 perror("Erreur lors de l'envoi du message au client");
-    //                 exit(EXIT_FAILURE);
-    //             }
-    //         }
-    //     }
-    /*
-        char save_verif[5];
-        strncpy (save_verif, buffer, 5);
-        save_verif[4] = '\0';
-        if (!strcmp(save_verif, "save")) {
-            check = 1;
-            char info[256];
-            
-            memcpy(info, buffer, 256);
-            char delim[] = " ";
-
-            char * aquarium_name = strtok(info, delim);
-            aquarium_name = strtok(NULL, "\n");
-
-            if (!strcmp(aquarium_name, "aquarium")) {
-                //save_aquarium(aquarium); segfault
-
-                strcpy(buffer, "> OK : aquarium saved");
-                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            else {
-                strcpy(buffer, "> NOK : aquarium not existing");
-                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                    perror("Erreur lors de l'envoi du message au client");
-                    exit(EXIT_FAILURE);
-                    }
-                }
-            }
         
-        // check des commandes inexistantes
-        if (check == 0 && strcmp(buffer, "log out\n") != 0) {
-            strcpy(buffer, "> NOK : Inexisting command");
-            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                perror("Erreur lors de l'envoi du message au client");
-                exit(EXIT_FAILURE);
-            } 
-        }
+//         // check des commandes inexistantes
+//         if (check == 0 && strcmp(buffer, "log out\n") != 0) {
+//             strcpy(buffer, "> NOK : Inexisting command");
+//             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+//                 perror("Erreur lors de l'envoi du message au client");
+//                 exit(EXIT_FAILURE);
+//             } 
+//         }
 
-    } while(strcmp(buffer, "log out\n") != 0);
+//     } while(strcmp(buffer, "log out\n") != 0);
 
-    // Envoi de sortie de connexion au client
-} */
+//     // Envoi de sortie de connexion au client
+// }

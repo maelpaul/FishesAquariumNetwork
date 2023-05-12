@@ -35,16 +35,14 @@ $(SRC_DIR)/server_utils.o : $(SRC_DIR)/server_utils.c
 $(SRC_DIR)/command_getfish.o : $(SRC_DIR)/command_getfish.c
 	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
-prompt: $(SRC_DIR)/prompt.c $(SRC_DIR)/parser.o
+$(SRC_DIR)/prompt_commands.o : $(SRC_DIR)/prompt_commands.c
+	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
+
+prompt: $(SRC_DIR)/prompt.c $(SRC_DIR)/parser.o  $(SRC_DIR)/server_utils.o $(SRC_DIR)/prompt_commands.o $(SRC_DIR)/aquarium.o $(SRC_DIR)/view.o $(SRC_DIR)/fish.o
 	gcc $(CFLAGS) ${INC_DIR} $^ -o $@
 
-<<<<<<< HEAD
-server: $(SRC_DIR)/server.c $(SRC_DIR)/server_utils.o $(SRC_DIR)/aquarium.o $(SRC_DIR)/view.o $(SRC_DIR)/fish.o $(SRC_DIR)/thread.o $(SRC_DIR)/command_fish.o
-	gcc ${CFLAGS} ${INC_DIR} $^ -o $@ -lm
-=======
-server: $(SRC_DIR)/server.c $(SRC_DIR)/server_utils.o $(SRC_DIR)/aquarium.o $(SRC_DIR)/view.o $(SRC_DIR)/fish.o $(SRC_DIR)/thread.o $(SRC_DIR)/command_getfish.o
+server: $(SRC_DIR)/server.c $(SRC_DIR)/server_utils.o $(SRC_DIR)/aquarium.o $(SRC_DIR)/view.o $(SRC_DIR)/fish.o $(SRC_DIR)/thread.o $(SRC_DIR)/command_getfish.o $(SRC_DIR)/prompt_commands.o $(SRC_DIR)/command_fish.o
 	gcc ${CFLAGS} ${INC_DIR} $^ -o $@ -lm -lpthread
->>>>>>> fd8e51e01ae66f14de3c3a42335aa166ec19b441
 
 client_bidon: $(SRC_DIR)/client_bidon.c
 	gcc ${CFLAGS} ${INC_DIR} $^ -o $@

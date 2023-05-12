@@ -1,6 +1,14 @@
 #ifndef _SERVER_UTILS_H_
 #define _SERVER_UTILS_H_
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "aquarium.h"
 #include "view.h"
 #include "fish.h"
