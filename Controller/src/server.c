@@ -346,11 +346,7 @@ int main()
     close(server_fd);
 
     return 0;
-
-    
-    
-
-    
+}
     
     
     
@@ -972,16 +968,48 @@ int main()
     //             }
     //         }
     //     }
+    /*
+        char save_verif[5];
+        strncpy (save_verif, buffer, 5);
+        save_verif[4] = '\0';
+        if (!strcmp(save_verif, "save")) {
+            check = 1;
+            char info[256];
+            
+            memcpy(info, buffer, 256);
+            char delim[] = " ";
 
-    //     // check des commandes inexistantes
-    //     if (check == 0 && strcmp(buffer, "log out\n") != 0) {
-    //         strcpy(buffer, "> NOK : Inexisting command");
-    //         if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-    //             perror("Erreur lors de l'envoi du message au client");
-    //             exit(EXIT_FAILURE);
-    //         } 
-    //     }
-    // } while(strcmp(buffer, "log out\n") != 0);
+            char * aquarium_name = strtok(info, delim);
+            aquarium_name = strtok(NULL, "\n");
+
+            if (!strcmp(aquarium_name, "aquarium")) {
+                //save_aquarium(aquarium); segfault
+
+                strcpy(buffer, "> OK : aquarium saved");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else {
+                strcpy(buffer, "> NOK : aquarium not existing");
+                if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                    perror("Erreur lors de l'envoi du message au client");
+                    exit(EXIT_FAILURE);
+                    }
+                }
+            }
+        
+        // check des commandes inexistantes
+        if (check == 0 && strcmp(buffer, "log out\n") != 0) {
+            strcpy(buffer, "> NOK : Inexisting command");
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            } 
+        }
+
+    } while(strcmp(buffer, "log out\n") != 0);
 
     // Envoi de sortie de connexion au client
-} 
+} */

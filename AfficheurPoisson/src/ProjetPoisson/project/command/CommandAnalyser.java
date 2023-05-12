@@ -24,6 +24,7 @@ public class CommandAnalyser {
         relations.put("delFish", new DelFishCommand(fishManager));
         relations.put("startFish", new StartFishCommand());
         relations.put("status", new StatusCommand(client));
+        relations.put("showFishName", new ShowFishNameCommand(fishManager));
 
         // get fish, ls (commande système (pas utilisateur))
     }
@@ -40,7 +41,7 @@ public class CommandAnalyser {
         if (args.length == NO_OPTIONAL_ARGUMENT)
             return relations.get(args[COMMAND_TYPE_ARGUMENT]).process(args);
 
-        if (args[FIRST_OPTIONAL_ARGUMENT].equals("help") || args[FIRST_OPTIONAL_ARGUMENT].equals("-h"))
+        if (args[FIRST_OPTIONAL_ARGUMENT].equalsIgnoreCase("help") || args[FIRST_OPTIONAL_ARGUMENT].equalsIgnoreCase("-h") )
             return relations.get(args[COMMAND_TYPE_ARGUMENT]).returnHelp();
 
         return relations.get(args[COMMAND_TYPE_ARGUMENT]).process(args);

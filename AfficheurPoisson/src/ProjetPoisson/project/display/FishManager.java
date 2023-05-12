@@ -57,7 +57,7 @@ public class FishManager {
 
         fishes.put(
                 name,
-                new Fish(info,  fishesFileName.get(0), current, positionPercentage, sizePourcentage)
+                new Fish(info, name, fishesFileName.get(0), current, positionPercentage, sizePourcentage)
         );
 
         return EResult.AddSuccessfully;
@@ -94,14 +94,14 @@ public class FishManager {
         return result.toString();
     }
 
-    public String getName (String delimiter, int namePerLine, String lineDelimiter){
+    public String getNamesStr(String delimiter, int namePerLine, String lineDelimiter){
         if (fishes.size() == 0)
             return null;
 
         return collectionToStr(delimiter, namePerLine, lineDelimiter, fishes.keySet());
     }
 
-    public String getMovementType (String delimiter, int namePerLine, String lineDelimiter){
+    public String getMovementsTypeStr(String delimiter, int namePerLine, String lineDelimiter){
         return collectionToStr(delimiter, namePerLine, lineDelimiter, Fish.GetFishBehaviourList());
     }
 
@@ -113,6 +113,12 @@ public class FishManager {
                 Vector2f position = new Vector2f(rand.nextFloat(), rand.nextFloat());
                 fish.travelToNewPosition(position, 1 + rand.nextFloat() * 3);
             }
+        }
+    }
+
+    public void setShowName(boolean value){
+        for (Fish fish : fishes.values()){
+            fish.setShowName(value);
         }
     }
 

@@ -25,6 +25,13 @@
 			"background" : {
 				"file" : "background.png",
 				"qualityType" : "realistic"
+			},
+			"connectedIcon" : {
+				"file" : "connected.png",
+				"qualityType" : "realistic"
+			}, "disconnectedIcon" : {
+				"file" : "disconnected.png",
+				"qualityType" : "realistic"
 			}
 		},
 		"hud" : {
