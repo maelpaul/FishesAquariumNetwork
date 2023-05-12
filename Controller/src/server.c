@@ -175,6 +175,7 @@ void *thread_prompt(void *arg) {
     pthread_mutex_lock(&mutex_aquarium);
     aquarium_free(aquarium);
     pthread_mutex_unlock(&mutex_aquarium);
+    printf("Fermeture du serveur...\n");
     assert(close(server_fd) == 0);
     exit(EXIT_SUCCESS);
 
