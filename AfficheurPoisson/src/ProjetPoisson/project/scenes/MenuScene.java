@@ -4,7 +4,6 @@ import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
 import ProjetPoisson.mightylib.graphics.shader.ShaderManager;
 import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
 import ProjetPoisson.mightylib.graphics.text.Text;
-import ProjetPoisson.mightylib.inputs.KeyboardManager;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningBehaviour;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningOption;
 import ProjetPoisson.mightylib.physics.tweenings.ETweeningType;
@@ -18,25 +17,30 @@ import ProjetPoisson.mightylib.scene.Scene;
 import ProjetPoisson.mightylib.util.Timer;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
+import ProjetPoisson.mightylib.util.math.MightyMath;
 import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;  
 import ProjetPoisson.project.display.FishManager;
-import ProjetPoisson.project.threads.ServerThread;
-import ProjetPoisson.project.threads.ClientThread;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
-
-
-import ProjetPoisson.mightylib.util.math.MightyMath;
 
 public class MenuScene extends Scene {
+    public enum EConnectionState {
+        Disconnected,
+        Starting,
+        SendLoad,
+        ReceiveLoad,
+        Connected
+    }
+
     public final static int PING_TIME = 35; // 40 in reality
+    public final static int ATTEMPT_CONNECTION_TIME = 2; // 40 in reality
 
     private Timer pingTimer;
+    private Timer attemptConnexionTimer;
 
     private Text text;
 
@@ -51,6 +55,11 @@ public class MenuScene extends Scene {
     private FloatTweening displacementMapTweening;
 
     private ClientTcp client;
+    private boolean clientInitialized;
+
+    private EConnectionState currentState;
+    private RectangleRenderer connectionStatusIcon;
+    private Text connectionStatusMessage;
 
 
     public void init(String[] args) {
@@ -58,6 +67,10 @@ public class MenuScene extends Scene {
 
         pingTimer = new Timer();
         pingTimer.start(PING_TIME);
+        pingTimer.stop();
+
+        attemptConnexionTimer = new Timer();
+        attemptConnexionTimer.start(ATTEMPT_CONNECTION_TIME);
 
         if (Resources.getInstance().isExistingResource(Icon.class, "Kraken"))
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
@@ -74,6 +87,7 @@ public class MenuScene extends Scene {
         Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
         client = new ClientTcp(conf_client);
         client.tryCreateConnection();
+        clientInitialized = false;
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);
@@ -84,6 +98,15 @@ public class MenuScene extends Scene {
         renderer.switchToTextureMode("background");
         renderer.setSizePix(windowSize.x, windowSize.y);
 
+        float reductionRatio = 0.5f;
+        connectionStatusIcon = new RectangleRenderer("texture2D");
+        connectionStatusIcon.switchToTextureMode("disconnectedIcon");
+        connectionStatusIcon.setSizeToTexture();
+        connectionStatusIcon.setScale(
+                new Vector3f(connectionStatusIcon.scale().x * reductionRatio, connectionStatusIcon.scale().y * reductionRatio, connectionStatusIcon.scale().z)
+        );
+        connectionStatusIcon.setPosition(new Vector2f(windowSize.x * 0.02f, windowSize.y * 0.025f));
+
         text = new Text();
         text.setText("Aquarium poisson")
                 .setFont("bahnschrift")
@@ -93,16 +116,27 @@ public class MenuScene extends Scene {
                 .setColor(new Color4f(1, 1, 1, 1))
                 .setFontSize(40);
 
+        connectionStatusMessage = new Text();
+        text.copyTo(connectionStatusMessage);
+
+        connectionStatusMessage.setText("disconnected")
+                .setFontSize(30)
+                .setReference(EDirection.Left)
+                .setColor(new Color4f())
+                .setPosition(new Vector2f(connectionStatusIcon.position().x + connectionStatusIcon.scale().x + 10,
+                        connectionStatusIcon.position().y + connectionStatusIcon.scale().x * 0.5f));
+
         Configuration conf = Resources.getInstance().getResource(Configuration.class, "affichage");
         Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
 
         fishManager = new FishManager(mainContext.getWindow().getInfo(), configuration);
-        /*int numberFish = 6;
+
+        int numberFish = 6;
         float size = MightyMath.mapLog(numberFish, 10, 100, 0.17f, 0.15f);
 
         for (int i = 0; i < numberFish; ++i)
             fishManager.addFish("Fish" + i, new Vector2f(0.5f, 0.5f), new Vector2f(size, size),
-                    (i % 3 == 0) ? "Straight" :  (i % 3 == 1) ?  "Teleport" : "Natural");*/
+                    (i % 3 == 0) ? "Straight" :  (i % 3 == 1) ?  "Teleport" : "Natural");
 
         displacementMap = Resources.getInstance().getResource(Texture.class, "displacementMap");
         ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("displacementMap", 1);
@@ -114,20 +148,44 @@ public class MenuScene extends Scene {
 
 
         analyser = new CommandAnalyser(client, fishManager);
+
+        setConnectionState(EConnectionState.Connected);
     }
 
-    public void tryEntryConnection(){
-        client.tryCreateConnection();
-        System.out.println("NOW");
-        try {
-            Thread.sleep(2500);
+    public void setConnectionState(EConnectionState connectionState){
+        currentState = connectionState;
+
+        if (currentState == EConnectionState.Disconnected){
+            connectionStatusIcon.switchToTextureMode("disconnectedIcon");
+            connectionStatusMessage.setColor(new Color4f(140f / 255f, 8f / 255f, 8f / 255f, 1));
+            connectionStatusMessage.setText("Disconnected");
+        } else if (currentState == EConnectionState.Connected){
+            connectionStatusIcon.switchToTextureMode("connectedIcon");
+            connectionStatusMessage.setColor(new Color4f(43f / 255f, 228f / 255f, 5f / 255f, 1));
+            connectionStatusMessage.setText("Connected");
+        } else {
+            connectionStatusIcon.switchToTextureMode("disconnectedIcon");
+            connectionStatusMessage.setColor(new Color4f(187f / 255f, 187f / 255f, 65f / 255f, 1));
+            connectionStatusMessage.setText("Connecting ...");
+        }
+    }
+
+
+    public void initializeConnection(){
+        /*try {
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
-        client.tryCreateConnection();
+        }*/
 
-        client.sendMessage("load aquarium");
-        try {
+        client.sendMessage("hello in as N1");
+        terminal.addToResultText(client.readMessage());
+
+        client.sendMessage("hello");
+        terminal.addToResultText(client.readMessage());
+
+        clientInitialized = true;
+        /*try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -148,8 +206,8 @@ public class MenuScene extends Scene {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
-        client.closeConnection();
+        }*/
+
 
         // client.sendMessage("hello");
     }
@@ -158,9 +216,19 @@ public class MenuScene extends Scene {
         super.update();
         fishManager.update();
 
-        System.out.println(client.isConnected() + " " + client.isTryingConnection());
-        if (!client.isConnected() && !client.isTryingConnection()) {
-            client.tryCreateConnection();
+        if (client.isConnected()){
+            if (!clientInitialized) {
+                initializeConnection();
+                attemptConnexionTimer.stop();
+            }
+        } else {
+            attemptConnexionTimer.update();
+
+            if (!client.isTryingConnection() && attemptConnexionTimer.isFinished()) {
+                System.out.println("lauch aquarium");
+                client.tryCreateConnection();
+                attemptConnexionTimer.resetStart();
+            }
         }
 
         terminal.update(mainContext.getInputManager(), mainContext.getSystemInfo());
@@ -203,6 +271,9 @@ public class MenuScene extends Scene {
 
         terminal.display();
 
+        connectionStatusIcon.display();
+        connectionStatusMessage.display();
+
         super.setAndDisplayRealScene();
     }
 
@@ -214,6 +285,12 @@ public class MenuScene extends Scene {
 
         text.unload();
         terminal.unload();
+
+        if (client.isConnected())
+            client.closeConnection();
+
+        connectionStatusIcon.unload();
+        connectionStatusMessage.unload();
 
         displacementMap.unload();
 

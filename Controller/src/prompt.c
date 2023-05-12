@@ -12,30 +12,16 @@
 #include "parser.h"
 
 #define BUFFER_SIZE 100
+#define MAX_ARG 4
 
-void clear(char * buffer) {
-    for (int i = 0; i < BUFFER_SIZE; i++) {
-        buffer[i] = '\0';
-    }
-}
-
-int length(char ** argv) {
-    int i = 0;
-    while (i < 4 && argv[i][0] != '\0') {
-        i++;
-    }
-    return i;
+void clear(char* str, int size) {
+    memset(str, '\0', size);
 }
 
 int main()
 {
     char buffer[BUFFER_SIZE];
-    char arg1[BUFFER_SIZE];
-    char arg2[BUFFER_SIZE];
-    char arg3[BUFFER_SIZE];
-    char arg4[BUFFER_SIZE];
-
-    printf("Enter your command :\n");
+    char args[MAX_ARG][BUFFER_SIZE];
 
     int client_fd;
     int portno = 12345;
@@ -62,80 +48,64 @@ int main()
     }
 
     // Réception de la réponse du serveur
-    memset(buffer, 0, sizeof(buffer));
+    clear(buffer, BUFFER_SIZE);
     if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
         perror("Erreur lors de la réception de la réponse du serveur");
         exit(EXIT_FAILURE);
     }
+
+    printf("Enter your command :\n");
     
-    while (1) {
+    int should_continue = 1;
+    while (should_continue) {
         struct command * command = malloc(sizeof(struct command));
     
         init_command(command);
-
-        clear(buffer);
-        clear(arg1);
-        clear(arg2);
-        clear(arg3);
-        clear(arg4);
+        clear(buffer, BUFFER_SIZE);
+        for (int i = 0; i < MAX_ARG; ++i)
+            clear(args[i], BUFFER_SIZE);
         
-        ssize_t a = read(0, buffer, BUFFER_SIZE);
-        if (a == -1) {
+        ssize_t read_size = read(0, buffer, BUFFER_SIZE);
+        if (read_size == -1) {
             perror("read");
             free_command(command);
             return EXIT_FAILURE;
         }
         
-        char * p = arg1;
-        int i = 0;
-        int j = 0;
-        int c = 0;
+        int arg_count = 0;
+        int arg_index = 0;
+        int in_word = 0;
         
-        while (buffer[i] != '\n') {
-            if (buffer[i] == ' ') {
-                if (c == 0) {
-                    p[j] = '\0';
-                    i++;
-                    j = 0;
-                    p = arg2;
-                    c++;
+        for (int i = 0; i < read_size; i++) {
+            if (buffer[i] == ' ' || buffer[i] == '\n') {
+                if (in_word) {
+                    args[arg_count][arg_index] = '\0';
+                    arg_count++;
+                    arg_index = 0;
+                    in_word = 0;
+
+                    if (arg_count >= MAX_ARG) {
+                        break;
+                    }
                 }
-                else if (c == 1) {
-                    p[j] = '\0';
-                    i++;
-                    j = 0;
-                    p = arg3;
-                    c++;
-                }
-                else if (c == 2) {
-                    p[j] = '\0';
-                    i++;
-                    j = 0;
-                    p = arg4;
-                    c++;
-                }
-                else {
-                    free_command(command);
-                    return EXIT_FAILURE;
-                }
+            } else {
+                args[arg_count][arg_index] = buffer[i];
+                arg_index++;
+                in_word = 1;
             }
-            while (buffer[i] == ' ') {
-                i++;
-            }
-            p[j] = buffer[i];
-            i++;
-            j++;
         }
-        p[j] = '\0';
-        
-        char * my_argv[4] = {arg1, arg2, arg3, arg4};
-        int my_argc = length(my_argv); 
 
-        // for (int i = 0; i < my_argc; i++) {
-        //     printf("argv[%d] = %s\n", i, my_argv[i]);
-        // }
+        if (in_word) {
+            args[arg_count][arg_index] = '\0';
+            arg_count++;
+        }
 
-        if(parse_command(command, my_argv, my_argc)){
+        char* my_argv[MAX_ARG];
+        for (int i = 0; i < arg_count; i++) {
+            my_argv[i] = args[i];
+        }
+
+        if(parse_command(command, my_argv, arg_count)){
             n = write(client_fd, buffer, strlen(buffer));
             if (n < 0) {
                 perror("Erreur lors de l'écriture sur la socket");
@@ -143,19 +113,18 @@ int main()
             }
                         
             memset(buffer, 0, sizeof(buffer));
-                if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
-                    perror("Erreur lors de la réception de la réponse du serveur");
-                    exit(EXIT_FAILURE);
-                }
+            if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
+                perror("Erreur lors de la réception de la réponse du serveur");
+                exit(EXIT_FAILURE);
+            }
             printf(">\n%s\n", buffer);
         }
-    
-        free_command(command);
         
-        if (strcmp(arg1, "exit") == 0 || strcmp(arg1, "quit") == 0 || strcmp(arg1, "q") == 0) {
-            free_command(command);
-            return EXIT_SUCCESS;
+        if (strcmp(args[0], "exit") == 0 || strcmp(args[0], "quit") == 0 || strcmp(args[0], "q") == 0) {
+            should_continue = 0;
         }
+            
+        free_command(command);
     }
     return EXIT_SUCCESS;
 }
