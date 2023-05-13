@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+#include "prompt.h"
 #include "parser.h"
 
 #define BUFFER_SIZE 100
@@ -18,7 +19,7 @@ void clear(char* str, int size) {
     memset(str, '\0', size);
 }
 
-int main()
+void prompt()
 {
     char buffer[BUFFER_SIZE];
     char args[MAX_ARG][BUFFER_SIZE];
@@ -69,7 +70,6 @@ int main()
         if (read_size == -1) {
             perror("read");
             free_command(command);
-            return EXIT_FAILURE;
         }
         
         int arg_count = 0;
@@ -126,5 +126,4 @@ int main()
             
         free_command(command);
     }
-    return EXIT_SUCCESS;
 }

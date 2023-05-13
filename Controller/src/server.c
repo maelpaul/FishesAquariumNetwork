@@ -13,6 +13,7 @@
 #include "command_fish.h"
 #include "command_getfish.h"
 #include "prompt_commands.h"
+#include "prompt.h"
 #include "init_server.h"
 
 
@@ -21,10 +22,16 @@
 
 int client_count = 0;
 int is_aquarium_loaded = 0;
+pthread_t wait_client;
 pthread_t threads[NB_CLIENTS];
 struct client_args * tab_args[NB_CLIENTS];
 pthread_mutex_t mutex_client_count = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_aquarium = PTHREAD_MUTEX_INITIALIZER;
+
+struct wait_client_context {
+    struct aquarium * aquarium;
+    int server_fd;
+};
 
 int verif(char * buf, char * s) {
     pthread_mutex_lock(&mutex_client_count);
@@ -218,20 +225,76 @@ void *thread_client(void *arg) {
     pthread_exit(NULL);
 }
 
+void * wait_for_client(void * arg){
+    socklen_t client_addr_len;
+    char buffer[BUFFER_SIZE];
+    struct sockaddr_in client_addr;
+    int newsockfd;
+
+    struct wait_client_context * context = (struct wait_client_context *) arg;
+
+    while(1) {
+        // Accepter une connexion entrante
+        client_addr_len = sizeof(client_addr);
+        newsockfd = accept(context->server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
+        if (newsockfd == -1) {
+            perror("Erreur lors de l'acceptation de la connexion");
+            exit(EXIT_FAILURE);
+        }
+
+        pthread_mutex_lock(&mutex_client_count);
+
+        if (client_count < NB_CLIENTS) {
+            // Créer un thread pour gérer le client
+            int *fd_server = malloc(sizeof(int));
+            *fd_server = context->server_fd;
+            int *client_id = malloc(sizeof(int));
+            *client_id = newsockfd;
+            struct client_args * client_args = malloc(sizeof(struct client_args));
+            client_args->aquarium = context->aquarium;
+            client_args->client_id = client_id;
+            client_args->client_number = client_count;
+            client_args->fd_server = fd_server;
+            if (client_count == 0) {
+                pthread_create(&threads[client_count], NULL, thread_prompt, (void *)client_args);
+                printf("Prompt connected. Prompt ID: %d\n", client_count);
+            }
+            else {
+                pthread_create(&threads[client_count], NULL, thread_client, (void *)client_args);
+                printf("Client connected. Client ID: %d\n", client_count);
+            }
+            tab_args[client_count] = client_args;
+            client_count++;
+        } 
+        else {
+            // Le nombre maximal de clients est atteint
+            printf("Le serveur est occupé. Impossible de gérer un nouveau client.\n");
+            
+            strcpy(buffer, "> Bye");
+            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }
+
+            close(newsockfd);
+        }
+
+        pthread_mutex_unlock(&mutex_client_count);
+    }
+}
+
 int main()
 {
     struct config conf;
-    char buffer[BUFFER_SIZE];
 
     load_config("controller.cfg", &conf);
 
     struct aquarium * aquarium = malloc(sizeof(struct aquarium));
 
     // server and socket file descriptor
-    int server_fd, newsockfd;
+    int server_fd;
     int portno = conf.controller_port;
-    struct sockaddr_in serv_addr, client_addr;
-    socklen_t client_addr_len;
+    struct sockaddr_in serv_addr;
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
     if (server_fd < 0) {
@@ -262,54 +325,15 @@ int main()
 
     printf("Serveur en attente de connexions...\n");
 
-    while(1) {
-        // Accepter une connexion entrante
-        client_addr_len = sizeof(client_addr);
-        newsockfd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
-        if (newsockfd == -1) {
-            perror("Erreur lors de l'acceptation de la connexion");
-            exit(EXIT_FAILURE);
-        }
+    struct wait_client_context context;
+    context.aquarium = aquarium;
+    context.server_fd = server_fd;
 
-        pthread_mutex_lock(&mutex_client_count);
+    pthread_create(&wait_client, NULL, wait_for_client, (void *) &context);
+    
+    prompt();
 
-        if (client_count < NB_CLIENTS) {
-            // Créer un thread pour gérer le client
-            int *fd_server = malloc(sizeof(int));
-            *fd_server = server_fd;
-            int *client_id = malloc(sizeof(int));
-            *client_id = newsockfd;
-            struct client_args * client_args = malloc(sizeof(struct client_args));
-            client_args->aquarium = aquarium;
-            client_args->client_id = client_id;
-            client_args->client_number = client_count;
-            client_args->fd_server = fd_server;
-            if (client_count == 0) {
-                pthread_create(&threads[client_count], NULL, thread_prompt, (void *)client_args);
-                printf("Prompt connected. Prompt ID: %d\n", client_count);
-            }
-            else {
-                pthread_create(&threads[client_count], NULL, thread_client, (void *)client_args);
-                printf("Client connected. Client ID: %d\n", client_count);
-            }
-            tab_args[client_count] = client_args;
-            client_count++;
-        } 
-        else {
-            // Le nombre maximal de clients est atteint
-            printf("Le serveur est occupé. Impossible de gérer un nouveau client.\n");
-            
-            strcpy(buffer, "> Bye");
-            if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
-                perror("Erreur lors de l'envoi du message au client");
-                exit(EXIT_FAILURE);
-            }
-
-            close(newsockfd);
-        }
-
-        pthread_mutex_unlock(&mutex_client_count);
-    }
+    pthread_join(wait_client, NULL);
 
     // Attendre que tous les threads se terminent
     for (int i = 0; i < client_count; i++) {
