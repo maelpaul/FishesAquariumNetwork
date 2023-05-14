@@ -208,3 +208,16 @@ void controller_aquarium_print(struct aquarium * aquarium, char * to_print){
     }
     strcat(to_print, "\0");
 }
+
+int verif(char * buf, char * s, int client_count, pthread_mutex_t * mutex_client_count) {
+    pthread_mutex_lock(mutex_client_count);
+    if (client_count > 1) {
+        pthread_mutex_unlock(mutex_client_count);
+        return -1;
+    }
+    pthread_mutex_unlock(mutex_client_count);
+    if (strcmp(buf, s) != 0) {
+        return -1;
+    }
+    return 1;
+}

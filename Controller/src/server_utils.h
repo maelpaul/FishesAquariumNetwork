@@ -45,4 +45,6 @@ int controller_start_fish(struct aquarium * aquarium, char * fish_name, int time
 
 void controller_aquarium_print(struct aquarium * aquarium, char * to_print);
 
+int verif(char * buf, char * s, int client_id, pthread_mutex_t * mutex_client_count);
+
 #endif
