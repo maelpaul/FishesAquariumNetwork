@@ -25,7 +25,7 @@ int load_config(const char *filename, struct config *conf);
 
 int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium);
 
-int save_aquarium(struct aquarium * aquarium);
+void save_aquarium(struct aquarium * aquarium);
 
 int controller_add_fish(struct aquarium *aquarium, int * coords, int * size, char * name, void (*path)(struct fish *, int, int));
 
@@ -44,5 +44,7 @@ void controller_update_fishes(struct aquarium * aquarium, int refresh_time);
 int controller_start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest);
 
 void controller_aquarium_print(struct aquarium * aquarium, char * to_print);
+
+int verif(char * buf, char * s, int client_id, pthread_mutex_t * mutex_client_count);
 
 #endif

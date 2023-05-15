@@ -76,25 +76,23 @@ int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium
     return 0;
 }
 
-int save_aquarium(struct aquarium * aquarium){
+void save_aquarium(struct aquarium * aquarium){
     FILE *fp;
-    char * filename = aquarium->name;
+    char filename[256];
+    strcpy(filename,aquarium->name);
     strcat(filename,".txt");
     fp = fopen(filename, "w+");
 
     if (fp == NULL) {
         printf("Failed to create file\n");
-        return 0;
+        return;
     }
 
-    /*
     char to_send[1024] = "";
     controller_aquarium_print(aquarium, to_send);
-    fprintf(fp, "%s", to_send);*/
+    fprintf(fp, "%s", to_send);
 
     fclose(fp);
-
-    return 1;
 }
 
 int controller_add_fish(struct aquarium *aquarium, int * coords, int * size, char * name, void (*path)(struct fish *, int, int)){
@@ -207,4 +205,17 @@ void controller_aquarium_print(struct aquarium * aquarium, char * to_print){
         strcat(to_print, "\n");
     }
     strcat(to_print, "\0");
+}
+
+int verif(char * buf, char * s, int client_count, pthread_mutex_t * mutex_client_count) {
+    pthread_mutex_lock(mutex_client_count);
+    if (client_count > 1) {
+        pthread_mutex_unlock(mutex_client_count);
+        return -1;
+    }
+    pthread_mutex_unlock(mutex_client_count);
+    if (strcmp(buf, s) != 0) {
+        return -1;
+    }
+    return 1;
 }

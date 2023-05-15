@@ -10,50 +10,14 @@
 #include <unistd.h>
 
 #include "prompt.h"
-#include "parser.h"
 
-#define BUFFER_SIZE 100
+#define BUFFER_SIZE 256
 #define MAX_ARG 4
 
-void clear(char* str, int size) {
-    memset(str, '\0', size);
-}
-
-void prompt()
+void prompt(int * aquarium_flag, struct aquarium * aquarium, pthread_mutex_t * mutex_aquarium)
 {
     char buffer[BUFFER_SIZE];
     char args[MAX_ARG][BUFFER_SIZE];
-
-    int client_fd;
-    int portno = 12345;
-    struct sockaddr_in serv_addr;
-    int n;
-
-    // Création du socket client
-    client_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (client_fd < 0) {
-        perror("Erreur lors de l'ouverture de la socket");
-        exit(EXIT_FAILURE);
-    }
-
-    // Configuration de l'adresse du serveur
-    memset(&serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Adresse IP du serveur
-    serv_addr.sin_port = htons(portno);
-
-    // Connexion au serveur distant
-    if (connect(client_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-        perror("Erreur lors de la connexion au serveur");
-        exit(EXIT_FAILURE);
-    }
-
-    // Réception de la réponse du serveur
-    clear(buffer, BUFFER_SIZE);
-    if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
-        perror("Erreur lors de la réception de la réponse du serveur");
-        exit(EXIT_FAILURE);
-    }
 
     printf("Enter your command :\n");
     
@@ -105,19 +69,29 @@ void prompt()
             my_argv[i] = args[i];
         }
 
-        if((strcmp(args[0], "quit") == 0) || parse_command(command, my_argv, arg_count)){
-            n = write(client_fd, buffer, strlen(buffer));
-            if (n < 0) {
-                perror("Erreur lors de l'écriture sur la socket");
-                exit(EXIT_FAILURE);
+        if(parse_command(command, my_argv, arg_count)){
+            if(!*aquarium_flag){
+                if(strcmp(command->command_name,"load")==0){
+                    prompt_load(command, aquarium, aquarium_flag, mutex_aquarium);
+                }
+                else{
+                    printf("> You first need to load an aquarium\n");
+                }
             }
-
-            memset(buffer, 0, sizeof(buffer));
-            if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
-                perror("Erreur lors de la réception de la réponse du serveur");
-                exit(EXIT_FAILURE);
+            else{
+                if(strcmp(command->command_name,"add view")==0){
+                    prompt_add_view(command, aquarium);
+                }
+                else if(strcmp(command->command_name,"del view")==0){
+                    prompt_del_view(command, aquarium);
+                }
+                else if(strcmp(command->command_name,"show")==0){
+                    prompt_show(command, aquarium);
+                }
+                else if(strcmp(command->command_name,"save")==0){
+                    prompt_save(command, aquarium);   
+                }
             }
-            printf("Message du serveur : %s\n", buffer);
         }
         
         if (strcmp(buffer, "> Bye") == 0) {

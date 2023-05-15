@@ -33,6 +33,7 @@ struct wait_client_context {
     int server_fd;
 };
 
+/*
 int verif(char * buf, char * s) {
     pthread_mutex_lock(&mutex_client_count);
     if (client_count > 1) {
@@ -44,8 +45,9 @@ int verif(char * buf, char * s) {
         return -1;
     }
     return 1;
-}
+}*/
 
+/*
 void *thread_prompt(void *arg) {
     struct client_args *client_args = (struct client_args *) arg;
     int client_id = *(client_args->client_id);
@@ -127,7 +129,7 @@ void *thread_prompt(void *arg) {
     exit(EXIT_SUCCESS);
 
     pthread_exit(NULL);
-}
+}*/
 
 void *thread_client(void *arg) {
     struct client_args *client_args = (struct client_args *) arg;
@@ -255,14 +257,8 @@ void * wait_for_client(void * arg){
             client_args->client_id = client_id;
             client_args->client_number = client_count;
             client_args->fd_server = fd_server;
-            if (client_count == 0) {
-                pthread_create(&threads[client_count], NULL, thread_prompt, (void *)client_args);
-                printf("Prompt connected. Prompt ID: %d\n", client_count);
-            }
-            else {
-                pthread_create(&threads[client_count], NULL, thread_client, (void *)client_args);
-                printf("Client connected. Client ID: %d\n", client_count);
-            }
+            pthread_create(&threads[client_count], NULL, thread_client, (void *)client_args);
+            printf("Client connected. Client ID: %d\n", client_count);
             tab_args[client_count] = client_args;
             client_count++;
         } 
@@ -331,7 +327,7 @@ int main()
 
     pthread_create(&wait_client, NULL, wait_for_client, (void *) &context);
     
-    prompt();
+    prompt(&is_aquarium_loaded, aquarium, &mutex_aquarium);
 
     pthread_join(wait_client, NULL);
 
@@ -340,7 +336,9 @@ int main()
         pthread_join(threads[i], NULL);
     }
 
+    pthread_mutex_lock(&mutex_aquarium);
     aquarium_free(aquarium);
+    pthread_mutex_unlock(&mutex_aquarium);
     close(server_fd);
 
     return 0;
