@@ -21,7 +21,7 @@ import ProjetPoisson.mightylib.util.math.MightyMath;
 import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.command.CommandAnalyser;
-import ProjetPoisson.project.command.Terminal;  
+import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.display.FishManager;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
@@ -149,7 +149,7 @@ public class MenuScene extends Scene {
 
         analyser = new CommandAnalyser(client, fishManager);
 
-        setConnectionState(EConnectionState.Connected);
+        setConnectionState(EConnectionState.Disconnected);
     }
 
     public void setConnectionState(EConnectionState connectionState){
@@ -172,31 +172,46 @@ public class MenuScene extends Scene {
 
 
     public void initializeConnection(){
-        /*try {
+        try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }*/
-
-        client.sendMessage("hello in as N1");
-        terminal.addToResultText(client.readMessage());
+        }
 
         client.sendMessage("hello");
-        terminal.addToResultText(client.readMessage());
 
-        clientInitialized = true;
-        /*try {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        String result = client.readMessage();
+        terminal.addToResultText(result);
+
+        System.out.println("Response : " + result);
+        System.out.println("saucisse");
+
+        /*client.sendMessage("addFish PoissonRouge2 at 200x30, 10x4, RandomWayPoint\n");
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        String response3 = client.readMessage();
+        System.out.println("Received response from server: " + response3);
+        try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         terminal.addToResultText(client.readMessage());
+
         //System.out.println("Received response from server: " + response);
-        client.sendMessage("show aquarium");
+        /*client.sendMessage("show aquarium");
         String response2 = client.readMessage();
         System.out.println("Received response from server: " + response2);
         client.sendMessage("addFish PoissonRouge2 at 200x30, 10x4, RandomWayPoint");
-        String response3 = client.readMessage();
+        //String response3 = client.readMessage();
         System.out.println("Received response from server: " + response3);
         String response4 = client.readMessage();
         client.sendMessage("status");
@@ -208,8 +223,7 @@ public class MenuScene extends Scene {
             Thread.currentThread().interrupt();
         }*/
 
-
-        // client.sendMessage("hello");
+        clientInitialized = true;
     }
 
     public void update() {

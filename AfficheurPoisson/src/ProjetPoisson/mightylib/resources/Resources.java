@@ -5,7 +5,6 @@ import ProjetPoisson.mightylib.resources.animation.AnimationDataLoader;
 import ProjetPoisson.mightylib.resources.sound.SoundLoader;
 import ProjetPoisson.mightylib.resources.texture.IconLoader;
 import ProjetPoisson.mightylib.resources.texture.TextureLoader;
-import ProjetPoisson.project.client.ConfigurationLoader;
 
 import java.util.Map;
 import java.util.ArrayList;
@@ -39,7 +38,6 @@ public class Resources {
         Loaders.add(new AnimationDataLoader());
         Loaders.add(new FontLoader());
         Loaders.add(new SoundLoader());
-        Loaders.add(new ConfigurationLoader());
 
         initialized = false;
         firstLoad = false;

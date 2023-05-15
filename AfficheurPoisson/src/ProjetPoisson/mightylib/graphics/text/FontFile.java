@@ -125,5 +125,9 @@ public class FontFile {
         return lineHeight;
     }
 
+    public int getReferenceSize() { return size; }
 
+    public int atlasWidth(){ return atlasWidth; }
+
+    public int atlasHeight(){ return atlasHeight; }
 }

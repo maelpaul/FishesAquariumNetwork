@@ -87,7 +87,6 @@ class ProjectLoading {
                         ))
         };
 
-
         inputManager.init(configurations);
     }
 }
