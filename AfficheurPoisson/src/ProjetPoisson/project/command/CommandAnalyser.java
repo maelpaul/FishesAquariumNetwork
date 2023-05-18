@@ -23,7 +23,7 @@ public class CommandAnalyser {
         relations.put("quit", new QuitCommand());
         relations.put("addFish", new AddFishCommand(fishManager));
         relations.put("delFish", new DelFishCommand(fishManager));
-        relations.put("startFish", new StartFishCommand());
+        relations.put("startFish", new StartFishCommand(fishManager));
         relations.put("status", new StatusCommand(client));
         relations.put("showFishName", new ShowFishNameCommand(fishManager));
 

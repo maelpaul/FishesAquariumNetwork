@@ -17,7 +17,9 @@ public class FishManager {
         AddErrorUnknownBehaviour,
 
         DeleteSuccessfully,
-        DeleteErrorNameNotExisting
+        DeleteErrorNameNotExisting,
+
+        StartSuccessfully, StartErrorUnknownName
     }
 
     private final HashMap<String, Fish> fishes;
@@ -61,6 +63,20 @@ public class FishManager {
         );
 
         return EResult.AddSuccessfully;
+    }
+
+    public EResult startFish(String name) {
+        if (name.equalsIgnoreCase("all")){
+            for (Fish fish : fishes.values())
+                fish.start();
+        }
+
+        if (!fishes.containsKey(name))
+            return EResult.StartErrorUnknownName;
+
+        fishes.get(name).start();
+
+        return EResult.StartSuccessfully;
     }
 
     public EResult delFish(String name){

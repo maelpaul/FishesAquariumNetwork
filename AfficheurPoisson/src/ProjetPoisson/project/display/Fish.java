@@ -50,6 +50,8 @@ public class Fish {
     private final EFishBehaviour behaviour;
 
     private final Text name;
+
+    private boolean started;
     public EFishBehaviour getBehaviour() { return behaviour; }
 
     public Fish(WindowInfo windowInfo, String name, String textureName, EFishBehaviour behaviour, Vector2f positionPercentage, Vector2f sizePercentage){
@@ -57,6 +59,8 @@ public class Fish {
         this.name = new Text();
 
         this.behaviour = behaviour;
+
+        started = false;
 
         random = new Random();
 
@@ -97,6 +101,9 @@ public class Fish {
                 .setColor(new Color4f(0, 0,0 , 0));
     }
 
+    public void start(){
+        started = true;
+    }
 
     public void setShowName(boolean value) {
         name.color.setA((value) ? 1: 0);
@@ -116,19 +123,25 @@ public class Fish {
 
             if (goalPosition.finished() || behaviour == EFishBehaviour.Teleport) {
                 setPosition(goalPosition.goalValue());
-            } else if (behaviour == EFishBehaviour.Natural) {
-                setPosition(goalPosition.value());
-            } else {
-                setPosition(goalPosition.value().add(new Vector2f(swimVector).mul(swimMovement.value())));
+            }
+
+            if(started) {
+                if (behaviour == EFishBehaviour.Natural) {
+                    setPosition(goalPosition.value());
+                } else {
+                    setPosition(goalPosition.value().add(new Vector2f(swimVector).mul(swimMovement.value())));
+                }
             }
         }
 
-        sizeTweening.update();
-        renderer.setScale(
-                new Vector3f(sizeTweening.value(),
-                             renderer.scale().y /*sizeTweening.value()*/,
-                             renderer.scale().z)
-        );
+        if(started) {
+            sizeTweening.update();
+            renderer.setScale(
+                    new Vector3f(sizeTweening.value(),
+                            renderer.scale().y /*sizeTweening.value()*/,
+                            renderer.scale().z)
+            );
+        }
     }
 
     public boolean finishedTravel(){

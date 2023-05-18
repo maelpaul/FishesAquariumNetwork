@@ -57,7 +57,7 @@ public class ClientThread extends CommunicationThread {
                             System.out.println("Messaged received(" + messageReceived + ") :" + result);
                             receivedMessages.add(new Message(messageReceived, result));
                             messageToSend.remove(messageReceived);
-
+                            System.out.println(didReceiveMessage());
                             messageReceived += 1;
                         }
                     }

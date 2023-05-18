@@ -96,7 +96,6 @@ public class ClientTcp {
             e.printStackTrace();
         }
 
-        message = message + "\n";
         return message;
     }
 

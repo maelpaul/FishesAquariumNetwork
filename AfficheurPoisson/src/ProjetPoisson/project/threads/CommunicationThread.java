@@ -30,12 +30,14 @@ public  abstract class CommunicationThread extends Thread {
     public void run() {}
 
     public boolean didReceiveMessage() {
-        return receivedMessages.size() == 0;
+        return receivedMessages.size() != 0;
     }
 
     public final Message[] message() {
         Message[] result = new Message[receivedMessages.size()];
         receivedMessages.toArray(result);
+
+        receivedMessages.clear();
         return result;
 
     }
