@@ -49,7 +49,7 @@ void *thread_client(void *arg) {
     int n;
 
     // Envoi d'un message au client
-    strcpy(buffer, "> Bonjour client ");
+    strcpy(buffer, "-1|> Bonjour client ");
     char chaine[10];
     sprintf(chaine, "%d !\n", client_number);
     strcat(buffer, chaine);
@@ -75,7 +75,7 @@ void *thread_client(void *arg) {
             perror("Erreur lors de la réception de la réponse du client");
             exit(EXIT_FAILURE);
         }
-        printf("Message du client %d , len(%ld) : %s\n", client_number,  strlen(buffer), buffer);
+        printf("Message du client %d : %s\n", client_number, buffer);
 
         int test = 0;
         for(long unsigned int i=0;i<5;i++){
