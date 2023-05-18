@@ -10,7 +10,7 @@ int get_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
         controller_update_fishes(aquarium, REFRESH_TIME);
         char fish_list[1024];
         strcpy(fish_list, header);
-        strcat(fish_list, "|> list ");
+        strcat(fish_list, "|list ");
         for (int i = 0; i < aquarium->fishes_len; i++) {
             char fish_info[128];
             sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1], aquarium->fishes[i]->time_to_dest);
@@ -42,7 +42,7 @@ int get_fish_continuously_server(char * header, char * buffer, struct aquarium *
             controller_update_fishes(aquarium, REFRESH_TIME);
             char fish_list[1024];
             strcpy(fish_list, header);
-            strcat(fish_list, "|> list ");
+            strcat(fish_list, "|list ");
             for (int i = 0; i < aquarium->fishes_len; i++) {
                 char fish_info[128];
                 sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1], aquarium->fishes[i]->time_to_dest);
@@ -77,7 +77,7 @@ int get_status_server(char * header, char * buffer, struct aquarium * aquarium, 
         sprintf(len, "%d ", nb_fishes);
         char info[1024]; 
         strcpy(info, header);
-        strcat(info, "|> OK : Connecté au contrôleur, ");
+        strcat(info, "|OK : Connecté au contrôleur, ");
         strcat(info, len);
 
         if (nb_fishes == 0 || nb_fishes == 1) {
@@ -129,7 +129,7 @@ int ping_server(char * header, char * buffer, int client_id) {
 
         if (channel == NULL) {
             strcpy(buffer, header);
-            strcat(buffer, "|> NOK : numéro de port invalide");
+            strcat(buffer, "|NOK : numéro de port invalide");
             if (send(client_id, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
@@ -137,7 +137,7 @@ int ping_server(char * header, char * buffer, int client_id) {
         }
         else if (!strcmp(channel, "12345")) {
             strcpy(buffer, header);
-            strcat(buffer, "|> pong 12345");
+            strcat(buffer, "|pong 12345");
             if (send(client_id, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
@@ -145,7 +145,7 @@ int ping_server(char * header, char * buffer, int client_id) {
         }
         else {
             strcpy(buffer, header);
-            strcat(buffer, "|> NOK : mauvais numéro de port");
+            strcat(buffer, "|NOK : mauvais numéro de port");
             if (send(client_id, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
