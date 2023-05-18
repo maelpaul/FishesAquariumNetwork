@@ -125,6 +125,29 @@ void *thread_client(void *arg) {
             perror("Erreur lors de la réception de la réponse du client");
             exit(EXIT_FAILURE);
         }
+        else if (n == 0) {
+            printf("Client %d déconnecté.\n", client_number);
+            // Fermer la connexion avec le client
+            close(client_id);
+
+            for (int i = 0; i < aquarium->views_len; i++) {
+                if (strcmp(client_view->name, aquarium->views[i]->name) == 0) {
+                    change_view_status(aquarium->views[i]);
+                    change_view_status(client_args->client_view);
+                }
+            }
+            
+            view_free(client_args->client_view);
+            free(client_args->client_id);
+            free(arg);
+
+            pthread_mutex_lock(&mutex_client_count);
+            client_count--;
+            available[thread_number] = 1;
+            pthread_mutex_unlock(&mutex_client_count);
+
+            pthread_exit(NULL);
+        }
         printf("Message du client %d : %s\n", client_number, buffer);
 
         int test = 0;
