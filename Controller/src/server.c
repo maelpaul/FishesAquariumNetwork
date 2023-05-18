@@ -109,11 +109,7 @@ void *thread_client(void *arg) {
             check = ping_server(header, message, client_id);
         }
         if (check == 0) {
-<<<<<<< HEAD
-            check = init_client(header, message, aquarium, &mutex_aquarium, client_id);
-=======
-            check = init_client(buffer, aquarium, &mutex_aquarium, client_id, client_view);
->>>>>>> 7243e527b3908e0f9a579d092f4bb72447d72d91
+            check = init_client(header, message, aquarium, &mutex_aquarium, client_id, client_view);
         }
 
         // check des commandes inexistantes
