@@ -17,6 +17,7 @@ struct client_args {
     int *client_id;
     struct aquarium * aquarium;
     int client_number;
+    struct view * client_view;
 };
 
 int client(void * client_arg);

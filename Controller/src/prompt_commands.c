@@ -87,13 +87,20 @@ void prompt_del_view(struct command * command, struct aquarium * aquarium, pthre
     int nb_views = aquarium->views_len;
     for(int i=0; i < nb_views; i++){
         if(removed == 0 && strcmp(aquarium->views[i]->name,view_name)==0){
-            clear(to_send,SEND_SIZE);
-            del_view(aquarium, view_name);
-            removed = 1;
-            strcpy(to_send,"> OK : view ");
-            strcat(to_send, view_name);
-            strcat(to_send, " deleted.");
-            printf("%s\n",to_send);
+            if (is_view_free(aquarium->views[i])) {
+                clear(to_send,SEND_SIZE);
+                del_view(aquarium, view_name);
+                removed = 1;
+                strcpy(to_send,"> OK : view ");
+                strcat(to_send, view_name);
+                strcat(to_send, " deleted.");
+                printf("%s\n",to_send);
+            }
+            else {
+                printf("> NOK : view used by a client\n");
+                pthread_mutex_unlock(mutex_aquarium);
+                return;
+            }
         }
     }
     pthread_mutex_unlock(mutex_aquarium);

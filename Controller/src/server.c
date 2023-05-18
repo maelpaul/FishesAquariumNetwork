@@ -41,6 +41,7 @@ void *thread_client(void *arg) {
     struct aquarium * aquarium = client_args->aquarium;
     pthread_mutex_unlock(&mutex_aquarium);
     int client_number = client_args->client_number;
+    struct view * client_view = client_args->client_view;
     (void) aquarium;
     char buffer[BUFFER_SIZE];
     int n;
@@ -104,7 +105,7 @@ void *thread_client(void *arg) {
             check = ping_server(buffer, client_id);
         }
         if (check == 0) {
-            check = init_client(buffer, aquarium, &mutex_aquarium, client_id);
+            check = init_client(buffer, aquarium, &mutex_aquarium, client_id, client_view);
         }
 
         // check des commandes inexistantes
@@ -125,6 +126,15 @@ void *thread_client(void *arg) {
 
     // Fermer la connexion avec le client
     close(client_id);
+
+    for (int i = 0; i < aquarium->views_len; i++) {
+        if (strcmp(client_view->name, aquarium->views[i]->name) == 0) {
+            change_view_status(aquarium->views[i]);
+            change_view_status(client_args->client_view);
+        }
+    }
+    
+    view_free(client_args->client_view);
     free(client_args->client_id);
     free(arg);
 
@@ -161,9 +171,14 @@ void * wait_for_client(void * arg){
             struct client_args * client_args = malloc(sizeof(struct client_args));
             pthread_mutex_lock(&mutex_aquarium);
             client_args->aquarium = context->aquarium;
-            pthread_mutex_unlock(&mutex_aquarium);
             client_args->client_id = client_id;
             client_args->client_number = client_count+1;
+            client_args->client_view = malloc(sizeof(struct view));
+            view_init(client_args->client_view);
+            int size[2] = {0, 0};
+            int coords[2] = {0, 0};
+            view_create(client_args->client_view, coords, size, "nok", client_args->aquarium->size[0], client_args->aquarium->size[1]);
+            pthread_mutex_unlock(&mutex_aquarium);
             pthread_create(&threads[client_count], NULL, thread_client, (void *)client_args);
             printf("Client connecté. Client ID: %d\n", client_count+1);
             tab_args[client_count] = client_args;
@@ -255,6 +270,15 @@ int main()
             exit(EXIT_FAILURE);
         }
         close(*(tab_args[i]->client_id));
+
+        for (int i = 0; i < aquarium->views_len; i++) {
+            if (strcmp(tab_args[i]->client_view->name, aquarium->views[i]->name) == 0) {
+                change_view_status(aquarium->views[i]);
+                change_view_status(tab_args[i]->client_view);
+            }
+        }
+        
+        view_free(tab_args[i]->client_view);
         free(tab_args[i]->client_id);
         free(tab_args[i]);
         pthread_cancel(threads[i]);
