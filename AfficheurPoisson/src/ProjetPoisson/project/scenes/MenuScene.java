@@ -18,11 +18,11 @@ import ProjetPoisson.mightylib.util.Timer;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
 import ProjetPoisson.mightylib.util.math.MightyMath;
-import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.display.FishManager;
+import ProjetPoisson.project.threads.ClientThread;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -30,7 +30,7 @@ import org.joml.Vector3f;
 public class MenuScene extends Scene {
     public enum EConnectionState {
         Disconnected,
-        Starting,
+        StartingConnectionProcedure,
         SendLoad,
         ReceiveLoad,
         Connected
@@ -54,7 +54,7 @@ public class MenuScene extends Scene {
     private Texture displacementMap;
     private FloatTweening displacementMapTweening;
 
-    private ClientTcp client;
+    private ClientThread client;
     private boolean clientInitialized;
 
     private EConnectionState currentState;
@@ -76,17 +76,12 @@ public class MenuScene extends Scene {
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
         /// SCENE INFORMATION ///
-        //ServerThread serverThread = new ServerThread();
-        //serverThread.start();
-        //ClientThread clientThread = new ClientThread();
-        //clientThread.start();
+        client = new ClientThread();
+        client.start();
 
         Vector2i windowSize = mainContext.getWindow().getInfo().getSizeCopy();
         terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.x * 0.5f,windowSize.y * 0.5f));
 
-        Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
-        client = new ClientTcp(conf_client);
-        client.tryCreateConnection();
         clientInitialized = false;
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
@@ -147,7 +142,7 @@ public class MenuScene extends Scene {
                 .initTwoValue(15f, 0f, 15f);
 
 
-        analyser = new CommandAnalyser(client, fishManager);
+        analyser = new CommandAnalyser(client.getClient(), fishManager);
 
         setConnectionState(EConnectionState.Disconnected);
     }
@@ -171,25 +166,31 @@ public class MenuScene extends Scene {
     }
 
 
-    public void initializeConnection(){
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    public void initializeConnection() {
+        client.sendMessage("hello\n");
+        client.sendMessage("ls\n");
+        client.sendMessage("addFish\n");
 
-        client.sendMessage("hello");
+        setConnectionState(EConnectionState.StartingConnectionProcedure);
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        String result = client.readMessage();
-        terminal.addToResultText(result);
+        /*String[] result = client.message();
+        terminal.addToResultText(result[0]);
 
-        System.out.println("Response : " + result);
+        System.out.println("Response : " + result[0]);
         System.out.println("saucisse");
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        client.sendMessage("ls");
+        result = client.message();
+        terminal.addToResultText(result[0]);
+
+        System.out.println("Response : " + result[0]);
+        System.out.println("saucisse");*/
 
         /*client.sendMessage("addFish PoissonRouge2 at 200x30, 10x4, RandomWayPoint\n");
         try {
@@ -230,7 +231,7 @@ public class MenuScene extends Scene {
         super.update();
         fishManager.update();
 
-        if (client.isConnected()){
+        if (client.getClient().isConnected()){
             if (!clientInitialized) {
                 initializeConnection();
                 attemptConnexionTimer.stop();
@@ -238,9 +239,8 @@ public class MenuScene extends Scene {
         } else {
             attemptConnexionTimer.update();
 
-            if (!client.isTryingConnection() && attemptConnexionTimer.isFinished()) {
-                System.out.println("lauch aquarium");
-                client.tryCreateConnection();
+            if (!client.getClient().isTryingConnection() && attemptConnexionTimer.isFinished()) {
+                client.shouldTryConnection();
                 attemptConnexionTimer.resetStart();
             }
         }
@@ -253,8 +253,9 @@ public class MenuScene extends Scene {
             if (result != null) {
                 if (result.equals("¤¤clear¤¤"))
                      terminal.clearResultText();
-                else
-                    terminal.addToResultText(result);
+                else if (result.equals("¤¤quit¤¤"))
+                    this.sceneManagerInterface.exit(0);
+                else terminal.addToResultText(result);
 
                 terminal.saveCommand()
                         .clearCommandText();
@@ -300,8 +301,7 @@ public class MenuScene extends Scene {
         text.unload();
         terminal.unload();
 
-        if (client.isConnected())
-            client.closeConnection();
+        client.interrupt();
 
         connectionStatusIcon.unload();
         connectionStatusMessage.unload();

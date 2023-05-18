@@ -45,12 +45,9 @@ public class ClientTcp {
     public void sendMessage(String message) {
         try {
             if (socket != null && socket.isConnected()) {
-                OutputStream os = socket.getOutputStream();
-                byte[] dataBytes = message.getBytes(StandardCharsets.UTF_8);
-                int dataLength = dataBytes.length;
-                os.write(ByteBuffer.allocate(4).putInt(dataLength).array());
-                os.write(dataBytes);
-                os.flush();
+                OutputStream outputStream = socket.getOutputStream();
+                outputStream.write(message.getBytes());
+                outputStream.flush();
                 //System.out.println("[Debug] Client sent message: " + message);
             } else {
                 System.out.println("Unable to send message: Socket is not connected or is closed.");

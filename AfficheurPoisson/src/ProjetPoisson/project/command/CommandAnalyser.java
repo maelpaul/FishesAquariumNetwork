@@ -20,6 +20,7 @@ public class CommandAnalyser {
         relations = new HashMap<>();
         relations.put("help", new HelpCommand());
         relations.put("clear", new ClearCommand());
+        relations.put("quit", new QuitCommand());
         relations.put("addFish", new AddFishCommand(fishManager));
         relations.put("delFish", new DelFishCommand(fishManager));
         relations.put("startFish", new StartFishCommand());
@@ -43,6 +44,7 @@ public class CommandAnalyser {
 
         if (args[FIRST_OPTIONAL_ARGUMENT].equalsIgnoreCase("help") || args[FIRST_OPTIONAL_ARGUMENT].equalsIgnoreCase("-h") )
             return relations.get(args[COMMAND_TYPE_ARGUMENT]).returnHelp();
+
 
         return relations.get(args[COMMAND_TYPE_ARGUMENT]).process(args);
     }

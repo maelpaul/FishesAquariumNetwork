@@ -72,15 +72,15 @@ void *thread_client(void *arg) {
             perror("Erreur lors de la réception de la réponse du client");
             exit(EXIT_FAILURE);
         }
+        printf("Message du client %d , len(%ld) : %s\n", client_number,  strlen(buffer), buffer);
+
         int test = 0;
         for(long unsigned int i=0;i<5;i++){
             if (buffer[test]=='\0'){
                 test++;
             }
         }
-        if (test<=2) {
-            printf("Message du client %d : %s\n", client_number, buffer);
-        }
+        
 
         if (check == 0) {
             check = add_fish_server(buffer, aquarium, &mutex_aquarium, client_id);

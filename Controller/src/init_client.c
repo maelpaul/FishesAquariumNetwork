@@ -1,12 +1,14 @@
 #include "init_client.h"
 
 int init_client(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id) {
-    if (!strncmp(buffer,"hello",5)) {
+    if (!strncmp(buffer, "hello", 5)) {
         char * view_name = NULL;
         int x = 2;
-        if(strlen(buffer)!=6){
+
+        if(strlen(buffer) != 6)
             x = hello_command_check(buffer, view_name);
-        }
+        
+
         if(x){
             if (x != 2) {
                 char input[256];
@@ -17,9 +19,11 @@ int init_client(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mut
                 view_name = strtok(NULL," ");
                 view_name = strtok(view_name,"\n");
             }
+
             pthread_mutex_lock(mutex);
             char * attributed_view = client_connection(aquarium, view_name);
             pthread_mutex_unlock(mutex);
+            
             if(strcmp(attributed_view,"no greeting")==0){
                 char to_send[64] = "> ";
                 strcat(to_send, attributed_view);

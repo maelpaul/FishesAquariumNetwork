@@ -1,41 +1,53 @@
 package ProjetPoisson.project.threads;
 
-import ProjetPoisson.mightylib.resources.Resources;
-import ProjetPoisson.project.client.ClientTcp;
-import ProjetPoisson.project.client.Configuration;
-import ProjetPoisson.project.client.ServerTcp;
+import ProjetPoisson.project.client.Message;
 
-import java.io.*;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.util.concurrent.CountDownLatch;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 
 public  abstract class CommunicationThread extends Thread {
-    protected volatile boolean running;
-    protected String receivedMessage;
-    protected String messageToSend;
-    public void run() {
+    private int messageIdCounter;
 
+    protected int messageProcessed;
+    protected int messageReceived;
+
+    protected volatile boolean running;
+    protected ArrayList<Message> receivedMessages;
+
+    protected HashMap<Integer, String> messageToSend;
+
+    CommunicationThread(){
+        receivedMessages = new ArrayList<>();
+        messageToSend = new HashMap<>();
+
+        messageIdCounter = 0;
+        messageProcessed = 0;
+        messageReceived = 0;
     }
+
+    public void run() {}
 
     public boolean didReceiveMessage() {
+        return receivedMessages.size() == 0;
+    }
+
+    public final Message[] message() {
+        Message[] result = new Message[receivedMessages.size()];
+        receivedMessages.toArray(result);
+        return result;
+
+    }
+
+    public final int sendMessage(String message) {
+        messageToSend.put(messageIdCounter, message);
+        return messageIdCounter++;
+    }
+
+    public final boolean didProcessedMessage() {
         return false;
     }
 
-    public String message() {
-        return null;
-    }
-
-    public void sendMessage(String message) {
-    }
-
-    public boolean didProcessedMessage() {
-        return false;
-    }
-
-    public void doStop() {
-    }
-
+    public abstract void doStop();
 }
