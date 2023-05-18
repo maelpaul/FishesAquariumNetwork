@@ -20,10 +20,12 @@
 #define NB_CLIENTS 8
 #define BUFFER_SIZE 256
 
+int counter = 0;
 int client_count = 0;
 int is_aquarium_loaded = 0;
 pthread_t wait_client;
 pthread_t threads[NB_CLIENTS];
+int available[NB_CLIENTS];
 struct client_args * tab_args[NB_CLIENTS];
 pthread_mutex_t mutex_client_count = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_aquarium = PTHREAD_MUTEX_INITIALIZER;
@@ -41,6 +43,7 @@ void *thread_client(void *arg) {
     struct aquarium * aquarium = client_args->aquarium;
     pthread_mutex_unlock(&mutex_aquarium);
     int client_number = client_args->client_number;
+    int thread_number = client_args->thread_number;
     struct view * client_view = client_args->client_view;
     (void) aquarium;
     char buffer[BUFFER_SIZE];
@@ -73,7 +76,7 @@ void *thread_client(void *arg) {
             perror("Erreur lors de la réception de la réponse du client");
             exit(EXIT_FAILURE);
         }
-        printf("Message du client %d , len(%ld) : %s\n", client_number,  strlen(buffer), buffer);
+        printf("Message du client %d : %s\n", client_number, buffer);
 
         int test = 0;
         for(long unsigned int i=0;i<5;i++){
@@ -81,7 +84,6 @@ void *thread_client(void *arg) {
                 test++;
             }
         }
-        
 
         if (check == 0) {
             check = add_fish_server(buffer, aquarium, &mutex_aquarium, client_id);
@@ -140,6 +142,7 @@ void *thread_client(void *arg) {
 
     pthread_mutex_lock(&mutex_client_count);
     client_count--;
+    available[thread_number] = 1;
     pthread_mutex_unlock(&mutex_client_count);
 
     pthread_exit(NULL);
@@ -165,23 +168,36 @@ void * wait_for_client(void * arg){
         pthread_mutex_lock(&mutex_client_count);
 
         if (client_count < NB_CLIENTS) {
+            counter++;
+
             // Créer un thread pour gérer le client
+            int first_available = -1;
+            int ok = 0;
+            for (int i = 0; i < NB_CLIENTS; i++) {
+                if (available[i] == 1 && ok == 0) {
+                    ok = 1;
+                    first_available = i;
+                    available[i] = 0;
+                }
+            }
+
             int *client_id = malloc(sizeof(int));
             *client_id = newsockfd;
             struct client_args * client_args = malloc(sizeof(struct client_args));
             pthread_mutex_lock(&mutex_aquarium);
             client_args->aquarium = context->aquarium;
             client_args->client_id = client_id;
-            client_args->client_number = client_count+1;
+            client_args->client_number = counter;
+            client_args->thread_number = first_available;
             client_args->client_view = malloc(sizeof(struct view));
             view_init(client_args->client_view);
             int size[2] = {0, 0};
             int coords[2] = {0, 0};
             view_create(client_args->client_view, coords, size, "nok", client_args->aquarium->size[0], client_args->aquarium->size[1]);
             pthread_mutex_unlock(&mutex_aquarium);
-            pthread_create(&threads[client_count], NULL, thread_client, (void *)client_args);
-            printf("Client connecté. Client ID: %d\n", client_count+1);
-            tab_args[client_count] = client_args;
+            pthread_create(&threads[first_available], NULL, thread_client, (void *)client_args);
+            printf("Client connecté. Client ID: %d\n", counter);
+            tab_args[first_available] = client_args;
             client_count++;
         } 
         else {
@@ -203,6 +219,10 @@ void * wait_for_client(void * arg){
 
 int main()
 {
+    for (int i = 0; i < NB_CLIENTS; i++) {
+        available[i] = 1;
+    }
+
     struct config conf;
     char buffer[BUFFER_SIZE];
 
@@ -263,26 +283,30 @@ int main()
     pthread_join(wait_client, NULL);
 
     // Attendre que tous les threads se terminent
-    for (int i = 0; i < client_count; i++) {
-        strcpy(buffer, "> Serveur fermé");
-        if (send(*(tab_args[i]->client_id), buffer, strlen(buffer), 0) < 0) {
-            perror("Erreur lors de l'envoi du message au client");
-            exit(EXIT_FAILURE);
-        }
-        close(*(tab_args[i]->client_id));
-
-        for (int i = 0; i < aquarium->views_len; i++) {
-            if (strcmp(tab_args[i]->client_view->name, aquarium->views[i]->name) == 0) {
-                change_view_status(aquarium->views[i]);
-                change_view_status(tab_args[i]->client_view);
+    for (int i = 0; i < NB_CLIENTS; i++) {
+        if (available[i] == 0) {
+            strcpy(buffer, "> Serveur fermé");
+            if (send(*(tab_args[i]->client_id), buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
             }
+
+            close(*(tab_args[i]->client_id));
+
+            for (int j = 0; j < aquarium->views_len; j++) {
+                if (strcmp(tab_args[i]->client_view->name, aquarium->views[j]->name) == 0) {
+                    change_view_status(aquarium->views[j]);
+                    change_view_status(tab_args[i]->client_view);
+                }
+            }
+            
+            view_free(tab_args[i]->client_view);
+            free(tab_args[i]->client_id);
+            free(tab_args[i]);
+            pthread_cancel(threads[i]);
+            pthread_join(threads[i], NULL);
+            available[i] = 1;
         }
-        
-        view_free(tab_args[i]->client_view);
-        free(tab_args[i]->client_id);
-        free(tab_args[i]);
-        pthread_cancel(threads[i]);
-        pthread_join(threads[i], NULL);
     }
 
     client_count = 0;
