@@ -17,10 +17,10 @@ import ProjetPoisson.mightylib.scene.Scene;
 import ProjetPoisson.mightylib.util.Timer;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
-import ProjetPoisson.mightylib.util.math.MightyMath;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.client.Message;
 import ProjetPoisson.project.command.CommandAnalyser;
+import ProjetPoisson.project.command.ResultCommand;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.display.FishManager;
 import ProjetPoisson.project.threads.ClientThread;
@@ -126,13 +126,6 @@ public class MenuScene extends Scene {
         Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
 
         fishManager = new FishManager(mainContext.getWindow().getInfo(), configuration);
-
-        /*int numberFish = 6;
-        float size = MightyMath.mapLog(numberFish, 10, 100, 0.17f, 0.15f);
-
-        for (int i = 0; i < numberFish; ++i)
-            fishManager.addFish("Fish" + i, new Vector2f(0.5f, 0.5f), new Vector2f(size, size),
-                    (i % 3 == 0) ? "Straight" :  (i % 3 == 1) ?  "Teleport" : "Natural");*/
 
         displacementMap = Resources.getInstance().getResource(Texture.class, "displacementMap");
         ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("displacementMap", 1);
@@ -244,20 +237,21 @@ public class MenuScene extends Scene {
 
         if (terminal.shouldProcessCommand()){
             String commandText = terminal.getCommandText();
-            String result = analyser.analyseCommand(commandText);
+            ResultCommand result = analyser.analyseCommand(commandText);
 
             if (result != null) {
-                if (result.equals("¤¤clear¤¤"))
+                if (result.getResultAction() == ResultCommand.EResultAction.Clear)
                      terminal.clearResultText();
-                else if (result.equals("¤¤quit¤¤"))
+                else if (result.getResultAction() == ResultCommand.EResultAction.Quit)
                     this.sceneManagerInterface.exit(0);
-                else terminal.addToResultText(result);
+                else
+                    terminal.addToResultText(result.getPromptResult());
 
                 terminal.saveCommand()
                         .clearCommandText();
 
-                if (EConnectionState.Connected == currentState && result.contains("OK"))
-                    client.sendMessage(commandText);
+                if (EConnectionState.Connected == currentState && result.getResultAction() == ResultCommand.EResultAction.SendServer)
+                    client.sendMessage(commandText.replace("/", ""));
             }
         }
 

@@ -1,15 +1,16 @@
 package ProjetPoisson.project.command.commands;
 
 import ProjetPoisson.project.command.ICommand;
+import ProjetPoisson.project.command.ResultCommand;
 
 public class ClearCommand implements ICommand {
     @Override
-    public String process(String[] args) {
-        return "¤¤clear¤¤";
+    public ResultCommand process(String[] args) {
+        return new ResultCommand(ResultCommand.EResultAction.Clear);
     }
 
     @Override
-    public String returnHelp() {
+    public ResultCommand returnHelp() {
         return null;
     }
 }

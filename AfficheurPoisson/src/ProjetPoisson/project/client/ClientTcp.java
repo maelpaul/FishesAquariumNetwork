@@ -73,15 +73,19 @@ public class ClientTcp {
 
         try {
             stream = socket.getInputStream();
-            byte[] byteMessage = new byte[1024];
-            int bytesRead = stream.read(byteMessage);
+            if (stream.available() > 0) {
+                byte[] byteMessage = new byte[1024];
+                int bytesRead = stream.read(byteMessage);
 
-            if (bytesRead == -1) {
-                throw new IOException("End of stream reached before message was fully received.");
+                if (bytesRead == -1) {
+                    throw new IOException("End of stream reached before message was fully received.");
+                }
+
+                message = new String(byteMessage, 0, bytesRead, ENCODING);
+                lastHeartbeat = System.currentTimeMillis(); // Update heartbeat when message is successfully read
+            } else {
+                return null;
             }
-
-            message = new String(byteMessage, 0, bytesRead, ENCODING);
-            lastHeartbeat = System.currentTimeMillis(); // Update heartbeat when message is successfully read
 
         } catch (EOFException | SocketException e) {
             System.out.println("Connection lost with the server. (EOF or SocketException)");
