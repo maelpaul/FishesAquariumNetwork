@@ -30,14 +30,14 @@ public class CommandAnalyser {
         // get fish, ls (commande système (pas utilisateur))
     }
 
-    public String analyseCommand(String command){
+    public ResultCommand analyseCommand(String command){
         String[] args = command.replace("/", "").replace("\n", "").split(" ");
 
         if (args.length == EMPTY_COMMAND)
-            return "Empty command !";
+            return new ResultCommand("Empty command !");
 
         if ( ! relations.containsKey(args[COMMAND_TYPE_ARGUMENT]))
-            return "-> NOK : command introuvable";
+            return new ResultCommand("-> NOK : command introuvable");
 
         if (args.length == NO_OPTIONAL_ARGUMENT)
             return relations.get(args[COMMAND_TYPE_ARGUMENT]).process(args);
