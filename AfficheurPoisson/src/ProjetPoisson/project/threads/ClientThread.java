@@ -41,8 +41,8 @@ public class ClientThread extends CommunicationThread {
 
         try {
             while (this.running){
-                Thread.sleep(500); // Add a delay of 500 milliseconds
-                System.out.println(messageProcessed + " " + messageReceived );
+                Thread.sleep(50); // Add a delay of 500 milliseconds
+                //System.out.println(messageProcessed + " " + messageReceived );
 
                 if (client.isConnected()){
                     if (messageToSend.size() > 0 && messageReceived == messageProcessed) {

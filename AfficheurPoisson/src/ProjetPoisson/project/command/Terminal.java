@@ -196,16 +196,22 @@ public class Terminal {
 
         previousCommandSelected = previousCommands.size();
 
+        //addToResultText("\n");
+
         return this;
     }
 
     public Terminal clearResultText(){
         resultText.setText(BASE_RESULT_MESSAGE);
+        commandText.fitText(commandTextCpy.toString(), maxSize, true);
 
         return this;
     }
 
     public Terminal addToResultText(String text){
+        if (text == null)
+            return this;
+
         if (text.charAt(text.length() - 1) != '\n')
             text += "\n";
 

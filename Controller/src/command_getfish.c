@@ -24,7 +24,8 @@ int get_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
         pthread_mutex_unlock(mutex);
         return 1;
     }
-    return 0;
+    
+    return 0;   
 }
 
 int get_fish_continuously_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){

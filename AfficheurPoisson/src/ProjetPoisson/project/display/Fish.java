@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Fish {
+    public enum EFishServerBehaviour {
+        RandomWayPoint
+    }
 
     public enum EFishBehaviour {
         Straight, Natural, Teleport
@@ -37,6 +40,7 @@ public class Fish {
 
     private final WindowInfo windowInfo;
 
+    private Vector2f goalPositionPercentage;
     private final Vector2fTweening goalPosition;
     private final Timer timer;
     private final RectangleRenderer renderer;
@@ -52,15 +56,16 @@ public class Fish {
     private boolean started;
     public EFishBehaviour getBehaviour() { return behaviour; }
 
-    public Fish(WindowInfo windowInfo, String name, String textureName, EFishBehaviour behaviour, Vector2f positionPercentage, Vector2f sizePercentage){
+    public Fish(WindowInfo windowInfo, String name, String textureName, Vector2f positionPercentage, Vector2f sizePercentage){
         this.windowInfo = windowInfo;
         this.name = new Text();
 
-        this.behaviour = behaviour;
+        random = new Random();
+
+        this.behaviour = EFishBehaviour.values()[random.nextInt(EFishBehaviour.values().length)];
 
         started = false;
 
-        random = new Random();
 
         renderer = new RectangleRenderer("texture2D");
         renderer.switchToTextureMode(textureName);
@@ -71,7 +76,13 @@ public class Fish {
         renderer.setPosition(new Vector2f(windowInfo.getVirtualSizeCopy().x * positionPercentage.x,
                         windowInfo.getVirtualSizeCopy().y * positionPercentage.y));
 
+
+        goalPositionPercentage = new Vector2f();
         goalPosition = new Vector2fTweening();
+        goalPosition.initTwoValue(0, this.renderer.get2DPosition(), this.renderer.get2DPosition())
+                .setTweeningValues(ETweeningType.Linear, ETweeningBehaviour.InOut)
+                .setTweeningOption(ETweeningOption.Direct);
+
         timer = new Timer();
 
         swimMovement = new FloatTweening();
@@ -151,6 +162,11 @@ public class Fish {
     }
 
     public void travelToNewPosition(Vector2f positionPercentage, float time){
+        if (goalPositionPercentage.x == positionPercentage.x && goalPositionPercentage.y == positionPercentage.y)
+            return;
+
+        goalPositionPercentage = new Vector2f(positionPercentage);
+
         setPosition(goalPosition.goalValue());
 
         Vector2f position = new Vector2f(

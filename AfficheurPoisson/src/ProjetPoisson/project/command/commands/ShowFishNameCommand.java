@@ -1,8 +1,10 @@
 package ProjetPoisson.project.command.commands;
 
+import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.command.ICommand;
 import ProjetPoisson.project.command.ResultCommand;
 import ProjetPoisson.project.display.FishManager;
+import ProjetPoisson.project.scenes.MenuScene;
 import org.joml.Vector2f;
 
 import java.util.Scanner;
@@ -12,12 +14,18 @@ public class ShowFishNameCommand implements ICommand {
     public static final int ARG_VALUE = 1;
 
     private final FishManager manager;
-    public ShowFishNameCommand(FishManager fishManager){
+
+    private final MenuScene.ConnectionStateContainer state;
+    public ShowFishNameCommand(MenuScene.ConnectionStateContainer state, FishManager fishManager){
+        this.state = state;
         this.manager = fishManager;
     }
 
     @Override
     public ResultCommand process(String[] args) {
+        if (state.get() != MenuScene.EConnectionState.Connected)
+            return new ResultCommand("-> NOK : Controleur introuvable");
+
         if (args.length == COMMAND_SIZE) {
             String value = args[ARG_VALUE];
 

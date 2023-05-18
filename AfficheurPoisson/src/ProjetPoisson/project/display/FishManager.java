@@ -58,13 +58,13 @@ public class FishManager {
         }
     }
 
-    public EResult addFish(String name, Vector2f positionPercentage, Vector2f sizePourcentage, String behaviour){
+    public EResult addFish(String name, Vector2f positionPercentage, Vector2f sizePercentage, String behaviour){
         if (fishes.containsKey(name))
             return EResult.AddErrorNameExisting;
 
-        Fish.EFishBehaviour current = null;
+        Fish.EFishServerBehaviour current = null;
 
-        for (Fish.EFishBehaviour value : Fish.EFishBehaviour.values()){
+        for (Fish.EFishServerBehaviour value : Fish.EFishServerBehaviour.values()){
             if (value.name().equals(behaviour)) {
                 current = value;
                 break;
@@ -76,7 +76,7 @@ public class FishManager {
 
         fishes.put(
                 name,
-                new Fish(info, name, fishesFileName.get(0), current, positionPercentage, sizePourcentage)
+                new Fish(info, name, fishesFileName.get(0), positionPercentage, sizePercentage)
         );
 
         return EResult.AddSuccessfully;
@@ -107,7 +107,7 @@ public class FishManager {
     }
 
     public void processFishUpdate(String fishArgs){
-        System.out.println(fishArgs);
+        System.out.println("Update Fish : " + fishArgs);
 
         String[] parts = fishArgs.trim().split(" ");
         if (parts.length != UPDATE_FISH_COMMAND_SIZE)

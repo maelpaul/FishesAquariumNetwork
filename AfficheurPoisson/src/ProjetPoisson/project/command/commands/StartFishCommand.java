@@ -1,8 +1,10 @@
 package ProjetPoisson.project.command.commands;
 
+import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.command.ICommand;
 import ProjetPoisson.project.command.ResultCommand;
 import ProjetPoisson.project.display.FishManager;
+import ProjetPoisson.project.scenes.MenuScene;
 
 public class StartFishCommand implements ICommand {
 
@@ -10,14 +12,19 @@ public class StartFishCommand implements ICommand {
 
     public static final int ARG_NAME = 1;
 
+    private final MenuScene.ConnectionStateContainer state;
     private final FishManager fishManager;
 
-    public StartFishCommand(FishManager fishManager){
+    public StartFishCommand(MenuScene.ConnectionStateContainer state, FishManager fishManager) {
+        this.state = state;
         this.fishManager = fishManager;
     }
 
     @Override
     public ResultCommand process(String[] args) {
+        if (state.get() != MenuScene.EConnectionState.Connected)
+            return new ResultCommand("-> NOK : Controleur introuvable");
+
         if (args.length == COMMAND_SIZE) {
             if (args[ARG_NAME].equalsIgnoreCase("all")){
                 fishManager.startFish("all");
@@ -30,7 +37,7 @@ public class StartFishCommand implements ICommand {
             if (result == FishManager.EResult.StartErrorUnknownName)
                 return new ResultCommand("  -> NOK : Nom inconnue");
 
-            return new ResultCommand("  -> OK : Poisson " + args[ARG_NAME] + " demarré");
+            return new ResultCommand("  -> OK : Poisson " + args[ARG_NAME] + " demarré", ResultCommand.EResultAction.SendServer);
         }
 
         return new ResultCommand("  -> NOK : Mauvais argument(s), faites \"startFish help\" pour plus d'aide");

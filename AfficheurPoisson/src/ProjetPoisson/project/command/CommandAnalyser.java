@@ -4,6 +4,7 @@ import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.command.commands.*;
 import ProjetPoisson.project.display.Fish;
 import ProjetPoisson.project.display.FishManager;
+import ProjetPoisson.project.scenes.MenuScene;
 
 import java.util.HashMap;
 
@@ -16,16 +17,16 @@ public class CommandAnalyser {
 
     HashMap<String, ICommand> relations;
 
-    public CommandAnalyser(ClientTcp client, FishManager fishManager) {
+    public CommandAnalyser(MenuScene.ConnectionStateContainer state, FishManager fishManager) {
         relations = new HashMap<>();
         relations.put("help", new HelpCommand());
         relations.put("clear", new ClearCommand());
         relations.put("quit", new QuitCommand());
-        relations.put("addFish", new AddFishCommand(fishManager));
-        relations.put("delFish", new DelFishCommand(fishManager));
-        relations.put("startFish", new StartFishCommand(fishManager));
-        relations.put("status", new StatusCommand(client));
-        relations.put("showFishName", new ShowFishNameCommand(fishManager));
+        relations.put("addFish", new AddFishCommand(state, fishManager));
+        relations.put("delFish", new DelFishCommand(state, fishManager));
+        relations.put("startFish", new StartFishCommand(state, fishManager));
+        relations.put("status", new StatusCommand(state));
+        relations.put("showFishName", new ShowFishNameCommand(state, fishManager));
 
         // get fish, ls (commande système (pas utilisateur))
     }
