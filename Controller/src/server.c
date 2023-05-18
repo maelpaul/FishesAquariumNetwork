@@ -18,7 +18,9 @@
 
 
 #define NB_CLIENTS 8
+#ifndef BUFFER_SIZE
 #define BUFFER_SIZE 256
+#endif
 
 int client_count = 0;
 int is_aquarium_loaded = 0;
@@ -81,30 +83,32 @@ void *thread_client(void *arg) {
             }
         }
         
+        char * header = strtok(buffer, "|");
+        char * message = strtok(NULL, "\0");
 
         if (check == 0) {
-            check = add_fish_server(buffer, aquarium, &mutex_aquarium, client_id);
+            check = add_fish_server(header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = del_fish_server(buffer, aquarium, &mutex_aquarium, client_id);
+            check = del_fish_server(header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = start_fish_server(buffer, aquarium, &mutex_aquarium, client_id);
+            check = start_fish_server(header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = get_fish_continuously_server(buffer, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_continuously_server(header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = get_fish_server(buffer, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_server(header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = get_status_server(buffer, aquarium, &mutex_aquarium, client_id);
+            check = get_status_server(header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = ping_server(buffer, client_id);
+            check = ping_server(header, message, client_id);
         }
         if (check == 0) {
-            check = init_client(buffer, aquarium, &mutex_aquarium, client_id);
+            check = init_client(header, message, aquarium, &mutex_aquarium, client_id);
         }
 
         // check des commandes inexistantes

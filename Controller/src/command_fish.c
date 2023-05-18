@@ -1,14 +1,16 @@
 #include "command_fish.h"
 
-int add_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
+#define BUFFER_SIZE 256
+
+int add_fish_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
     char add_verif[8];
     strncpy (add_verif, buffer, 7);
     add_verif[7] = '\0';   /* null character manually added */
 
     if (!strcmp(add_verif, "addFish")) {
 
-        char info[256];
-        memcpy(info, buffer, 256);
+        char info[BUFFER_SIZE];
+        memcpy(info, buffer, BUFFER_SIZE);
         char delim[] = " ";
 
         /* Cut the buffer to separate the contents.*/
@@ -55,28 +57,32 @@ int add_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t *
         }
 
         if (check_path == 0 && path != NULL) {
-            strcpy(buffer, "> NOK : Modèle de mobilité non supporté");
+            strcpy(buffer, header);
+            strcat(buffer, "|> NOK : Modèle de mobilité non supporté");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
         }
         else if (val == 0 && check_path == 1) {
-            strcpy(buffer, "> NOK : Poisson déjà existant");
+            strcpy(buffer, header);
+            strcat(buffer, "|> NOK : Poisson déjà existant");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
         }
         else if (val == 1 && check_path == 1) {
-            strcpy(buffer, "> OK");
+            strcpy(buffer, header);
+            strcat(buffer, "|> OK");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             } 
         }
         else {
-            strcpy(buffer, "> NOK : Syntaxe invalide");
+            strcpy(buffer, header);
+            strcat(buffer, "|> NOK : Syntaxe invalide");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
@@ -89,7 +95,7 @@ int add_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t *
     }
 }
 
-int del_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
+int del_fish_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
     // Suppression d'un poisson
     char del_verif[8];
     strncpy (del_verif, buffer, 7);
@@ -97,8 +103,8 @@ int del_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t *
 
     if (!strcmp(del_verif, "delFish")) {
         // Suppression un poisson
-        char info[256];
-        memcpy(info, buffer, 256);
+        char info[BUFFER_SIZE];
+        memcpy(info, buffer, BUFFER_SIZE);
         char delim[] = " ";
 
         char * verif = strtok(info, delim);
@@ -111,21 +117,24 @@ int del_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t *
         pthread_mutex_unlock(mutex);
 
         if (val == 0) {
-            strcpy(buffer, "> NOK : Poisson inexistant");
+            strcpy(buffer, header);
+            strcat(buffer, "|> NOK : Poisson inexistant");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
         }
         else if (val == 1) {
-            strcpy(buffer, "> OK");
+            strcpy(buffer, header);
+            strcat(buffer, "|> OK");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             } 
         }
         else {
-            strcpy(buffer, "> NOK : Nom de poisson invalide");
+            strcpy(buffer, header);
+            strcat(buffer, "|> NOK : Nom de poisson invalide");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
@@ -138,7 +147,7 @@ int del_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t *
     }
 }
 
-int start_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
+int start_fish_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
     // Démarrage d'un poisson
     char start_verif[10];
     strncpy (start_verif, buffer, 9);
@@ -146,8 +155,8 @@ int start_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t
 
     if (!strcmp(start_verif, "startFish")) {
         // Démarrage d'un poisson
-        char info[256];
-        memcpy(info, buffer, 256);
+        char info[BUFFER_SIZE];
+        memcpy(info, buffer, BUFFER_SIZE);
         char delim[] = " ";
 
         /* Cut the buffer to separate the contents.*/
@@ -161,28 +170,32 @@ int start_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t
         pthread_mutex_unlock(mutex);
 
         if (val == 0) {
-            strcpy(buffer, "> NOK : Poisson inexistant");
+            strcpy(buffer, header);
+            strcat(buffer, "|> NOK : Poisson inexistant");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
         }
         else if (val == 1) {
-            strcpy(buffer, "> OK");
+            strcpy(buffer, header);
+            strcat(buffer, "|> OK");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             } 
         }
         else if (val == 2) {
-            strcpy(buffer, "> NOK : Poisson déjà démaré");
+            strcpy(buffer, header);
+            strcat(buffer, "|> NOK : Poisson déjà démaré");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }                 
         }
         else {
-            strcpy(buffer, "> NOK : Nom de poisson invalide");
+            strcpy(buffer, header);
+            strcat(buffer, "|> NOK : Nom de poisson invalide");
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);

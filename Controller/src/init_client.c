@@ -1,6 +1,8 @@
 #include "init_client.h"
 
-int init_client(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id) {
+char to_send[64];
+
+int init_client(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id) {
     if (!strncmp(buffer, "hello", 5)) {
         char * view_name = NULL;
         int x = 2;
@@ -25,28 +27,28 @@ int init_client(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mut
             pthread_mutex_unlock(mutex);
             
             if(strcmp(attributed_view,"no greeting")==0){
-                char to_send[64] = "> ";
+                strcpy(to_send, header);
+                strcpy(to_send, "|> ");
                 strcat(to_send, attributed_view);
-                strcpy(buffer, to_send);
-                if (send(client_id, buffer, strlen(buffer), 0) < 0) {
+                if (send(client_id, to_send, strlen(to_send), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 }
             }
             else{
-                char to_send[64] = "> greeting ";
+                strcpy(to_send, header);
+                strcat(to_send, "|> greeting ");
                 strcat(to_send, attributed_view);
-                strcpy(buffer, to_send);
-                if (send(client_id, buffer, strlen(buffer), 0) < 0) {
+                if (send(client_id, to_send, strlen(to_send), 0) < 0) {
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 } 
             }
         }
         else{
-            char to_send[64] = "> incorrect format";
-            strcpy(buffer, to_send);
-            if (send(client_id, buffer, strlen(buffer), 0) < 0) {
+            strcpy(to_send, header);
+            strcat(to_send, "|> incorrect format");
+            if (send(client_id, to_send, strlen(to_send), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             } 

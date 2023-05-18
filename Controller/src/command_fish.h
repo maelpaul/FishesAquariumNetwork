@@ -13,6 +13,6 @@
 #include "thread.h"
 #include "server_utils.h"
 
-int add_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock);
-int del_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock);
-int start_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock);
+int add_fish_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock);
+int del_fish_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock);
+int start_fish_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock);
