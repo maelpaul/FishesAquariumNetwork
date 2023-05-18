@@ -1,6 +1,7 @@
 package ProjetPoisson.project.command.commands;
 
 import ProjetPoisson.project.command.ICommand;
+import ProjetPoisson.project.command.ResultCommand;
 import ProjetPoisson.project.display.FishManager;
 import org.joml.Vector2f;
 
@@ -23,29 +24,29 @@ public class AddFishCommand implements ICommand {
     }
 
     @Override
-    public String process(String[] args) {
+    public ResultCommand process(String[] args) {
         if (args.length == OPTION_SIZE) {
             if (args[ARG_OPTION].contains("-"))
                 return processOption(args);
 
-            return "  -> NOK : Mauvais argument(s), faites \"addFish help\" pour plus d'aide";
+            return new ResultCommand("  -> NOK : Mauvais argument(s), faites \"addFish help\" pour plus d'aide");
         } else if (args.length == COMMAND_SIZE) {
             String[] positionPercentage = args[ARG_POSITION].replace(",", "").split("x");
             String[] sizePercentage = args[ARG_SIZE].replace(",", "").split("x");
 
             if (positionPercentage.length != 2)
-                return "  -> NOK : Mauvais nombre argument positions, faites \"addFish help\" pour plus d'aide";
+                return new ResultCommand("  -> NOK : Mauvais nombre argument positions, faites \"addFish help\" pour plus d'aide");
             if (sizePercentage.length != 2)
-                return "  -> NOK : Mauvais nombre argument taille, faites \"addFish help\" pour plus d'aide";
+                return new ResultCommand("  -> NOK : Mauvais nombre argument taille, faites \"addFish help\" pour plus d'aide");
 
             if (!isInteger(positionPercentage[0], 10) || !isInteger(positionPercentage[1], 10))
-                return "  -> NOK : Mauvais argument(s) positions(s), faites \"addFish help\" pour plus d'aide";
+                return new ResultCommand("  -> NOK : Mauvais argument(s) positions(s), faites \"addFish help\" pour plus d'aide");
 
             if (!isInteger(sizePercentage[0], 10) || !isInteger(sizePercentage[1], 10))
-                return "  -> NOK : Mauvais argument(s) taille(s), faites \"addFish help\" pour plus d'aide";
+                return new ResultCommand("  -> NOK : Mauvais argument(s) taille(s), faites \"addFish help\" pour plus d'aide");
 
             if (args[ARG_NAME].equalsIgnoreCase("all"))
-                return "  -> NOK : Un poisson ne peut pas s'appeler all";
+                return new ResultCommand("  -> NOK : Un poisson ne peut pas s'appeler all");
 
             FishManager.EResult result = fishManager.addFish(
                     args[ARG_NAME],
@@ -60,38 +61,36 @@ public class AddFishCommand implements ICommand {
                     args[ARG_BEHAVIOUR]);
 
             if (result == FishManager.EResult.AddErrorNameExisting)
-                return "  -> NOK : Nom poisson déjà existant";
+                return new ResultCommand("  -> NOK : Nom poisson déjà existant");
 
             if (result == FishManager.EResult.AddErrorUnknownBehaviour)
-                return "  -> NOK : Nom comportement non existant";
+                return new ResultCommand("  -> NOK : Nom comportement non existant");
 
-            return "  -> OK : Poisson ajouté";
+            return new ResultCommand("  -> OK : Poisson ajouté", ResultCommand.EResultAction.SendServer);
         }
 
-        return "  -> NOK : Mauvais argument(s), faites \"addFish help\" pour plus d'aide";
+        return new ResultCommand("  -> NOK : Mauvais argument(s), faites \"addFish help\" pour plus d'aide");
     }
 
-    private String processOption(String[] args){
+    private ResultCommand processOption(String[] args){
         String option = args[1].replace("-", "");
         String result;
 
         if (option.equals("d")) {
             result = fishManager.getMovementsTypeStr(", ", 4, "\n");
             if (result == null)
-                return "  -> OK : Aucun mouvement enregistré !\n";
+                return new ResultCommand("  -> OK : Aucun mouvement enregistré !");
 
-            return "  -> OK : Liste des types de mouvements :\n" + result;
+            return new ResultCommand("  -> OK : Liste des types de mouvements :\n" + result);
         } else if (option.equals("n")) {
             result = fishManager.getNamesStr(", ", 4, "\n");
             if (result == null)
-                return "  -> OK : Aucun poisson enregistré !\n";
+                return new ResultCommand("  -> OK : Aucun poisson enregistré !");
 
-            return "  -> OK : Liste des noms de poissons :\n" + result;
-        } else if (option.equals("b")){
-
+            return new ResultCommand("  -> OK : Liste des noms de poissons :\n" + result);
         }
 
-        return "  -> NOK : Option inconnue, faites \"addFish help\" pour plus d'aide";
+        return new ResultCommand("  -> NOK : Option inconnue, faites \"addFish help\" pour plus d'aide");
     }
 
     public static boolean isInteger(String s, int radix) {
@@ -104,10 +103,10 @@ public class AddFishCommand implements ICommand {
     }
 
     @Override
-    public String returnHelp() {
-        return "  -> help(addFish) : \n" +
+    public ResultCommand returnHelp() {
+        return new ResultCommand("  -> help(addFish) : \n" +
                 "    addFish NAME at WIDTHxHEIGHT, XxY, BEHAVIOUR : ajoute un poisson\n" +
                 "    addFish -d : affiche la liste des types de déplacements\n" +
-                "    addFish -n : affiche la liste des noms utilisés";
+                "    addFish -n : affiche la liste des noms utilisés");
     }
 }

@@ -1,6 +1,6 @@
 package ProjetPoisson.project.command;
 
 public interface ICommand {
-    String process(String[] args);
-    String returnHelp();
+    ResultCommand process(String[] args);
+    ResultCommand returnHelp();
 }

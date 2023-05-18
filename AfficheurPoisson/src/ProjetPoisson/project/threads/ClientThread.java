@@ -42,11 +42,13 @@ public class ClientThread extends CommunicationThread {
         try {
             while (this.running){
                 Thread.sleep(500); // Add a delay of 500 milliseconds
+                System.out.println(messageProcessed + " " + messageReceived );
 
                 if (client.isConnected()){
                     if (messageToSend.size() > 0 && messageReceived == messageProcessed) {
-                        String toSend = messageToSend.get(messageProcessed);
-                        System.out.println("Messaged Sended(" + messageProcessed + ") : " + toSend);
+                        String toSend = messageProcessed + "|" + messageToSend.get(messageProcessed);
+
+                        System.out.println("Messaged sent(" + messageReceived + ") :" + toSend);
                         client.sendMessage(toSend);
 
                         messageProcessed += 1;
@@ -54,15 +56,26 @@ public class ClientThread extends CommunicationThread {
 
                     String result = client.readMessage();
                     if (result != null) {
-                        System.out.println("Messaged received(" + messageReceived + ") :" + result);
-                        receivedMessages.add(new Message(messageReceived, result));
-                        messageToSend.remove(messageReceived);
+                        if (result.contains("|")) {
+                            int numberMessage = Integer.parseInt(result.substring(0, result.indexOf("|")));
+                            if (numberMessage > messageReceived)
+                                messageReceived = numberMessage;
 
-                        if (result.contains("list")) {
-                            if (messageReceived != messageProcessed)
+                            System.out.println("Messaged received(" + messageReceived + ") :" + result);
+
+                            result = result.substring(result.indexOf("|") + 1);
+
+                            receivedMessages.add(new Message(messageReceived, result));
+                            messageToSend.remove(messageReceived);
+
+                            if (result.contains("list")) {
+                                if (messageReceived != messageProcessed)
+                                    messageReceived += 1;
+                            } else {
                                 messageReceived += 1;
+                            }
                         } else {
-                            messageReceived += 1;
+                            System.out.println(result);
                         }
                     }
                 } else if (shouldTryConnection){

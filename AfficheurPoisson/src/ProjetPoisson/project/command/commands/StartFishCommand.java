@@ -1,6 +1,7 @@
 package ProjetPoisson.project.command.commands;
 
 import ProjetPoisson.project.command.ICommand;
+import ProjetPoisson.project.command.ResultCommand;
 import ProjetPoisson.project.display.FishManager;
 
 public class StartFishCommand implements ICommand {
@@ -16,29 +17,29 @@ public class StartFishCommand implements ICommand {
     }
 
     @Override
-    public String process(String[] args) {
+    public ResultCommand process(String[] args) {
         if (args.length == COMMAND_SIZE) {
             if (args[ARG_NAME].equalsIgnoreCase("all")){
                 fishManager.startFish("all");
 
-                return "  -> OK : Tout les poissons sont demarrés";
+                return new ResultCommand("  -> OK : Tout les poissons sont demarrés");
             }
 
             FishManager.EResult result = fishManager.startFish(args[ARG_NAME]);
 
             if (result == FishManager.EResult.StartErrorUnknownName)
-                return "  -> NOK : Nom inconnue";
+                return new ResultCommand("  -> NOK : Nom inconnue");
 
-            return "  -> OK : Poisson " + args[ARG_NAME] + " demarré";
+            return new ResultCommand("  -> OK : Poisson " + args[ARG_NAME] + " demarré");
         }
 
-        return "  -> NOK : Mauvais argument(s), faites \"startFish help\" pour plus d'aide";
+        return new ResultCommand("  -> NOK : Mauvais argument(s), faites \"startFish help\" pour plus d'aide");
     }
 
     @Override
-    public String returnHelp() {
-        return "  -> help(startFish) : \n" +
+    public ResultCommand returnHelp() {
+        return new ResultCommand("  -> help(startFish) : \n" +
                 "    startFish NAME : démarre le poisson nommé NAME,\n" +
-                "    startFish all : démarre tout les poissons";
+                "    startFish all : démarre tout les poissons");
     }
 }
