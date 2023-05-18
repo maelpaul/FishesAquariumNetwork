@@ -14,7 +14,7 @@
 #include "command_getfish.h"
 #include "prompt_commands.h"
 #include "prompt.h"
-#include "init_server.h"
+#include "init_client.h"
 
 
 #define NB_CLIENTS 8
@@ -27,114 +27,19 @@ pthread_t threads[NB_CLIENTS];
 struct client_args * tab_args[NB_CLIENTS];
 pthread_mutex_t mutex_client_count = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_aquarium = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_is_aquarium_loaded = PTHREAD_MUTEX_INITIALIZER; 
 
 struct wait_client_context {
     struct aquarium * aquarium;
     int server_fd;
 };
 
-/*
-int verif(char * buf, char * s) {
-    pthread_mutex_lock(&mutex_client_count);
-    if (client_count > 1) {
-        pthread_mutex_unlock(&mutex_client_count);
-        return -1;
-    }
-    pthread_mutex_unlock(&mutex_client_count);
-    if (strcmp(buf, s) != 0) {
-        return -1;
-    }
-    return 1;
-}*/
-
-/*
-void *thread_prompt(void *arg) {
-    struct client_args *client_args = (struct client_args *) arg;
-    int client_id = *(client_args->client_id);
-    struct aquarium * aquarium = client_args->aquarium;
-    int client_number = client_args->client_number;
-    (void) aquarium;
-    char buffer[BUFFER_SIZE];
-    int n;
-    int server_fd = *(client_args->fd_server);
-
-    assert(client_number == 0);
-
-    // Envoi d'un message au client
-    strcpy(buffer, "> Bonjour prompt !");
-    if (send(client_id, buffer, strlen(buffer), 0) < 0) {
-        perror("Erreur lors de l'envoi du message au client");
-        exit(EXIT_FAILURE);
-    }
-
-    do {
-        memset(buffer, 0, sizeof(buffer));
-        if ((n = recv(client_id, buffer, sizeof(buffer), 0)) < 0) {
-            perror("Erreur lors de la réception de la réponse du client");
-            exit(EXIT_FAILURE);
-        }
-        prompt_load(buffer, aquarium, client_id, &is_aquarium_loaded, &mutex_aquarium); 
-    } while(!is_aquarium_loaded);
-
-    do {
-        // Réception de la réponse du client
-        memset(buffer, 0, sizeof(buffer));
-        if ((n = recv(client_id, buffer, sizeof(buffer), 0)) < 0) {
-            perror("Erreur lors de la réception de la réponse du client");
-            exit(EXIT_FAILURE);
-        }
-        int test = 0;
-        for(long unsigned int i=0;i<5;i++){
-            if (buffer[test]=='\0'){
-                test++;
-            }
-        }
-        if (test<=2) {
-            printf("Message du prompt (%d) : %s\n", client_number, buffer);
-        }
-
-        if (verif(buffer, "quit\n") != 1) {
-            strcpy(buffer, "> NOK");
-            if (send(client_id, buffer, strlen(buffer), 0) < 0) {
-                perror("Erreur lors de l'envoi du message au client");
-                exit(EXIT_FAILURE);
-            } 
-        }
-    } while(verif(buffer, "quit\n") != 1);
-
-    strcpy(buffer, "> Bye");
-    if (send(client_id, buffer, strlen(buffer), 0) < 0) {
-        perror("Erreur lors de l'envoi du message au client");
-        exit(EXIT_FAILURE);
-    }
-
-    pthread_mutex_lock(&mutex_client_count);
-
-    for (int i = client_count-1; i > -1; i--) {
-        close(*(tab_args[i]->client_id));
-        free(tab_args[i]->client_id);
-        free(tab_args[i]->fd_server);
-        free(tab_args[i]);
-    }
-
-    client_count = 0;
-
-    pthread_mutex_unlock(&mutex_client_count);
-
-    pthread_mutex_lock(&mutex_aquarium);
-    aquarium_free(aquarium);
-    pthread_mutex_unlock(&mutex_aquarium);
-    printf("Fermeture du serveur...\n");
-    assert(close(server_fd) == 0);
-    exit(EXIT_SUCCESS);
-
-    pthread_exit(NULL);
-}*/
-
 void *thread_client(void *arg) {
     struct client_args *client_args = (struct client_args *) arg;
     int client_id = *(client_args->client_id);
+    pthread_mutex_lock(&mutex_aquarium);
     struct aquarium * aquarium = client_args->aquarium;
+    pthread_mutex_unlock(&mutex_aquarium);
     int client_number = client_args->client_number;
     (void) aquarium;
     char buffer[BUFFER_SIZE];
@@ -150,9 +55,13 @@ void *thread_client(void *arg) {
         exit(EXIT_FAILURE);
     }
 
+    pthread_mutex_lock(&mutex_is_aquarium_loaded);
     while(is_aquarium_loaded == 0) {
-        continue;
+        pthread_mutex_unlock(&mutex_is_aquarium_loaded);
+        sleep(1);
+        pthread_mutex_lock(&mutex_is_aquarium_loaded);
     }
+    pthread_mutex_unlock(&mutex_is_aquarium_loaded);
 
     do {
         int check = 0;
@@ -183,10 +92,10 @@ void *thread_client(void *arg) {
             check = start_fish_server(buffer, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = get_fish_server(buffer, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_continuously_server(buffer, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = get_fish_continuously_server(buffer, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_server(buffer, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
             check = get_status_server(buffer, aquarium, &mutex_aquarium, client_id);
@@ -195,7 +104,7 @@ void *thread_client(void *arg) {
             check = ping_server(buffer, client_id);
         }
         if (check == 0) {
-            check = init_server(buffer, aquarium, &mutex_aquarium, client_id);
+            check = init_client(buffer, aquarium, &mutex_aquarium, client_id);
         }
 
         // check des commandes inexistantes
@@ -217,7 +126,6 @@ void *thread_client(void *arg) {
     // Fermer la connexion avec le client
     close(client_id);
     free(client_args->client_id);
-    free(client_args->fd_server);
     free(arg);
 
     pthread_mutex_lock(&mutex_client_count);
@@ -248,17 +156,16 @@ void * wait_for_client(void * arg){
 
         if (client_count < NB_CLIENTS) {
             // Créer un thread pour gérer le client
-            int *fd_server = malloc(sizeof(int));
-            *fd_server = context->server_fd;
             int *client_id = malloc(sizeof(int));
             *client_id = newsockfd;
             struct client_args * client_args = malloc(sizeof(struct client_args));
+            pthread_mutex_lock(&mutex_aquarium);
             client_args->aquarium = context->aquarium;
+            pthread_mutex_unlock(&mutex_aquarium);
             client_args->client_id = client_id;
-            client_args->client_number = client_count;
-            client_args->fd_server = fd_server;
+            client_args->client_number = client_count+1;
             pthread_create(&threads[client_count], NULL, thread_client, (void *)client_args);
-            printf("Client connected. Client ID: %d\n", client_count);
+            printf("Client connecté. Client ID: %d\n", client_count+1);
             tab_args[client_count] = client_args;
             client_count++;
         } 
@@ -282,10 +189,12 @@ void * wait_for_client(void * arg){
 int main()
 {
     struct config conf;
+    char buffer[BUFFER_SIZE];
 
     load_config("controller.cfg", &conf);
 
     struct aquarium * aquarium = malloc(sizeof(struct aquarium));
+    aquarium_init(aquarium);
 
     // server and socket file descriptor
     int server_fd;
@@ -322,23 +231,44 @@ int main()
     printf("Serveur en attente de connexions...\n");
 
     struct wait_client_context context;
+    pthread_mutex_lock(&mutex_aquarium);
     context.aquarium = aquarium;
+    pthread_mutex_unlock(&mutex_aquarium);
     context.server_fd = server_fd;
 
     pthread_create(&wait_client, NULL, wait_for_client, (void *) &context);
     
-    prompt(&is_aquarium_loaded, aquarium, &mutex_aquarium);
+    prompt(&is_aquarium_loaded, aquarium, &mutex_aquarium, &mutex_is_aquarium_loaded);
+    
+    pthread_mutex_lock(&mutex_client_count);
+    pthread_mutex_lock(&mutex_aquarium);
+    pthread_mutex_lock(&mutex_is_aquarium_loaded);
 
+    pthread_cancel(wait_client);
     pthread_join(wait_client, NULL);
 
     // Attendre que tous les threads se terminent
     for (int i = 0; i < client_count; i++) {
+        strcpy(buffer, "> Serveur fermé");
+        if (send(*(tab_args[i]->client_id), buffer, strlen(buffer), 0) < 0) {
+            perror("Erreur lors de l'envoi du message au client");
+            exit(EXIT_FAILURE);
+        }
+        close(*(tab_args[i]->client_id));
+        free(tab_args[i]->client_id);
+        free(tab_args[i]);
+        pthread_cancel(threads[i]);
         pthread_join(threads[i], NULL);
     }
 
-    pthread_mutex_lock(&mutex_aquarium);
+    client_count = 0;
     aquarium_free(aquarium);
+
+    pthread_mutex_unlock(&mutex_is_aquarium_loaded);
     pthread_mutex_unlock(&mutex_aquarium);
+    pthread_mutex_unlock(&mutex_client_count);
+    
+    printf("Fermeture du serveur...\n");
     close(server_fd);
 
     return 0;

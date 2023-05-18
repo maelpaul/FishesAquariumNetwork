@@ -118,7 +118,7 @@ int controller_del_fish(struct aquarium *aquarium, char *fish){
 }
 
 char * client_connection(struct aquarium *aquarium, char* view_name){
-    if(view_name == NULL || view_name_check(aquarium, view_name)){
+    if(view_name == NULL || !view_name_check(aquarium, view_name)){
         return find_and_attibute_free_view(aquarium);
     }
     else{

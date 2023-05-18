@@ -48,8 +48,12 @@ int check_command(struct command * command, char** argv, int argc, char * comman
 int parse_command(struct command * command, char** argv, int argc){
     int result;
 
-    if(strcmp(argv[0], "help") == 0){
-        printf("> You can use \"load\", \"save, \"show\", \"add view\" or \"del view\" command\n");
+    if(strcmp(argv[0], "exit") == 0){
+        command->command_name = "exit";
+        return 1;
+    }
+    else if(strcmp(argv[0], "help") == 0){
+        printf("> You can use \"load\", \"save\", \"show\", \"add view\", \"del view\" or \"exit\" command\n");
         return 0;
 
     } else if(strcmp(argv[0], "load") == 0){
@@ -90,7 +94,7 @@ int parse_command(struct command * command, char** argv, int argc){
         return result;
     }
 
-    printf("> Unknown command : should be \"load\", \"save, \"show\", \"add view\" or \"del view\" (received %s)\n", argv[0]);
+    printf("> Unknown command : should be \"load\", \"save\", \"show\", \"add view\", \"del view\" or \"exit\" (received %s)\n", argv[0]);
 
     return 0;
 }

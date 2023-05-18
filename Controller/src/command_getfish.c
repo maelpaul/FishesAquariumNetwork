@@ -8,7 +8,6 @@ int get_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t *
     if (!strcmp(ask_periodic_verif, "getFishes")) {
         pthread_mutex_lock(mutex);
         controller_update_fishes(aquarium, REFRESH_TIME);
-        pthread_mutex_unlock(mutex);
         char fish_list[1024] = "> list ";
         for (int i = 0; i < aquarium->fishes_len; i++) {
             char fish_info[128];
@@ -20,6 +19,7 @@ int get_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t *
             perror("Erreur lors de l'envoi de la liste des poissons au client");
             exit(EXIT_FAILURE);
         }
+        pthread_mutex_unlock(mutex);
         return 1;
     }
     return 0;
@@ -38,7 +38,6 @@ int get_fish_continuously_server(char * buffer, struct aquarium * aquarium, pthr
         for (int i = 0; i < 10; ++i) {
             pthread_mutex_lock(mutex);
             controller_update_fishes(aquarium, REFRESH_TIME);
-            pthread_mutex_unlock(mutex);
             char fish_list[1024] = "> list ";
             for (int i = 0; i < aquarium->fishes_len; i++) {
                 char fish_info[128];
@@ -50,9 +49,10 @@ int get_fish_continuously_server(char * buffer, struct aquarium * aquarium, pthr
                 perror("Erreur lors de l'envoi de la liste des poissons au client");
                 exit(EXIT_FAILURE);
             }
+            pthread_mutex_unlock(mutex);
             if (i != 9) {
                 sleep(1);
-            }                
+            }              
         }
         return 1;
     }
@@ -67,7 +67,6 @@ int get_status_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t
     if (!strcmp(status_verif, "status")) {
         pthread_mutex_lock(mutex);
         controller_update_fishes(aquarium, REFRESH_TIME);
-        pthread_mutex_unlock(mutex);
         // Affichage statut
         int nb_fishes = aquarium->fishes_len;
         char len[10];
@@ -101,6 +100,7 @@ int get_status_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t
             perror("Erreur lors de l'envoi de la liste des poissons au client");
             exit(EXIT_FAILURE);
         }
+        pthread_mutex_unlock(mutex);
         return 1;
     }
     return 0;

@@ -7,7 +7,7 @@ INC_DIR = -I$(SRC_DIR) -I$(TEST_DIR)
 
 all : build test
 
-build : server client_bidon
+build : server client
 
 test : test_fish test_view test_aquarium
 
@@ -38,16 +38,16 @@ $(SRC_DIR)/server_utils.o : $(SRC_DIR)/server_utils.c
 $(SRC_DIR)/command_getfish.o : $(SRC_DIR)/command_getfish.c
 	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
-$(SRC_DIR)/init_server.o : $(SRC_DIR)/init_server.c
+$(SRC_DIR)/init_client.o : $(SRC_DIR)/init_client.c
 	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
 $(SRC_DIR)/prompt_commands.o : $(SRC_DIR)/prompt_commands.c
 	gcc ${CFLAGS} ${INC_DIR} $< -c -o $@
 
-server: $(SRC_DIR)/server.c $(SRC_DIR)/server_utils.o $(SRC_DIR)/aquarium.o $(SRC_DIR)/view.o $(SRC_DIR)/fish.o $(SRC_DIR)/thread.o $(SRC_DIR)/command_getfish.o $(SRC_DIR)/prompt_commands.o $(SRC_DIR)/command_fish.o $(SRC_DIR)/init_server.o $(SRC_DIR)/parser.o  $(SRC_DIR)/prompt_commands.o $(SRC_DIR)/prompt.o
+server: $(SRC_DIR)/server.c $(SRC_DIR)/server_utils.o $(SRC_DIR)/aquarium.o $(SRC_DIR)/view.o $(SRC_DIR)/fish.o $(SRC_DIR)/thread.o $(SRC_DIR)/command_getfish.o $(SRC_DIR)/prompt_commands.o $(SRC_DIR)/command_fish.o $(SRC_DIR)/init_client.o $(SRC_DIR)/parser.o $(SRC_DIR)/prompt_commands.o $(SRC_DIR)/prompt.o
 	gcc ${CFLAGS} ${INC_DIR} $^ -o $@ -lm -lpthread
 
-client_bidon: $(SRC_DIR)/client_bidon.c
+client: $(SRC_DIR)/client.c
 	gcc ${CFLAGS} ${INC_DIR} $^ -o $@
 
 test_fish : $(SRC_DIR)/fish.o
@@ -62,4 +62,4 @@ test_aquarium: $(SRC_DIR)/fish.o $(SRC_DIR)/view.o $(SRC_DIR)/aquarium.o
 clean :
 	rm -f $(TST_DIR)/*.o
 	rm -f $(SRC_DIR)/*.o
-	rm -f server test_view prompt test_fish test_aquarium client_bidon
+	rm -f server test_view prompt test_fish test_aquarium client

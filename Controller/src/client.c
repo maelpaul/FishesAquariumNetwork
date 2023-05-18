@@ -44,7 +44,7 @@ int main() {
 
     printf("Message du serveur : %s\n", buffer);
 
-    if (strcmp(buffer, "> Bye") == 0) {
+    if (strcmp(buffer, "> Bye") == 0 || strcmp(buffer, "> Serveur fermé") == 0) {
         // Fermeture de la connexion avec le serveur
         close(client_fd);
         return 0;
@@ -78,6 +78,11 @@ int main() {
                     exit(EXIT_FAILURE);
                 }
                 printf("Message du serveur : %s\n", buffer);
+                if (strcmp(buffer, "> Bye") == 0 || strcmp(buffer, "> Serveur fermé") == 0) {
+                    // Fermeture de la connexion avec le serveur
+                    close(client_fd);
+                    return 0;
+                }
                 if (i != 9) {
                     sleep(1);
                 }
@@ -90,6 +95,11 @@ int main() {
                 exit(EXIT_FAILURE);
             }
             printf("Message du serveur : %s\n", buffer);
+            if (strcmp(buffer, "> Bye") == 0 || strcmp(buffer, "> Serveur fermé") == 0) {
+                // Fermeture de la connexion avec le serveur
+                close(client_fd);
+                return 0;
+            }
         }
     } while (val != 0);
 

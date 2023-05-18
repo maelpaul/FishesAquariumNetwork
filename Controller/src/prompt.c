@@ -14,7 +14,7 @@
 #define BUFFER_SIZE 256
 #define MAX_ARG 4
 
-void prompt(int * aquarium_flag, struct aquarium * aquarium, pthread_mutex_t * mutex_aquarium)
+void prompt(int * aquarium_flag, struct aquarium * aquarium, pthread_mutex_t * mutex_aquarium, pthread_mutex_t * mutex_aquarium_flag)
 {
     char buffer[BUFFER_SIZE];
     char args[MAX_ARG][BUFFER_SIZE];
@@ -70,26 +70,36 @@ void prompt(int * aquarium_flag, struct aquarium * aquarium, pthread_mutex_t * m
         }
 
         if(parse_command(command, my_argv, arg_count)){
+            if (strcmp(command->command_name,"exit")==0) {
+                free_command(command);
+                return;
+            }
+            pthread_mutex_lock(mutex_aquarium_flag);
             if(!*aquarium_flag){
+                pthread_mutex_unlock(mutex_aquarium_flag);
                 if(strcmp(command->command_name,"load")==0){
-                    prompt_load(command, aquarium, aquarium_flag, mutex_aquarium);
+                    prompt_load(command, aquarium, aquarium_flag, mutex_aquarium, mutex_aquarium_flag);
                 }
                 else{
                     printf("> You first need to load an aquarium\n");
                 }
             }
             else{
-                if(strcmp(command->command_name,"add view")==0){
-                    prompt_add_view(command, aquarium);
+                pthread_mutex_unlock(mutex_aquarium_flag);
+                if(strcmp(command->command_name,"load")==0){
+                    prompt_load(command, aquarium, aquarium_flag, mutex_aquarium, mutex_aquarium_flag);
+                }
+                else if(strcmp(command->command_name,"add view")==0){
+                    prompt_add_view(command, aquarium, mutex_aquarium);
                 }
                 else if(strcmp(command->command_name,"del view")==0){
-                    prompt_del_view(command, aquarium);
+                    prompt_del_view(command, aquarium, mutex_aquarium);
                 }
                 else if(strcmp(command->command_name,"show")==0){
-                    prompt_show(command, aquarium);
+                    prompt_show(command, aquarium, mutex_aquarium);
                 }
                 else if(strcmp(command->command_name,"save")==0){
-                    prompt_save(command, aquarium);   
+                    prompt_save(command, aquarium, mutex_aquarium);   
                 }
             }
         }
