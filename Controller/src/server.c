@@ -119,7 +119,7 @@ void *thread_client(void *arg) {
         }
 
         // check des commandes inexistantes
-        if (check == 0 && strcmp(buffer, "log out\n") != 0) {
+        if (check == 0 && strcmp(message, "log out\n") != 0) {
             strcpy(buffer, header);
             strcat(buffer, "|NOK : Inexisting command");
             if (send(client_id, buffer, strlen(buffer), 0) < 0) {
@@ -127,10 +127,9 @@ void *thread_client(void *arg) {
                 exit(EXIT_FAILURE);
             } 
         }
-    } while(strcmp(buffer, "log out\n") != 0);
+    } while(strcmp(message, "log out\n") != 0);
 
-    strcpy(buffer, header);
-    strcat(buffer, "|Bye");
+    strcpy(buffer, "-1|Bye");
     if (send(client_id, buffer, strlen(buffer), 0) < 0) {
         perror("Erreur lors de l'envoi du message au client");
         exit(EXIT_FAILURE);
