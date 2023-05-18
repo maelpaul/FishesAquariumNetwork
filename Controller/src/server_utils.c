@@ -117,19 +117,21 @@ int controller_del_fish(struct aquarium *aquarium, char *fish){
     return -1;
 }
 
-char * client_connection(struct aquarium *aquarium, char* view_name){
+char * client_connection(struct aquarium *aquarium, char* view_name, struct view * client_view){
     if(view_name == NULL || !view_name_check(aquarium, view_name)){
-        return find_and_attibute_free_view(aquarium);
+        return find_and_attibute_free_view(aquarium, client_view);
     }
     else{
         for(int i=0 ; i < aquarium->views_len ; i++){
             if(strcmp(aquarium->views[i]->name,view_name) == 0){
                 if(is_view_free(aquarium->views[i])){
                     change_view_status(aquarium->views[i]);
+                    change_view_status(client_view);
+                    strcpy(client_view->name, aquarium->views[i]->name);
                     return aquarium->views[i]->name;   
                 }
                 else{
-                    return find_and_attibute_free_view(aquarium);
+                    return find_and_attibute_free_view(aquarium, client_view);
                 }              
             }
         }
@@ -138,10 +140,12 @@ char * client_connection(struct aquarium *aquarium, char* view_name){
     return ret;
 }
 
-char * find_and_attibute_free_view(struct aquarium *aquarium){
+char * find_and_attibute_free_view(struct aquarium *aquarium, struct view * client_view){
     for(int i=0 ; i < aquarium->views_len ; i++){
         if(is_view_free(aquarium->views[i])){
             change_view_status(aquarium->views[i]);
+            change_view_status(client_view);
+            strcpy(client_view->name, aquarium->views[i]->name);
             return aquarium->views[i]->name;                
         }
     }

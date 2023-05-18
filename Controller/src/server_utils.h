@@ -31,9 +31,9 @@ int controller_add_fish(struct aquarium *aquarium, int * coords, int * size, cha
 
 int controller_del_fish(struct aquarium *aquarium, char *fish);
 
-char * client_connection(struct aquarium *aquarium, char* view_name);
+char * client_connection(struct aquarium *aquarium, char* view_name, struct view * client_view);
 
-char * find_and_attibute_free_view(struct aquarium *aquarium);
+char * find_and_attibute_free_view(struct aquarium *aquarium, struct view * client_view);
 
 int hello_command_check(char * buffer, char * view_name);
 
