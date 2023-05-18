@@ -11,7 +11,7 @@ int get_fish_server(char * buffer, struct aquarium * aquarium, pthread_mutex_t *
         char fish_list[1024] = "> list ";
         for (int i = 0; i < aquarium->fishes_len; i++) {
             char fish_info[128];
-            sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
+            sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1], aquarium->fishes[i]->time_to_dest);
             strcat(fish_list, fish_info);
         }
         strcat(fish_list, "\n");
@@ -41,7 +41,7 @@ int get_fish_continuously_server(char * buffer, struct aquarium * aquarium, pthr
             char fish_list[1024] = "> list ";
             for (int i = 0; i < aquarium->fishes_len; i++) {
                 char fish_info[128];
-                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->time_to_dest);
+                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1], aquarium->fishes[i]->time_to_dest);
                 strcat(fish_list, fish_info);
             }
             strcat(fish_list, "\n");
