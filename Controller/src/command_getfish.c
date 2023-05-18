@@ -77,7 +77,7 @@ int get_status_server(char * header, char * buffer, struct aquarium * aquarium, 
         sprintf(len, "%d ", nb_fishes);
         char info[1024]; 
         strcpy(info, header);
-        strcpy(info, "|> OK : Connecté au contrôleur, ");
+        strcat(info, "|> OK : Connecté au contrôleur, ");
         strcat(info, len);
 
         if (nb_fishes == 0 || nb_fishes == 1) {
