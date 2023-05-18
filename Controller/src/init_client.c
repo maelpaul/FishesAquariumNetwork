@@ -34,7 +34,7 @@ int init_client(char * buffer, struct aquarium * aquarium, pthread_mutex_t * mut
                 }
             }
             else{
-                char to_send[64] = "> greeting ";
+                char to_send[64] = "> greeting  ";
                 strcat(to_send, attributed_view);
                 strcpy(buffer, to_send);
                 if (send(client_id, buffer, strlen(buffer), 0) < 0) {
