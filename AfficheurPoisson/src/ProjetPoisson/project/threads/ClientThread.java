@@ -1,25 +1,33 @@
 package ProjetPoisson.project.threads;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import ProjetPoisson.mightylib.resources.Resources;
 import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.client.Configuration;
+import ProjetPoisson.project.client.Message;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 public class ClientThread extends CommunicationThread {
+
     protected ClientTcp client;
+    protected boolean shouldTryConnection;
 
     public ClientThread() {
         this.running = true;
+        shouldTryConnection = false;
+    }
+
+    public void shouldTryConnection(){
+        shouldTryConnection = true;
     }
 
     public void ClientSetup() {
         System.out.println("[Debug] Setting up the client...");
         Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
         client = new ClientTcp(conf_client);
-        client.tryCreateConnection();
     }
 
 
@@ -29,43 +37,45 @@ public class ClientThread extends CommunicationThread {
 
     public void run() {
         this.ClientSetup();
+        messageReceived -= 1;
+
         try {
-            Thread.sleep(1000); // Add a delay of 500 milliseconds
+            while (this.running){
+                Thread.sleep(500); // Add a delay of 500 milliseconds
+
+                if (client.isConnected()){
+                    if (messageToSend.size() > 0 && messageReceived == messageProcessed) {
+                        String toSend = messageToSend.get(messageProcessed);
+                        System.out.println("Messaged Sended(" + messageProcessed + ") : " + toSend);
+                        client.sendMessage(toSend);
+
+                        messageProcessed += 1;
+                    }
+
+                    String result = client.readMessage();
+                    if (result != null) {
+                        System.out.println("Messaged received(" + messageReceived + ") :" + result);
+                        receivedMessages.add(new Message(messageReceived, result));
+                        messageToSend.remove(messageReceived);
+
+                        if (result.contains("list")) {
+                            if (messageReceived != messageProcessed)
+                                messageReceived += 1;
+                        } else {
+                            messageReceived += 1;
+                        }
+                    }
+                } else if (shouldTryConnection){
+                    client.tryCreateConnection();
+                    shouldTryConnection = false;
+                }
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        client.sendMessage("addFish PoissonRouge at 90x40, 10x4, RandomWayPoint");
-        client.sendMessage("addFish PoissonRouge2 at 200x30, 10x4, RandomWayPoint");
-        String response = client.readMessage();
-        System.out.println("Received response from server: " + response);
-        //client.sendMessage("ls");
-        client.sendMessage("addFish PoissonRouge3 at 135x82, 12x3, RandomWayPoint");
-        try {
-            Thread.sleep(2000); // Add a delay of 500 milliseconds
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        client.closeConnection();
     }
 
-    public boolean didReceiveMessage() {
-        return receivedMessage != null;
-    }
-
-    public String message() {
-        if (receivedMessage != null) {
-            String tempMessage = receivedMessage;
-            receivedMessage = null;
-            return tempMessage;
-        }
-        return null;
-    }
-
-    public void sendMessage(String message) {
-        messageToSend = message;
-    }
-
+    @Override
     public void doStop() {
         this.running = false;
         if (client != null && client.isConnected()) {

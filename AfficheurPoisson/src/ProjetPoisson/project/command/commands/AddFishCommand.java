@@ -44,6 +44,9 @@ public class AddFishCommand implements ICommand {
             if (!isInteger(sizePercentage[0], 10) || !isInteger(sizePercentage[1], 10))
                 return "  -> NOK : Mauvais argument(s) taille(s), faites \"addFish help\" pour plus d'aide";
 
+            if (args[ARG_NAME].equalsIgnoreCase("all"))
+                return "  -> NOK : Un poisson ne peut pas s'appeler all";
+
             FishManager.EResult result = fishManager.addFish(
                     args[ARG_NAME],
                     new Vector2f(
@@ -58,6 +61,9 @@ public class AddFishCommand implements ICommand {
 
             if (result == FishManager.EResult.AddErrorNameExisting)
                 return "  -> NOK : Nom poisson déjà existant";
+
+            if (result == FishManager.EResult.AddErrorUnknownBehaviour)
+                return "  -> NOK : Nom comportement non existant";
 
             return "  -> OK : Poisson ajouté";
         }

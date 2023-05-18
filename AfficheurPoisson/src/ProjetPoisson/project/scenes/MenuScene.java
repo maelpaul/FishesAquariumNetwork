@@ -18,11 +18,12 @@ import ProjetPoisson.mightylib.util.Timer;
 import ProjetPoisson.mightylib.util.math.Color4f;
 import ProjetPoisson.mightylib.util.math.EDirection;
 import ProjetPoisson.mightylib.util.math.MightyMath;
-import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.client.Configuration;
+import ProjetPoisson.project.client.Message;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.display.FishManager;
+import ProjetPoisson.project.threads.ClientThread;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -30,14 +31,17 @@ import org.joml.Vector3f;
 public class MenuScene extends Scene {
     public enum EConnectionState {
         Disconnected,
-        Starting,
-        SendLoad,
-        ReceiveLoad,
+        FirstMessageSent,
+        StartingConnectionProcedure,
+        ReceiveIdConnection,
+        CreatedAllFished,
         Connected
     }
 
     public final static int PING_TIME = 35; // 40 in reality
-    public final static int ATTEMPT_CONNECTION_TIME = 2; // 40 in reality
+    public final static int ATTEMPT_CONNECTION_TIME = 2;
+
+    public final static int WAIT_FOR_EXIT = 5;
 
     private Timer pingTimer;
     private Timer attemptConnexionTimer;
@@ -54,13 +58,13 @@ public class MenuScene extends Scene {
     private Texture displacementMap;
     private FloatTweening displacementMapTweening;
 
-    private ClientTcp client;
-    private boolean clientInitialized;
+    private ClientThread client;
 
     private EConnectionState currentState;
     private RectangleRenderer connectionStatusIcon;
     private Text connectionStatusMessage;
 
+    private String idClient = "??";
 
     public void init(String[] args) {
         super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
@@ -76,18 +80,11 @@ public class MenuScene extends Scene {
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
         /// SCENE INFORMATION ///
-        //ServerThread serverThread = new ServerThread();
-        //serverThread.start();
-        //ClientThread clientThread = new ClientThread();
-        //clientThread.start();
+        client = new ClientThread();
+        client.start();
 
         Vector2i windowSize = mainContext.getWindow().getInfo().getSizeCopy();
         terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.x * 0.5f,windowSize.y * 0.5f));
-
-        Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
-        client = new ClientTcp(conf_client);
-        client.tryCreateConnection();
-        clientInitialized = false;
 
         main3DCamera.setPos(new Vector3f(0, 0, 0));
         setClearColor(52, 189, 235, 1f);
@@ -147,7 +144,7 @@ public class MenuScene extends Scene {
                 .initTwoValue(15f, 0f, 15f);
 
 
-        analyser = new CommandAnalyser(client, fishManager);
+        analyser = new CommandAnalyser(client.getClient(), fishManager);
 
         setConnectionState(EConnectionState.Disconnected);
     }
@@ -162,85 +159,72 @@ public class MenuScene extends Scene {
         } else if (currentState == EConnectionState.Connected){
             connectionStatusIcon.switchToTextureMode("connectedIcon");
             connectionStatusMessage.setColor(new Color4f(43f / 255f, 228f / 255f, 5f / 255f, 1));
-            connectionStatusMessage.setText("Connected");
+            connectionStatusMessage.setText("Connected as " + idClient);
         } else {
             connectionStatusIcon.switchToTextureMode("disconnectedIcon");
             connectionStatusMessage.setColor(new Color4f(187f / 255f, 187f / 255f, 65f / 255f, 1));
-            connectionStatusMessage.setText("Connecting ...");
+            connectionStatusMessage.setText("Connecting as " + idClient + " ...");
         }
     }
 
 
-    public void initializeConnection(){
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+    public void initializeConnection() {
+        switch (currentState){
+            case Disconnected:
+                if (client.didReceiveMessage()){
+                    Message[] messages = client.message();
+                    if (messages.length == 1) {
+                        terminal.addToResultText(messages[0].getMessage().replace(">", "<"));
+                        client.sendMessage("hello\n");
+                        setConnectionState(EConnectionState.StartingConnectionProcedure);
+                    }
+                }
+
+                break;
+            case StartingConnectionProcedure:
+                if (client.didReceiveMessage()){
+                    Message[] messages = client.message();
+                    if (messages.length == 1) {
+                        terminal.addToResultText(messages[0].getMessage().replace(">", "<"));
+                        String[] parts = messages[0].getMessage().split(" ");
+                        if (parts.length == 3)
+                            idClient = parts[2];
+
+                        client.sendMessage("ls\n");
+                        setConnectionState(EConnectionState.FirstMessageSent);
+                    }
+                }
+                break;
+            case FirstMessageSent:
+                if (client.didReceiveMessage()){
+                    Message[] messages = client.message();
+                    if (messages.length == 1) {
+                        terminal.addToResultText(messages[0].getMessage().replace(">", "<"));
+
+                        setConnectionState(EConnectionState.Connected);
+                    }
+                }
+                break;
+
         }
 
-        client.sendMessage("hello");
-
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        String result = client.readMessage();
-        terminal.addToResultText(result);
-
-        System.out.println("Response : " + result);
-        System.out.println("saucisse");
-
-        /*client.sendMessage("addFish PoissonRouge2 at 200x30, 10x4, RandomWayPoint\n");
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        String response3 = client.readMessage();
-        System.out.println("Received response from server: " + response3);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        terminal.addToResultText(client.readMessage());
-
-        //System.out.println("Received response from server: " + response);
-        /*client.sendMessage("show aquarium");
-        String response2 = client.readMessage();
-        System.out.println("Received response from server: " + response2);
-        client.sendMessage("addFish PoissonRouge2 at 200x30, 10x4, RandomWayPoint");
-        //String response3 = client.readMessage();
-        System.out.println("Received response from server: " + response3);
-        String response4 = client.readMessage();
-        client.sendMessage("status");
-        System.out.println("Received response from server: " + response4);
-        client.sendMessage("ping 12345");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }*/
-
-        clientInitialized = true;
+        //
     }
 
     public void update() {
         super.update();
         fishManager.update();
 
-        if (client.isConnected()){
-            if (!clientInitialized) {
+        if (client.getClient().isConnected()){
+            if (currentState != EConnectionState.Connected) {
                 initializeConnection();
                 attemptConnexionTimer.stop();
             }
         } else {
             attemptConnexionTimer.update();
 
-            if (!client.isTryingConnection() && attemptConnexionTimer.isFinished()) {
-                System.out.println("lauch aquarium");
-                client.tryCreateConnection();
+            if (!client.getClient().isTryingConnection() && attemptConnexionTimer.isFinished()) {
+                client.shouldTryConnection();
                 attemptConnexionTimer.resetStart();
             }
         }
@@ -253,8 +237,9 @@ public class MenuScene extends Scene {
             if (result != null) {
                 if (result.equals("¤¤clear¤¤"))
                      terminal.clearResultText();
-                else
-                    terminal.addToResultText(result);
+                else if (result.equals("¤¤quit¤¤"))
+                    this.sceneManagerInterface.exit(0);
+                else terminal.addToResultText(result);
 
                 terminal.saveCommand()
                         .clearCommandText();
@@ -300,8 +285,7 @@ public class MenuScene extends Scene {
         text.unload();
         terminal.unload();
 
-        if (client.isConnected())
-            client.closeConnection();
+        client.interrupt();
 
         connectionStatusIcon.unload();
         connectionStatusMessage.unload();

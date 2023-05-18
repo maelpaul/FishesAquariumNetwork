@@ -206,8 +206,11 @@ public class Terminal {
     }
 
     public Terminal addToResultText(String text){
+        if (text.charAt(text.length() - 1) != '\n')
+            text += "\n";
+
         resultText.setText(resultText.text().substring(0, resultText.text().length() - BASE_RESULT_MESSAGE.length())
-                + text + "\n" + BASE_RESULT_MESSAGE);
+                + text + BASE_RESULT_MESSAGE);
 
         return this;
     }

@@ -44,25 +44,6 @@ public class ServerThread extends CommunicationThread{
         System.out.println("Server: Client disconnected");
     }
 
-
-
-    public boolean didReceiveMessage() {
-            return receivedMessage != null;
-        }
-
-        public String message() {
-            if (receivedMessage != null) {
-                String tempMessage = receivedMessage;
-                receivedMessage = null;
-                return tempMessage;
-            }
-            return null;
-        }
-
-        public void sendMessage(String message) {
-            messageToSend = message;
-        }
-
     public void doStop() {
         this.running = false;
         if (server != null && server.hasClient()) {
