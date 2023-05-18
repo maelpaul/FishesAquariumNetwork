@@ -48,7 +48,7 @@ server: $(SRC_DIR)/server.c $(SRC_DIR)/server_utils.o $(SRC_DIR)/aquarium.o $(SR
 	gcc ${CFLAGS} ${INC_DIR} $^ -o $@ -lm -lpthread
 
 client: $(SRC_DIR)/client.c
-	gcc ${CFLAGS} ${INC_DIR} $^ -o $@
+	gcc ${CFLAGS} ${INC_DIR} $^ -o $@ -lpthread
 
 test_fish : $(SRC_DIR)/fish.o
 	gcc ${CFLAGS} ${INC_DIR} $(TEST_DIR)/test_fish.c $^ -o $@

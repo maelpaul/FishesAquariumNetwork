@@ -8,6 +8,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <assert.h>
+#include <sys/select.h>
 
 #include "server_utils.h"
 #include "command_fish.h"
@@ -71,9 +72,52 @@ void *thread_client(void *arg) {
 
     char * header;
     char * message;
+    time_t last_communication_time;
+    time(&last_communication_time);
 
     do {
         int check = 0;
+
+        // Utilisation de select pour surveiller les messages des clients pendant 30 secondes
+        fd_set read_fds;
+        struct timeval timeout;
+        FD_ZERO(&read_fds);
+        FD_SET(client_id, &read_fds);
+        timeout.tv_sec = 30;
+        timeout.tv_usec = 0;
+
+        int select_result = select(client_id + 1, &read_fds, NULL, NULL, &timeout);
+        if (select_result == -1) {
+            perror("Erreur lors de l'utilisation de select");
+            exit(EXIT_FAILURE);
+        } else if (select_result == 0) {
+            printf("Client %d inactif pendant 30 secondes. Fermeture de la connexion.\n", client_number);
+            strcpy(buffer, "-1|Timeout");
+            if (send(client_id, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }
+            // Fermer la connexion avec le client
+            close(client_id);
+
+            for (int i = 0; i < aquarium->views_len; i++) {
+                if (strcmp(client_view->name, aquarium->views[i]->name) == 0) {
+                    change_view_status(aquarium->views[i]);
+                    change_view_status(client_args->client_view);
+                }
+            }
+            
+            view_free(client_args->client_view);
+            free(client_args->client_id);
+            free(arg);
+
+            pthread_mutex_lock(&mutex_client_count);
+            client_count--;
+            available[thread_number] = 1;
+            pthread_mutex_unlock(&mutex_client_count);
+
+            pthread_exit(NULL);
+        }
 
         // Réception de la réponse du client
         memset(buffer, 0, sizeof(buffer));
@@ -213,7 +257,7 @@ void * wait_for_client(void * arg){
             // Le nombre maximal de clients est atteint
             printf("Le serveur est occupé. Impossible de gérer un nouveau client.\n");
             
-            strcpy(buffer, "> Bye");
+            strcpy(buffer, "-1|Bye");
             if (send(newsockfd, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
@@ -294,7 +338,7 @@ int main()
     // Attendre que tous les threads se terminent
     for (int i = 0; i < NB_CLIENTS; i++) {
         if (available[i] == 0) {
-            strcpy(buffer, "> Serveur fermé");
+            strcpy(buffer, "-1|Serveur fermé");
             if (send(*(tab_args[i]->client_id), buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);

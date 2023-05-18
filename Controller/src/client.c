@@ -8,6 +8,30 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <pthread.h>
+
+pthread_t wait_exit;
+
+void * wait_server_exit(void * arg){
+    char buffer[256];
+    int client_fd = *((int *) arg);
+    int n;
+    while(1) {
+        memset(buffer, 0, sizeof(buffer));
+        if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
+            perror("Erreur lors de la réception de la réponse du serveur");
+            exit(EXIT_FAILURE);
+        }
+
+        printf("Message du serveur : %s\n", buffer);
+
+        if (strcmp(buffer, "-1|Bye") == 0 || strcmp(buffer, "-1|Serveur fermé") == 0 || strcmp(buffer, "-1|Timeout") == 0) {
+            // Fermeture de la connexion avec le serveur
+            close(client_fd);
+            exit(EXIT_SUCCESS);
+        }
+    }
+}
 
 int main() {
     int client_fd;
@@ -45,7 +69,7 @@ int main() {
 
     printf("Message du serveur : %s\n", buffer);
 
-    if (strcmp(buffer, "> Bye") == 0 || strcmp(buffer, "> Serveur fermé") == 0) {
+    if (strcmp(buffer, "-1|Bye") == 0 || strcmp(buffer, "-1|Serveur fermé") == 0 || strcmp(buffer, "-1|Timeout") == 0) {
         // Fermeture de la connexion avec le serveur
         close(client_fd);
         return 0;
@@ -56,7 +80,9 @@ int main() {
     char * header;
     char * message;
 
-    do{
+    pthread_create(&wait_exit, NULL, wait_server_exit, (void *) &client_fd);
+
+    do{ 
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
             for (int i = 0; i < 256; i++) {
                 buffer_cp[i] = buffer[i];
@@ -74,6 +100,7 @@ int main() {
                 perror("Erreur lors de l'écriture sur la socket");
                 exit(EXIT_FAILURE);
             }
+            sleep(1);
         } else {
             perror("Erreur lors de la lecture depuis l'entrée standard");
             exit(EXIT_FAILURE);
@@ -81,35 +108,35 @@ int main() {
 
         if (check_ls == 1) {
             for (int i = 0; i < 10; ++i) {
-                memset(buffer, 0, sizeof(buffer));
-                if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
-                    perror("Erreur lors de la réception de la réponse du serveur");
-                    exit(EXIT_FAILURE);
-                }
-                printf("Message du serveur : %s\n", buffer);
-                if (strcmp(buffer, "> Bye") == 0 || strcmp(buffer, "> Serveur fermé") == 0) {
-                    // Fermeture de la connexion avec le serveur
-                    close(client_fd);
-                    return 0;
-                }
+                // memset(buffer, 0, sizeof(buffer));
+                // if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
+                //     perror("Erreur lors de la réception de la réponse du serveur");
+                //     exit(EXIT_FAILURE);
+                // }
+                // printf("Message du serveur : %s\n", buffer);
+                // if (strcmp(buffer, "-1|") == 0 || strcmp(buffer, "-1|Serveur fermé") == 0 || strcmp(buffer, "-1|Timeout") == 0) {
+                //     // Fermeture de la connexion avec le serveur
+                //     close(client_fd);
+                //     return 0;
+                // }
                 if (i != 9) {
                     sleep(1);
                 }
             }
         }
-        else {
-            memset(buffer, 0, sizeof(buffer));
-            if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
-                perror("Erreur lors de la réception de la réponse du serveur");
-                exit(EXIT_FAILURE);
-            }
-            printf("Message du serveur : %s\n", buffer);
-            if (strcmp(buffer, "> Bye") == 0 || strcmp(buffer, "> Serveur fermé") == 0) {
-                // Fermeture de la connexion avec le serveur
-                close(client_fd);
-                return 0;
-            }
-        }
+        // else {
+        //     memset(buffer, 0, sizeof(buffer));
+        //     if ((n = recv(client_fd, buffer, sizeof(buffer), 0)) < 0) {
+        //         perror("Erreur lors de la réception de la réponse du serveur");
+        //         exit(EXIT_FAILURE);
+        //     }
+        //     printf("Message du serveur : %s\n", buffer);
+        //     if (strcmp(buffer, "-1|") == 0 || strcmp(buffer, "-1|Serveur fermé") == 0 || strcmp(buffer, "-1|Timeout") == 0) {
+        //         // Fermeture de la connexion avec le serveur
+        //         close(client_fd);
+        //         return 0;
+        //     }
+        // }
     } while (val != 0);
 
     // Fermeture de la connexion avec le serveur
