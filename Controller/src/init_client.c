@@ -6,7 +6,7 @@ int init_client(char * header, char * buffer, struct aquarium * aquarium, pthrea
     if (!strncmp(buffer,"hello",5)) {
         if (strcmp(client_view->name, "nok") != 0) {
             strcpy(to_send,header);
-            strcat(to_send, "> you already have a view : ");
+            strcat(to_send, "|> you already have a view : ");
             strcat(to_send, client_view->name);
             strcat(to_send, "\n");
             strcpy(buffer, to_send);
