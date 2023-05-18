@@ -44,6 +44,7 @@ public  abstract class CommunicationThread extends Thread {
 
     public final int sendMessage(String message) {
         messageToSend.put(messageIdCounter, message);
+        System.out.println("Hey " + messageReceived + " " + messageProcessed);
         return messageIdCounter++;
     }
 

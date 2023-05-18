@@ -1,3 +1,7 @@
+#ifndef _PROMPT_COMMANDS_H_
+#define _PROMPT_COMMANDS_H_
+
+
 #include "server_utils.h"
 #include "parser.h"
 
@@ -14,3 +18,5 @@ void prompt_save(struct command * command, struct aquarium * aquarium, pthread_m
 void prompt_show(struct command * command, struct aquarium * aquarium, pthread_mutex_t * mutex_aquarium);
 
 void clear(char* str, int size);
+
+#endif

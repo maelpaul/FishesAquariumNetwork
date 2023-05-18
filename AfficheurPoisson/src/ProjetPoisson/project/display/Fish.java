@@ -17,7 +17,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
 
 public class Fish {
@@ -50,7 +49,6 @@ public class Fish {
     private final EFishBehaviour behaviour;
 
     private final Text name;
-
     private boolean started;
     public EFishBehaviour getBehaviour() { return behaviour; }
 
@@ -75,7 +73,6 @@ public class Fish {
 
         goalPosition = new Vector2fTweening();
         timer = new Timer();
-
 
         swimMovement = new FloatTweening();
         swimMovement.setTweeningValues(ETweeningType.Sinusoidal, ETweeningBehaviour.InOut)
@@ -154,6 +151,8 @@ public class Fish {
     }
 
     public void travelToNewPosition(Vector2f positionPercentage, float time){
+        setPosition(goalPosition.goalValue());
+
         Vector2f position = new Vector2f(
                 windowInfo.getVirtualSizeCopy().x * positionPercentage.x,
                 windowInfo.getVirtualSizeCopy().y * positionPercentage.y);

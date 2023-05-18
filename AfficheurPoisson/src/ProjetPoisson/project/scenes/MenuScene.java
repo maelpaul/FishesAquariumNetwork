@@ -123,17 +123,16 @@ public class MenuScene extends Scene {
                 .setPosition(new Vector2f(connectionStatusIcon.position().x + connectionStatusIcon.scale().x + 10,
                         connectionStatusIcon.position().y + connectionStatusIcon.scale().x * 0.5f));
 
-        Configuration conf = Resources.getInstance().getResource(Configuration.class, "affichage");
         Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
 
         fishManager = new FishManager(mainContext.getWindow().getInfo(), configuration);
 
-        int numberFish = 6;
+        /*int numberFish = 6;
         float size = MightyMath.mapLog(numberFish, 10, 100, 0.17f, 0.15f);
 
         for (int i = 0; i < numberFish; ++i)
             fishManager.addFish("Fish" + i, new Vector2f(0.5f, 0.5f), new Vector2f(size, size),
-                    (i % 3 == 0) ? "Straight" :  (i % 3 == 1) ?  "Teleport" : "Natural");
+                    (i % 3 == 0) ? "Straight" :  (i % 3 == 1) ?  "Teleport" : "Natural");*/
 
         displacementMap = Resources.getInstance().getResource(Texture.class, "displacementMap");
         ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("displacementMap", 1);
@@ -190,7 +189,7 @@ public class MenuScene extends Scene {
                         if (parts.length == 3)
                             idClient = parts[2];
 
-                        client.sendMessage("ls\n");
+                        client.sendMessage("getFishes\n");
                         setConnectionState(EConnectionState.FirstMessageSent);
                     }
                 }
@@ -199,16 +198,28 @@ public class MenuScene extends Scene {
                 if (client.didReceiveMessage()){
                     Message[] messages = client.message();
                     if (messages.length == 1) {
+                        String fishMessage = messages[0].getMessage();
+                        fishMessage = ">list [PoissonRouge at 92x40,10x4,5] [PoissonClown at 22x80,12x6,5]\n";
+
                         terminal.addToResultText(messages[0].getMessage().replace(">", "<"));
+
+                        if (fishMessage.contains("]")){
+                            String[] fishesArguments = fishMessage
+                                    .replace(">list", "")
+                                    .replace("\n", "")
+                                    .replace("[", "")
+                                    .split("]");
+
+                            for (String fishArgument : fishesArguments){
+                                fishManager.processFishUpdate(fishArgument.trim());
+                            }
+                        }
 
                         setConnectionState(EConnectionState.Connected);
                     }
                 }
                 break;
-
         }
-
-        //
     }
 
     public void update() {
@@ -232,7 +243,8 @@ public class MenuScene extends Scene {
         terminal.update(mainContext.getInputManager(), mainContext.getSystemInfo());
 
         if (terminal.shouldProcessCommand()){
-            String result = analyser.analyseCommand(terminal.getCommandText());
+            String commandText = terminal.getCommandText();
+            String result = analyser.analyseCommand(commandText);
 
             if (result != null) {
                 if (result.equals("¤¤clear¤¤"))
@@ -243,6 +255,9 @@ public class MenuScene extends Scene {
 
                 terminal.saveCommand()
                         .clearCommandText();
+
+                if (EConnectionState.Connected == currentState && result.contains("OK"))
+                    client.sendMessage(commandText);
             }
         }
 

@@ -8,6 +8,7 @@ import org.joml.Vector2f;
 
 import java.io.File;
 import java.util.*;
+import java.util.Random;
 
 public class FishManager {
     public enum EResult {
@@ -21,6 +22,22 @@ public class FishManager {
 
         StartSuccessfully, StartErrorUnknownName
     }
+
+    private final static int UPDATE_FISH_COMMAND_SIZE = 3;
+    private final static int UPDATE_FISH_ARG_NAME = 0;
+    private final static int UPDATE_FISH_ARG_AT = 1;
+    private final static int UPDATE_FISH_ARG_DATA = 2;
+
+
+    private final static int UPDATE_FISH_ARG_SIZE = 1;
+    private final static int UPDATE_FISH_ARG_WIDTH = 0;
+    private final static int UPDATE_FISH_ARG_HEIGHT = 1;
+
+    private final static int UPDATE_FISH_ARG_POSITION = 0;
+    private final static int UPDATE_FISH_ARG_X = 0;
+    private final static int UPDATE_FISH_ARG_Y = 1;
+
+    private final static int UPDATE_FISH_ARG_TIME = 2;
 
     private final HashMap<String, Fish> fishes;
     ArrayList<String> fishesFileName = new ArrayList<>();
@@ -89,6 +106,43 @@ public class FishManager {
         return EResult.DeleteSuccessfully;
     }
 
+    public void processFishUpdate(String fishArgs){
+        System.out.println(fishArgs);
+
+        String[] parts = fishArgs.trim().split(" ");
+        if (parts.length != UPDATE_FISH_COMMAND_SIZE)
+            return;
+
+        String data = parts[UPDATE_FISH_ARG_DATA].replace(" ", "");
+
+        String[] dataParts = data.split(",");
+
+        String size = dataParts[UPDATE_FISH_ARG_SIZE];
+
+        float width = Float.parseFloat(size.split("x")[UPDATE_FISH_ARG_WIDTH]) / 100f;
+        float height = Float.parseFloat(size.split("x")[UPDATE_FISH_ARG_HEIGHT]) / 100f;
+
+        String position = dataParts[UPDATE_FISH_ARG_POSITION];
+
+        float x = Float.parseFloat(position.split("x")[UPDATE_FISH_ARG_X]) / 100f;
+        float y = Float.parseFloat(position.split("x")[UPDATE_FISH_ARG_Y]) / 100f;
+
+        int time = Integer.parseInt(dataParts[UPDATE_FISH_ARG_TIME]);
+
+        if (fishes.containsKey(parts[UPDATE_FISH_ARG_NAME])){
+            fishes.get(parts[UPDATE_FISH_ARG_NAME]).travelToNewPosition(
+                    new Vector2f(x, y),
+                    time
+            );
+        } else {
+            addFish(parts[UPDATE_FISH_ARG_NAME],
+                    new Vector2f(x, y),
+                    new Vector2f(width, height),
+                    Fish.EFishBehaviour.values()[rand.nextInt(Fish.EFishBehaviour.values().length)].name());
+        }
+    }
+
+
     public String collectionToStr(String delimiter, int namePerLine, String lineDelimiter, Collection<String> c){
         StringBuilder result = new StringBuilder();
         int counter = 0;
@@ -125,10 +179,10 @@ public class FishManager {
         for (Fish fish : fishes.values()){
             fish.update();
 
-            if (fish.finishedTravel()){
+            /*if (fish.finishedTravel()){
                 Vector2f position = new Vector2f(rand.nextFloat(), rand.nextFloat());
                 fish.travelToNewPosition(position, 1 + rand.nextFloat() * 3);
-            }
+            }*/
         }
     }
 

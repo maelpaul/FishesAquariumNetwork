@@ -1,3 +1,6 @@
+#ifndef _THREAD_H_
+#define _THREAD_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -17,6 +20,9 @@ struct client_args {
     int *client_id;
     struct aquarium * aquarium;
     int client_number;
+    struct view * client_view;
 };
 
 int client(void * client_arg);
+
+#endif
