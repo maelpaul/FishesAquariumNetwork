@@ -14,6 +14,7 @@ int main() {
     int portno = 12345;
     struct sockaddr_in serv_addr;
     char buffer[256];
+    char buffer_cp[256];
     int n;
 
     // Création du socket client
@@ -52,12 +53,20 @@ int main() {
 
     int val = 1;
     int check_ls = 0;
+    char * header;
+    char * message;
 
     do{
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-            val = strcmp(buffer, "log out\n");
+            for (int i = 0; i < 256; i++) {
+                buffer_cp[i] = buffer[i];
+            }
+            header = strtok(buffer_cp, "|");
+            (void) header;
+            message = strtok(NULL, "\0");
+            val = strcmp(message, "log out\n");
             check_ls = 0;
-            if (!strcmp(buffer, "getFishesContinuously\n") || !strcmp(buffer, "ls\n")) {
+            if (!strcmp(message, "getFishesContinuously\n") || !strcmp(message, "ls\n")) {
                 check_ls = 1;
             }
             n = write(client_fd, buffer, strlen(buffer));
