@@ -144,12 +144,16 @@ public class FishManager {
         }
     }
 
-    public void unload(){
+    public void clear(){
         for (String name : fishes.keySet()){
             fishes.get(name).unload();
         }
 
         fishes.clear();
+    }
+
+    public void unload(){
+        clear();
     }
 
     @Override

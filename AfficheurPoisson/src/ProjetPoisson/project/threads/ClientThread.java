@@ -42,7 +42,6 @@ public class ClientThread extends CommunicationThread {
         try {
             while (this.running){
                 Thread.sleep(500); // Add a delay of 500 milliseconds
-                //System.out.println("loop");
 
                 if (client.isConnected()){
                     if (messageToSend.size() > 0 && messageReceived == messageProcessed) {
@@ -51,13 +50,18 @@ public class ClientThread extends CommunicationThread {
                         client.sendMessage(toSend);
 
                         messageProcessed += 1;
-                    } else if (messageReceived < messageProcessed) {
-                        String result = client.readMessage();
-                        if (result != null){
-                            System.out.println("Messaged received(" + messageReceived + ") :" + result);
-                            receivedMessages.add(new Message(messageReceived, result));
-                            messageToSend.remove(messageReceived);
-                            System.out.println(didReceiveMessage());
+                    }
+
+                    String result = client.readMessage();
+                    if (result != null) {
+                        System.out.println("Messaged received(" + messageReceived + ") :" + result);
+                        receivedMessages.add(new Message(messageReceived, result));
+                        messageToSend.remove(messageReceived);
+
+                        if (result.contains("list")) {
+                            if (messageReceived != messageProcessed)
+                                messageReceived += 1;
+                        } else {
                             messageReceived += 1;
                         }
                     }

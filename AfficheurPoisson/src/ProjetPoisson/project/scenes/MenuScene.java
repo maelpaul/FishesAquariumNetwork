@@ -39,7 +39,9 @@ public class MenuScene extends Scene {
     }
 
     public final static int PING_TIME = 35; // 40 in reality
-    public final static int ATTEMPT_CONNECTION_TIME = 2; // 40 in reality
+    public final static int ATTEMPT_CONNECTION_TIME = 2;
+
+    public final static int WAIT_FOR_EXIT = 5;
 
     private Timer pingTimer;
     private Timer attemptConnexionTimer;
