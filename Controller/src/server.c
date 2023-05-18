@@ -69,6 +69,9 @@ void *thread_client(void *arg) {
     }
     pthread_mutex_unlock(&mutex_is_aquarium_loaded);
 
+    char * header;
+    char * message;
+
     do {
         int check = 0;
 
@@ -87,8 +90,8 @@ void *thread_client(void *arg) {
             }
         }
         
-        char * header = strtok(buffer, "|");
-        char * message = strtok(NULL, "\0");
+        header = strtok(buffer, "|");
+        message = strtok(NULL, "\0");
 
         if (check == 0) {
             check = add_fish_server(header, message, aquarium, &mutex_aquarium, client_id);
@@ -117,7 +120,8 @@ void *thread_client(void *arg) {
 
         // check des commandes inexistantes
         if (check == 0 && strcmp(buffer, "log out\n") != 0) {
-            strcpy(buffer, "> NOK : Inexisting command");
+            strcpy(buffer, header);
+            strcat(buffer, "|NOK : Inexisting command");
             if (send(client_id, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
@@ -125,7 +129,8 @@ void *thread_client(void *arg) {
         }
     } while(strcmp(buffer, "log out\n") != 0);
 
-    strcpy(buffer, "> Bye");
+    strcpy(buffer, header);
+    strcat(buffer, "|Bye");
     if (send(client_id, buffer, strlen(buffer), 0) < 0) {
         perror("Erreur lors de l'envoi du message au client");
         exit(EXIT_FAILURE);
