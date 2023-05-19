@@ -31,7 +31,8 @@ int available[NB_CLIENTS];
 struct client_args * tab_args[NB_CLIENTS];
 pthread_mutex_t mutex_client_count = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_aquarium = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex_is_aquarium_loaded = PTHREAD_MUTEX_INITIALIZER; 
+pthread_mutex_t mutex_is_aquarium_loaded = PTHREAD_MUTEX_INITIALIZER;
+int print_client_answer = 1; 
 
 struct wait_client_context {
     struct aquarium * aquarium;
@@ -147,7 +148,9 @@ void *thread_client(void *arg) {
 
             pthread_exit(NULL);
         }
-        printf("Message du client %d : %s\n", client_number, buffer);
+        if (print_client_answer == 1) {
+            printf("Message du client %d : %s\n", client_number, buffer);
+        }
 
         int test = 0;
         for(long unsigned int i=0;i<5;i++){
@@ -293,8 +296,14 @@ void * wait_for_client(void * arg){
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    for (int i = 0; i < argc; ++i) {
+        if (strcmp(argv[i], "-m") == 0) {
+            print_client_answer = 0;
+        } 
+    }
+
     for (int i = 0; i < NB_CLIENTS; i++) {
         available[i] = 1;
     }
