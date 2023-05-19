@@ -85,8 +85,7 @@ public class ClientThread extends CommunicationThread {
                             System.err.println("Message without header : \n" + result);
                         }
                     }
-                } else if (shouldTryConnection){
-                    System.out.println("GNONENOF");
+                } else if (shouldTryConnection) {
                     client.tryCreateConnection();
                     shouldTryConnection = false;
                 }

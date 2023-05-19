@@ -17,7 +17,7 @@ public class CommandAnalyser {
 
     HashMap<String, ICommand> relations;
 
-    public CommandAnalyser(MenuScene.ConnectionStateContainer state, FishManager fishManager) {
+    public CommandAnalyser(MenuScene.ConnectionStateContainer state, FishManager fishManager, MenuScene.TryConnectionContainer tryConnection) {
         relations = new HashMap<>();
         relations.put("help", new HelpCommand());
         relations.put("clear", new ClearCommand());
@@ -27,8 +27,9 @@ public class CommandAnalyser {
         relations.put("startFish", new StartFishCommand(state, fishManager));
         relations.put("status", new StatusCommand(state));
         relations.put("showFishName", new ShowFishNameCommand(state, fishManager));
+        relations.put("log", new LogOutCommand());
+        relations.put("tryConnection", new TryConnectionCommand(tryConnection));
 
-        // get fish, ls (commande système (pas utilisateur))
     }
 
     public ResultCommand analyseCommand(String command){

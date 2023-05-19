@@ -4,8 +4,8 @@ public final class ResultCommand {
     public enum EResultAction {
         None,
         Clear,
+        SendServer,
         Quit,
-        SendServer
     }
 
     private final String promptResult;
