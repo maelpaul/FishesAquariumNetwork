@@ -75,6 +75,7 @@ public class MenuScene extends Scene {
     private ConnectionStateContainer currentState;
     private RectangleRenderer connectionStatusIcon;
     private Text connectionStatusMessage;
+    private boolean firstDisconnect = false;
 
     int waitResponse;
 
@@ -197,9 +198,9 @@ public class MenuScene extends Scene {
                     if (messages.length == 1) {
                         terminal.addToResultText("<" + messages[0].getMessage());
                         String[] parts = messages[0].getMessage().split(" ");
+                        idClient = parts[1];
                         if (parts.length == 3)
                             idClient = parts[2];
-
                         client.sendMessage("getFishes\n");
                         setConnectionState(EConnectionState.FirstMessageSent);
                     }
@@ -242,33 +243,40 @@ public class MenuScene extends Scene {
         super.update();
         fishManager.update();
 
-        if (client.getClient().isConnected()){
-            if (currentState.get() == EConnectionState.Connected) {
-                updateFishRequestTime.update();
-                if (updateFishRequestTime.isFinished()) {
-                    if (waitResponse == -1) {
-                        waitResponse = client.sendMessage("getFishes");
-                    } else if (client.didReceiveMessage()) {
-                        for (Message message : client.message()){
-                            if (message.getId() == waitResponse){
-                                analyseGetFished(message);
+        if (firstDisconnect==false) {
+            if (client.isDisconnected()) {
+                terminal.addToResultText("Client Disconnected");
+                setConnectionState(EConnectionState.Disconnected);
+                this.firstDisconnect = true;
+            }
+            if (client.getClient().isConnected()) {
+                if (currentState.get() == EConnectionState.Connected) {
+                    updateFishRequestTime.update();
+                    if (updateFishRequestTime.isFinished()) {
+                        if (waitResponse == -1) {
+                            //waitResponse = client.sendMessage("getFishes");
+                        } else if (client.didReceiveMessage()) {
+                            for (Message message : client.message()) {
+                                if (message.getId() == waitResponse) {
+                                    analyseGetFished(message);
 
-                                waitResponse = -1;
+                                    waitResponse = -1;
+                                }
                             }
                         }
+                        updateFishRequestTime.resetStart();
                     }
-                    updateFishRequestTime.resetStart();
+                } else {
+                    initializeConnection();
+                    attemptConnexionTimer.stop();
                 }
             } else {
-                initializeConnection();
-                attemptConnexionTimer.stop();
-            }
-        } else {
-            attemptConnexionTimer.update();
+                attemptConnexionTimer.update();
 
-            if (!client.getClient().isTryingConnection() && attemptConnexionTimer.isFinished()) {
-                client.shouldTryConnection();
-                attemptConnexionTimer.resetStart();
+                if (!client.getClient().isTryingConnection() && attemptConnexionTimer.isFinished()) {
+                    client.shouldTryConnection();
+                    attemptConnexionTimer.resetStart();
+                }
             }
         }
 

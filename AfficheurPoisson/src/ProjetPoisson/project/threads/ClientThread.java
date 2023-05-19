@@ -35,6 +35,10 @@ public class ClientThread extends CommunicationThread {
         return this.client;
     }
 
+    public boolean isDisconnected(){
+        return this.client.isDisconnected();
+    }
+
     public void run() {
         this.ClientSetup();
         messageReceived -= 1;
@@ -56,6 +60,9 @@ public class ClientThread extends CommunicationThread {
 
                     String result = client.readMessage();
                     if (result != null) {
+                        if (result.contains("Connection lost")){
+                            this.running = false;
+                        }
                         if (result.contains("|")) {
                             int numberMessage = Integer.parseInt(result.substring(0, result.indexOf("|")));
                             if (numberMessage > messageReceived)
