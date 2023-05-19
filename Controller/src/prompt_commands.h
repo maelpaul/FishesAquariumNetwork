@@ -1,7 +1,7 @@
 #ifndef _PROMPT_COMMANDS_H_
 #define _PROMPT_COMMANDS_H_
 
-
+#include <dirent.h>
 #include "server_utils.h"
 #include "parser.h"
 

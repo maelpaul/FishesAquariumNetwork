@@ -23,9 +23,9 @@ struct config {
 
 int load_config(const char *filename, struct config *conf);
 
-int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium);
+int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium, const char * aquarium_name);
 
-void save_aquarium(struct aquarium * aquarium);
+void save_aquarium(struct aquarium * aquarium, const char * aquarium_name);
 
 int controller_add_fish(struct aquarium *aquarium, int * coords, int * size, char * name, void (*path)(struct fish *, int, int));
 

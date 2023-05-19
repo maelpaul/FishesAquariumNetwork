@@ -17,8 +17,9 @@ void aquarium_init(struct aquarium * aquarium) {
     } 
 }
 
-void aquarium_create(struct aquarium * aquarium, int * size, char * name) {
-    aquarium->name = name;
+void aquarium_create(struct aquarium * aquarium, int * size, const char * name) {
+    aquarium->name = malloc(strlen(name)+1);
+    strcpy(aquarium->name, name);
     aquarium->fishes = malloc(DEFAULT_NUMBER_FISH * sizeof(struct fish *));
     aquarium->views = malloc(DEFAULT_NUMBER_VIEW * sizeof(struct view *));
     aquarium->fishes_len = 0;
@@ -121,6 +122,7 @@ void del_view(struct aquarium * aquarium, char * view_name) {
 }
 
 void aquarium_free(struct aquarium * aquarium) {
+    free(aquarium->name);
     for (int i = 0; i < aquarium->fishes_len; i++) {
         fish_free(aquarium->fishes[i]);
     }

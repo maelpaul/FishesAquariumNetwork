@@ -17,7 +17,7 @@ struct aquarium {
 
 void aquarium_init(struct aquarium * aquarium);
 
-void aquarium_create(struct aquarium * aquarium, int * size, char * name);
+void aquarium_create(struct aquarium * aquarium, int * size, const char * name);
 
 int fish_name_check(struct aquarium * aquarium, char * fish_name);
 

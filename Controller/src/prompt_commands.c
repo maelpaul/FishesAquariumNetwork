@@ -14,31 +14,69 @@ void prompt_load(struct command * command, struct aquarium * aquarium, int * aqu
         pthread_mutex_unlock(mutex_aquarium_flag);
         char * aquarium_name = command->params[0];
 
-        if (!strcmp(aquarium_name, "aquarium")) {
-            clear(to_send,SEND_SIZE);
-            strcpy(to_send, "> OK : aquarium loaded (");
-            pthread_mutex_lock(mutex_aquarium);
-            load_initial_aquarium_config("aquarium_example.txt", aquarium);
-            int nb_views = aquarium->views_len;
-            pthread_mutex_unlock(mutex_aquarium);
-            char len[10];
-            sprintf(len, "%d ", nb_views);
-            strcat(to_send, len);
+        DIR *dir;
+        struct dirent *ent;
 
-            if (nb_views == 0 || nb_views == 1) {
-                strcat(to_send, "display view)!");
-            }
-            else {
-                strcat(to_send, "display views)!");    
-            }
+        const char *path = "../Controller/aquariums";
 
-            pthread_mutex_lock(mutex_aquarium_flag);
-            *aquarium_flag=1;
-            pthread_mutex_unlock(mutex_aquarium_flag);
-
-            printf("%s\n",to_send);
+        // Ouvrir le répertoire
+        dir = opendir(path);
+        if (dir == NULL) {
+            printf("Erreur lors de l'ouverture du répertoire.\n");
+            exit(EXIT_FAILURE);
         }
-        else {
+
+        int check = 0;
+
+        // Parcourir les fichiers du répertoire
+        while ((ent = readdir(dir)) != NULL) {
+            // Ignorer les entrées spéciales "." et ".."
+            if (strcmp(ent->d_name, ".") != 0 && strcmp(ent->d_name, "..") != 0) {
+                char f_name_cp[64];
+                for (int i = 0; i < (int) strlen(ent->d_name); ++i) {
+                    f_name_cp[i] = ent->d_name[i];
+                }
+                f_name_cp[strlen(ent->d_name)] = '\0';
+                char * file_name;
+                file_name = strtok(f_name_cp, ".");
+
+                char f_path[100];
+                memset(f_path, 0, strlen(f_path));
+                char * file_path = "../Controller/aquariums/";
+                strcat(f_path, file_path);
+                strcat(f_path, ent->d_name);
+
+                if (!strcmp(aquarium_name, file_name)) {
+                    check = 1;
+                    clear(to_send,SEND_SIZE);
+                    strcpy(to_send, "> OK : aquarium loaded (");
+                    pthread_mutex_lock(mutex_aquarium);
+                    load_initial_aquarium_config(f_path, aquarium, aquarium_name);
+                    int nb_views = aquarium->views_len;
+                    pthread_mutex_unlock(mutex_aquarium);
+                    char len[10];
+                    sprintf(len, "%d ", nb_views);
+                    strcat(to_send, len);
+
+                    if (nb_views == 0 || nb_views == 1) {
+                        strcat(to_send, "display view)!");
+                    }
+                    else {
+                        strcat(to_send, "display views)!");    
+                    }
+
+                    pthread_mutex_lock(mutex_aquarium_flag);
+                    *aquarium_flag=1;
+                    pthread_mutex_unlock(mutex_aquarium_flag);
+
+                    printf("%s\n",to_send);
+                }
+            }
+        }
+
+        // Fermer le répertoire
+        closedir(dir);
+        if (check == 0) {
             printf("> NOK : aquarium not existing\n");
         }
     }
@@ -128,13 +166,8 @@ void prompt_show(struct command * command, struct aquarium * aquarium, pthread_m
 void prompt_save(struct command * command, struct aquarium * aquarium, pthread_mutex_t * mutex_aquarium){
     char * aquarium_name = command->params[0];
 
-    if (!strcmp(aquarium_name, "aquarium")) {
-        pthread_mutex_lock(mutex_aquarium);
-        save_aquarium(aquarium);
-        pthread_mutex_unlock(mutex_aquarium);
-        printf("> OK : aquarium saved\n");
-    }
-    else {
-        printf("> NOK : aquarium not existing\n");
-    }
+    pthread_mutex_lock(mutex_aquarium);
+    save_aquarium(aquarium, aquarium_name);
+    pthread_mutex_unlock(mutex_aquarium);
+    printf("> OK : aquarium saved\n");
 }

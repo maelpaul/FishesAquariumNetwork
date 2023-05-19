@@ -37,7 +37,7 @@ int load_config(const char *filename, struct config *conf)
     return 0;
 }
 
-int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium){
+int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium, const char * aquarium_name){
     FILE *fp;
     char line[256], buf1[256], buf2[256];
 
@@ -52,7 +52,7 @@ int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium
     sscanf(line, "%255s", buf1);
     size[0] = atoi(strtok(buf1,"x"));
     size[1] = atoi(strtok(NULL,"x"));
-    aquarium_create(aquarium, size, "oui");
+    aquarium_create(aquarium, size, aquarium_name);
 
     while (fgets(line, sizeof(line), fp)) {
         if (sscanf(line, "%255s %255s", buf1, buf2) == 2) {
@@ -76,10 +76,11 @@ int load_initial_aquarium_config(const char *filename, struct aquarium *aquarium
     return 0;
 }
 
-void save_aquarium(struct aquarium * aquarium){
+void save_aquarium(struct aquarium * aquarium, const char * aquarium_name){
     FILE *fp;
     char filename[256];
-    strcpy(filename,aquarium->name);
+    strcpy(filename, "../Controller/aquariums/");
+    strcat(filename,aquarium_name);
     strcat(filename,".txt");
     fp = fopen(filename, "w+");
 
