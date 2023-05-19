@@ -301,7 +301,10 @@ int main(int argc, char *argv[])
     for (int i = 0; i < argc; ++i) {
         if (strcmp(argv[i], "-m") == 0) {
             print_client_answer = 0;
-        } 
+        }
+        if (strcmp(argv[i], "-h") == 0) {
+            printf("*** May the Force be with you ***\n");
+        }
     }
 
     for (int i = 0; i < NB_CLIENTS; i++) {
