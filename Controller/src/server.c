@@ -23,7 +23,6 @@
 #define BUFFER_SIZE 256
 #endif
 
-int counter = 0;
 int client_count = 0;
 int is_aquarium_loaded = 0;
 pthread_t wait_client;
@@ -32,7 +31,8 @@ int available[NB_CLIENTS];
 struct client_args * tab_args[NB_CLIENTS];
 pthread_mutex_t mutex_client_count = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_aquarium = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex_is_aquarium_loaded = PTHREAD_MUTEX_INITIALIZER; 
+pthread_mutex_t mutex_is_aquarium_loaded = PTHREAD_MUTEX_INITIALIZER;
+int print_client_answer = 1; 
 
 struct wait_client_context {
     struct aquarium * aquarium;
@@ -148,7 +148,9 @@ void *thread_client(void *arg) {
 
             pthread_exit(NULL);
         }
-        printf("Message du client %d : %s\n", client_number, buffer);
+        if (print_client_answer == 1) {
+            printf("Message du client %d : %s\n", client_number, buffer);
+        }
 
         int test = 0;
         for(long unsigned int i=0;i<5;i++){
@@ -244,7 +246,7 @@ void * wait_for_client(void * arg){
         pthread_mutex_lock(&mutex_client_count);
 
         if (client_count < NB_CLIENTS) {
-            counter++;
+            int number;
 
             // Créer un thread pour gérer le client
             int first_available = -1;
@@ -253,6 +255,7 @@ void * wait_for_client(void * arg){
                 if (available[i] == 1 && ok == 0) {
                     ok = 1;
                     first_available = i;
+                    number = first_available+1;
                     available[i] = 0;
                 }
             }
@@ -263,7 +266,7 @@ void * wait_for_client(void * arg){
             pthread_mutex_lock(&mutex_aquarium);
             client_args->aquarium = context->aquarium;
             client_args->client_id = client_id;
-            client_args->client_number = counter;
+            client_args->client_number = number;
             client_args->thread_number = first_available;
             client_args->client_view = malloc(sizeof(struct view));
             view_init(client_args->client_view);
@@ -272,7 +275,7 @@ void * wait_for_client(void * arg){
             view_create(client_args->client_view, coords, size, "nok", client_args->aquarium->size[0], client_args->aquarium->size[1]);
             pthread_mutex_unlock(&mutex_aquarium);
             pthread_create(&threads[first_available], NULL, thread_client, (void *)client_args);
-            printf("Client connecté. Client ID: %d\n", counter);
+            printf("Client connecté. Client ID: %d\n", number);
             tab_args[first_available] = client_args;
             client_count++;
         } 
@@ -293,8 +296,17 @@ void * wait_for_client(void * arg){
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    for (int i = 0; i < argc; ++i) {
+        if (strcmp(argv[i], "-m") == 0) {
+            print_client_answer = 0;
+        }
+        if (strcmp(argv[i], "-h") == 0) {
+            printf("*** May the Force be with you ***\n");
+        }
+    }
+
     for (int i = 0; i < NB_CLIENTS; i++) {
         available[i] = 1;
     }
