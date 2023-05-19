@@ -38,6 +38,6 @@ public class DelFishCommand implements ICommand {
     @Override
     public ResultCommand returnHelp() {
         return new ResultCommand("  -> help(delFish) : \n" +
-                "    delFish NAME\n");
+                "    delFish NAME : delete a fish named NAME");
     }
 }

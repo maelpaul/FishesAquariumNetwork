@@ -46,6 +46,18 @@ public class MenuScene extends Scene {
         public void set(EConnectionState state) { this.state = state; }
     }
 
+    public static class TryConnectionContainer {
+        private boolean value;
+
+        public TryConnectionContainer(boolean value) {
+            this.value = value;
+        }
+
+        public boolean get() { return value; }
+
+        public void set(boolean value) { this.value = value; }
+    }
+
     public final static float PING_TIME = 35; // 40 in reality
     public final static float ATTEMPT_CONNECTION_TIME = 2;
 
@@ -53,7 +65,7 @@ public class MenuScene extends Scene {
 
     public final static float UPDATE_FISH_REQUEST_TIME = 1;
 
-    // Display
+    /// Display
     private Text text;
     private RectangleRenderer renderer;
     private Terminal terminal;
@@ -63,7 +75,7 @@ public class MenuScene extends Scene {
     private Text connectionStatusMessage;
 
 
-    // Systems
+    /// Systems
     private CommandAnalyser analyser;
     private FishManager fishManager;
     private Timer pingTimer;
@@ -71,7 +83,8 @@ public class MenuScene extends Scene {
     private Timer updateFishRequestTime;
 
 
-    // Network
+    /// Network
+    private TryConnectionContainer shouldTryConnexion;
     private ClientThread client;
     private ConnectionStateContainer currentState;
     private int waitResponseId;
@@ -81,33 +94,16 @@ public class MenuScene extends Scene {
     public void init(String[] args) {
         super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
 
-        pingTimer = new Timer();
-        pingTimer.start(PING_TIME);
-        pingTimer.stop();
+        /// Display
+        setClearColor(0, 0, 0, 1f);
 
-        attemptConnexionTimer = new Timer();
-        attemptConnexionTimer.start(ATTEMPT_CONNECTION_TIME);
-
-        updateFishRequestTime = new Timer();
-        updateFishRequestTime.start(UPDATE_FISH_REQUEST_TIME);
-
-        waitResponseId = -1;
-        waitGetFishesResponseId = -1;
+        Vector2i windowSize = mainContext.getWindow().getInfo().getSizeCopy();
+        terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.x * 0.5f,windowSize.y * 0.5f));
+        main3DCamera.setPos(new Vector3f(0, 0, 0));
 
         if (Resources.getInstance().isExistingResource(Icon.class, "Kraken"))
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
-        /// SCENE INFORMATION ///
-        client = new ClientThread();
-        client.start();
-
-        Vector2i windowSize = mainContext.getWindow().getInfo().getSizeCopy();
-        terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.x * 0.5f,windowSize.y * 0.5f));
-
-        main3DCamera.setPos(new Vector3f(0, 0, 0));
-        setClearColor(52, 189, 235, 1f);
-
-        /// RENDERERS ///
         renderer = new RectangleRenderer("texture2DDisplacement");
         renderer.switchToTextureMode("background");
         renderer.setSizePix(windowSize.x, windowSize.y);
@@ -140,10 +136,6 @@ public class MenuScene extends Scene {
                 .setPosition(new Vector2f(connectionStatusIcon.position().x + connectionStatusIcon.scale().x + 10,
                         connectionStatusIcon.position().y + connectionStatusIcon.scale().x * 0.5f));
 
-        Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
-
-        fishManager = new FishManager(mainContext.getWindow().getInfo(), configuration);
-
         displacementMap = Resources.getInstance().getResource(Texture.class, "displacementMap");
         ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("displacementMap", 1);
 
@@ -152,10 +144,35 @@ public class MenuScene extends Scene {
                 .setTweeningOption(ETweeningOption.LoopReversed)
                 .initTwoValue(15f, 0f, 15f);
 
+        /// Systems
+
+        Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
+        fishManager = new FishManager(mainContext.getWindow().getInfo(), configuration);
+
+        pingTimer = new Timer();
+        pingTimer.start(PING_TIME);
+        pingTimer.stop();
+
+        attemptConnexionTimer = new Timer();
+        attemptConnexionTimer.start(ATTEMPT_CONNECTION_TIME);
+
+        updateFishRequestTime = new Timer();
+        updateFishRequestTime.start(UPDATE_FISH_REQUEST_TIME);
+
+        /// Network
+
+        shouldTryConnexion = new TryConnectionContainer(true);
         currentState = new ConnectionStateContainer();
-        analyser = new CommandAnalyser(currentState, fishManager);
+
+        waitResponseId = -1;
+        waitGetFishesResponseId = -1;
+
+        client = new ClientThread();
+        client.start();
 
         setConnectionState(EConnectionState.Disconnected);
+
+        analyser = new CommandAnalyser(currentState, fishManager, shouldTryConnexion);
     }
 
     public void setConnectionState(EConnectionState connectionState){
@@ -226,6 +243,9 @@ public class MenuScene extends Scene {
 
     public void resetConnexion(){
         idClient = "??";
+        terminal.addToResultText("Client Disconnected");
+        attemptConnexionTimer.resetStart();
+        shouldTryConnexion.set(false);
         setConnectionState(EConnectionState.Disconnected);
     }
 
@@ -259,9 +279,7 @@ public class MenuScene extends Scene {
         fishManager.update();
 
         if (!client.getClient().isConnected() && currentState.get() == EConnectionState.Connected) {
-            terminal.addToResultText("Client Disconnected");
-            setConnectionState(EConnectionState.Disconnected);
-            attemptConnexionTimer.resetStart();
+            resetConnexion();
         }
 
         if (currentState.get() == EConnectionState.Connected) {
@@ -287,7 +305,8 @@ public class MenuScene extends Scene {
                 initializeConnection();
                 attemptConnexionTimer.stop();
             } else {
-                if (!client.getClient().isTryingConnection() && attemptConnexionTimer.isFinished()) {
+                if (!client.getClient().isTryingConnection()
+                        && attemptConnexionTimer.isFinished() && shouldTryConnexion.get()) {
                     client.shouldTryConnection();
                     attemptConnexionTimer.resetStart();
                 }
@@ -303,9 +322,9 @@ public class MenuScene extends Scene {
             if (result != null) {
                 if (result.getResultAction() == ResultCommand.EResultAction.Clear)
                      terminal.clearResultText();
-                else if (result.getResultAction() == ResultCommand.EResultAction.Quit)
-                    this.sceneManagerInterface.exit(0);
-                else
+                else if (result.getResultAction() == ResultCommand.EResultAction.Quit) {
+                    waitResponseId = client.sendMessage("log out");
+                } else
                     terminal.addToResultText(result.getPromptResult());
 
                 terminal.saveCommand()
