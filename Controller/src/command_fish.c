@@ -47,9 +47,20 @@ int add_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
         int check_path = 0;
         
         if (path != NULL) {
-            if (!strcmp(path, "RandomWayPoint")) {
+            if (!strcmp(path, "RandomWayPoint") || !strcmp(path, "HorizontalWayPoint") || !strcmp(path, "VerticalWayPoint")) {
                 check_path = 1;
-                void (*new_path)(struct fish *, int, int) = &RandomWayPoint;
+                void (*new_path)(struct fish *, int, int) = NULL;
+
+                if (!strcmp(path, "RandomWayPoint")) {
+                    new_path = &RandomWayPoint;
+                }
+                else if (!strcmp(path, "HorizontalWayPoint")) {
+                    new_path = &HorizontalWayPoint;
+                }
+                else if (!strcmp(path, "VerticalWayPoint")) {
+                    new_path = &VerticalWayPoint;
+                }
+                
                 pthread_mutex_lock(mutex);
                 val = controller_add_fish(aquarium, coords, size, name, new_path);
                 pthread_mutex_unlock(mutex);

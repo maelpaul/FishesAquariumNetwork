@@ -164,6 +164,18 @@ void RandomWayPoint(struct fish * fish, int width, int height) {
     fish->dest[1] = rand() % height;    
 }
 
+void HorizontalWayPoint(struct fish * fish, int width, int height) {
+    (void) height;
+    fish->dest[0] = rand() % width;
+    fish->dest[1] = fish->coords[1];
+}
+
+void VerticalWayPoint(struct fish * fish, int width, int height) {
+    (void) width;
+    fish->dest[0] = fish->coords[0];
+    fish->dest[1] = rand() % height; 
+}
+
 int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest) {
     int val = 0;
     for (int i = 0; i < aquarium->fishes_len; i++) {

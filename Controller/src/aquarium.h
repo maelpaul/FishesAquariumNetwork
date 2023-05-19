@@ -41,6 +41,10 @@ int get_aquarium_height(struct aquarium * aquarium);
 
 void RandomWayPoint(struct fish * fish, int width, int height);
 
+void HorizontalWayPoint(struct fish * fish, int width, int height);
+
+void VerticalWayPoint(struct fish * fish, int width, int height);
+
 int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest);
 
 void update_fishes(struct aquarium * aquarium, int refresh_time);
