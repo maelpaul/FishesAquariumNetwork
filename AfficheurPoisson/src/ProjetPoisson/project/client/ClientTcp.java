@@ -16,9 +16,6 @@ public class ClientTcp {
 
     private volatile boolean running = true;
 
-    private boolean isDisconnected = false;
-
-
     private boolean TryingConnection;
 
     public ClientTcp(Configuration configuration){
@@ -65,9 +62,6 @@ public class ClientTcp {
         return socket != null && socket.isConnected();
     }
 
-    public boolean isDisconnected(){
-        return this.isDisconnected;
-    }
     public String readMessage() {
         if (socket == null || !socket.isConnected()) {
             System.out.println("Can't read message while connection not initialized or disconnected");
@@ -88,13 +82,7 @@ public class ClientTcp {
                 }
 
                 message = new String(byteMessage, 0, bytesRead, ENCODING);
-                System.out.println(message);
-                if (message.equals("-1|Timeout")){
-                    System.out.println("Disconnected from the server because of Timeout");
-                    closeConnection();
-                    this.isDisconnected = true;
-                    return "Connection lost with the server.";
-                }
+
                 lastHeartbeat = System.currentTimeMillis();
 
             }
@@ -105,12 +93,10 @@ public class ClientTcp {
         } catch (EOFException | SocketException e) {
             System.out.println("Connection lost with the server. (EOF or SocketException)");
             closeConnection();
-            this.isDisconnected = true;
             return "Connection lost with the server.";
         } catch (SocketTimeoutException e) {
             System.out.println("Socket read timed out. Connection may be lost.");
             closeConnection();
-            this.isDisconnected = true;
             return "Connection lost with the server.";
         } catch (IOException e) {
             e.printStackTrace();
@@ -151,6 +137,7 @@ public class ClientTcp {
 
     public void closeConnection() {
         running = false; // Stop the heartbeat loop
+        TryingConnection = false;
         if (socket == null) {
             System.out.println("Can't close uncreated connection.");
             return;
@@ -160,6 +147,7 @@ public class ClientTcp {
             socket.shutdownInput();
             socket.shutdownOutput();
             socket.close();
+            socket = null;
         } catch (IOException e) {
             if (e instanceof SocketException && e.getMessage().equals("Socket is closed")) {
                 System.out.println("Socket was already closed.");
