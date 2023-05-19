@@ -74,9 +74,26 @@ public class FishManager {
         if (current == null)
             return EResult.AddErrorUnknownBehaviour;
 
+        // Part to choose texture based on fish's name
+        String fishTextureName = name;
+        if (name.contains("_")){
+            fishTextureName = name.substring(0, name.indexOf("_"));
+        }
+
+        boolean found = false;
+        for (int i = 0; i < fishesFileName.size() && !found; ++i){
+            if (fishesFileName.get(i).equalsIgnoreCase(fishTextureName)){
+                fishTextureName = fishesFileName.get(i);
+                found = true;
+            }
+        }
+
+        if (!found)
+            fishTextureName = fishesFileName.get(rand.nextInt(fishesFileName.size()));
+
         fishes.put(
                 name,
-                new Fish(info, name, fishesFileName.get(0), positionPercentage, sizePercentage)
+                new Fish(info, name, fishTextureName , positionPercentage, sizePercentage)
         );
 
         return EResult.AddSuccessfully;
@@ -130,7 +147,7 @@ public class FishManager {
         int time = Integer.parseInt(dataParts[UPDATE_FISH_ARG_TIME]);
 
         if (fishes.containsKey(parts[UPDATE_FISH_ARG_NAME])){
-            fishes.get(parts[UPDATE_FISH_ARG_NAME]).travelToNewPosition(
+            fishes.get(parts[UPDATE_FISH_ARG_NAME]).    travelToNewPosition(
                     new Vector2f(x, y),
                     time
             );

@@ -10,8 +10,8 @@ import java.util.HashMap;
 public  abstract class CommunicationThread extends Thread {
     private int messageIdCounter;
 
-    protected int messageProcessed;
-    protected int messageReceived;
+    protected int processedMessageNumber;
+    protected int receivedMessageNumber;
 
     protected volatile boolean running;
     protected ArrayList<Message> receivedMessages;
@@ -22,9 +22,13 @@ public  abstract class CommunicationThread extends Thread {
         receivedMessages = new ArrayList<>();
         messageToSend = new HashMap<>();
 
+        reset();
+    }
+
+    public void reset(){
         messageIdCounter = 0;
-        messageProcessed = 0;
-        messageReceived = 0;
+        processedMessageNumber = 0;
+        receivedMessageNumber = 0;
     }
 
     public void run() {}
@@ -36,8 +40,8 @@ public  abstract class CommunicationThread extends Thread {
     public final Message[] message() {
         Message[] result = new Message[receivedMessages.size()];
         receivedMessages.toArray(result);
-
         receivedMessages.clear();
+
         return result;
 
     }

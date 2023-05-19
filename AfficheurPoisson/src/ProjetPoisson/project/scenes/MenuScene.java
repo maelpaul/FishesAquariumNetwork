@@ -38,7 +38,7 @@ public class MenuScene extends Scene {
         Connected
     }
 
-    public class ConnectionStateContainer {
+    public static class ConnectionStateContainer {
         private EConnectionState state = EConnectionState.Disconnected;
 
         public EConnectionState get() { return state; }
@@ -53,32 +53,29 @@ public class MenuScene extends Scene {
 
     public final static float UPDATE_FISH_REQUEST_TIME = 1;
 
-    private Timer pingTimer;
-    private Timer attemptConnexionTimer;
-
-    private Timer updateFishRequestTime;
-
+    // Display
     private Text text;
-
     private RectangleRenderer renderer;
-
     private Terminal terminal;
-
-    private CommandAnalyser analyser;
-
-    private FishManager fishManager;
     private Texture displacementMap;
     private FloatTweening displacementMapTweening;
-
-    private ClientThread client;
-
-    private ConnectionStateContainer currentState;
     private RectangleRenderer connectionStatusIcon;
     private Text connectionStatusMessage;
-    private boolean firstDisconnect = false;
 
-    int waitResponse;
 
+    // Systems
+    private CommandAnalyser analyser;
+    private FishManager fishManager;
+    private Timer pingTimer;
+    private Timer attemptConnexionTimer;
+    private Timer updateFishRequestTime;
+
+
+    // Network
+    private ClientThread client;
+    private ConnectionStateContainer currentState;
+    private int waitResponseId;
+    private int waitGetFishesResponseId;
     private String idClient = "??";
 
     public void init(String[] args) {
@@ -94,7 +91,9 @@ public class MenuScene extends Scene {
         updateFishRequestTime = new Timer();
         updateFishRequestTime.start(UPDATE_FISH_REQUEST_TIME);
 
-        waitResponse = -1;
+        waitResponseId = -1;
+        waitGetFishesResponseId = -1;
+
         if (Resources.getInstance().isExistingResource(Icon.class, "Kraken"))
             mainContext.getWindow().setIcon(Resources.getInstance().getResource(Icon.class, "Kraken"));
 
@@ -109,7 +108,6 @@ public class MenuScene extends Scene {
         setClearColor(52, 189, 235, 1f);
 
         /// RENDERERS ///
-
         renderer = new RectangleRenderer("texture2DDisplacement");
         renderer.switchToTextureMode("background");
         renderer.setSizePix(windowSize.x, windowSize.y);
@@ -183,36 +181,42 @@ public class MenuScene extends Scene {
         switch (currentState.get()){
             case Disconnected:
                 if (client.didReceiveMessage()){
-                    Message[] messages = client.message();
-                    if (messages.length == 1) {
-                        terminal.addToResultText("<" + messages[0].getMessage());
-                        client.sendMessage("hello\n");
+                    for (Message message : client.message()){
+                        System.out.println(message.getId());
+                        if (message.getId() != -1)
+                            continue;
+
+                        terminal.addToResultText("< " + message.getMessage());
+                        waitResponseId = client.sendMessage("hello\n");
                         setConnectionState(EConnectionState.StartingConnectionProcedure);
+                        break;
                     }
                 }
 
                 break;
             case StartingConnectionProcedure:
                 if (client.didReceiveMessage()){
-                    Message[] messages = client.message();
-                    if (messages.length == 1) {
-                        terminal.addToResultText("<" + messages[0].getMessage());
-                        String[] parts = messages[0].getMessage().split(" ");
+                    for (Message message : client.message()){
+                        if (message.getId() != waitResponseId)
+                            continue;
+
+                        terminal.addToResultText("<" + message.getMessage());
+                        String[] parts = message.getMessage().split(" ");
                         idClient = parts[1];
                         if (parts.length == 3)
                             idClient = parts[2];
-                        client.sendMessage("getFishes\n");
+                        waitResponseId = client.sendMessage("getFishes\n");
                         setConnectionState(EConnectionState.FirstMessageSent);
                     }
                 }
                 break;
             case FirstMessageSent:
                 if (client.didReceiveMessage()){
-                    Message[] messages = client.message();
-                    if (messages.length == 1) {
-                        analyseGetFished(messages[0]);
-                        //fishMessage = ">list [PoissonRouge at 92x40,10x4,5] [PoissonClown at 22x80,12x6,5]\n";
+                    for (Message message : client.message()){
+                        if (message.getId() != waitResponseId)
+                            continue;
 
+                        analyseGetFished(message);
                         setConnectionState(EConnectionState.Connected);
                     }
                 }
@@ -220,11 +224,13 @@ public class MenuScene extends Scene {
         }
     }
 
+    public void resetConnexion(){
+        idClient = "??";
+        setConnectionState(EConnectionState.Disconnected);
+    }
+
     public void analyseGetFished(Message message){
         String fishMessage = message.getMessage();
-        //fishMessage = ">list [PoissonRouge at 92x40,10x4,5] [PoissonClown at 22x80,12x6,5]\n";
-
-        //terminal.addToResultText(message.getMessage().replace(">", "<"));
 
         if (fishMessage.contains("]")){
             String[] fishesArguments = fishMessage
@@ -239,40 +245,48 @@ public class MenuScene extends Scene {
         }
     }
 
+    public void analyseMessage(Message message) {
+        if (message.getMessage().substring(0, 4).equalsIgnoreCase("list")) {
+            if (message.getId() == waitGetFishesResponseId) {
+                analyseGetFished(message);
+                waitGetFishesResponseId = -1;
+            }
+        }
+    }
+
     public void update() {
         super.update();
         fishManager.update();
 
-        if (firstDisconnect==false) {
-            if (client.isDisconnected()) {
-                terminal.addToResultText("Client Disconnected");
-                setConnectionState(EConnectionState.Disconnected);
-                this.firstDisconnect = true;
-            }
-            if (client.getClient().isConnected()) {
-                if (currentState.get() == EConnectionState.Connected) {
-                    updateFishRequestTime.update();
-                    if (updateFishRequestTime.isFinished()) {
-                        if (waitResponse == -1) {
-                            //waitResponse = client.sendMessage("getFishes");
-                        } else if (client.didReceiveMessage()) {
-                            for (Message message : client.message()) {
-                                if (message.getId() == waitResponse) {
-                                    analyseGetFished(message);
+        if (!client.getClient().isConnected() && currentState.get() == EConnectionState.Connected) {
+            terminal.addToResultText("Client Disconnected");
+            setConnectionState(EConnectionState.Disconnected);
+            attemptConnexionTimer.resetStart();
+        }
 
-                                    waitResponse = -1;
-                                }
-                            }
-                        }
-                        updateFishRequestTime.resetStart();
-                    }
-                } else {
-                    initializeConnection();
-                    attemptConnexionTimer.stop();
+        if (currentState.get() == EConnectionState.Connected) {
+            if (client.didReceiveMessage()) {
+                for (Message message : client.message()) {
+                    analyseMessage(message);
                 }
-            } else {
-                attemptConnexionTimer.update();
+            }
 
+            updateFishRequestTime.update();
+
+            if (updateFishRequestTime.isFinished()) {
+                if (waitGetFishesResponseId == -1) {
+                    waitGetFishesResponseId = client.sendMessage("getFishes");
+
+                    updateFishRequestTime.resetStart();
+                }
+            }
+
+        } else {
+            attemptConnexionTimer.update();
+            if (client.getClient().isConnected()){
+                initializeConnection();
+                attemptConnexionTimer.stop();
+            } else {
                 if (!client.getClient().isTryingConnection() && attemptConnexionTimer.isFinished()) {
                     client.shouldTryConnection();
                     attemptConnexionTimer.resetStart();
@@ -303,11 +317,6 @@ public class MenuScene extends Scene {
         }
 
         displacementMapTweening.update();
-        pingTimer.update();
-        if (pingTimer.isFinished()){
-            // DO THINGS
-            pingTimer.resetStart();
-        }
 
         ShaderManager.getInstance().getShader(renderer.getShape().getShaderId()).glUniform("time", displacementMapTweening.value());
     }
