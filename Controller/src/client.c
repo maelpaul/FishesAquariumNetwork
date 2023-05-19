@@ -38,7 +38,7 @@ int main() {
     int portno = 12345;
     struct sockaddr_in serv_addr;
     char buffer[256];
-    char buffer_cp[256];
+    char buffer_cp[258];
     int n;
 
     // Création du socket client
@@ -77,25 +77,20 @@ int main() {
 
     int val = 1;
     int check_ls = 0;
-    char * header;
-    char * message;
 
     pthread_create(&wait_exit, NULL, wait_server_exit, (void *) &client_fd);
 
     do{ 
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-            for (int i = 0; i < 256; i++) {
-                buffer_cp[i] = buffer[i];
-            }
-            header = strtok(buffer_cp, "|");
-            (void) header;
-            message = strtok(NULL, "\0");
-            val = strcmp(message, "log out\n");
+            memset(buffer_cp, 0, strlen(buffer_cp));
+            strcpy(buffer_cp, "1|");
+            strcat(buffer_cp, buffer);
+            val = strcmp(buffer, "log out\n");
             check_ls = 0;
-            if (!strcmp(message, "getFishesContinuously\n") || !strcmp(message, "ls\n")) {
+            if (!strcmp(buffer, "getFishesContinuously\n") || !strcmp(buffer, "ls\n")) {
                 check_ls = 1;
             }
-            n = write(client_fd, buffer, strlen(buffer));
+            n = write(client_fd, buffer_cp, strlen(buffer_cp));
             if (n < 0) {
                 perror("Erreur lors de l'écriture sur la socket");
                 exit(EXIT_FAILURE);
