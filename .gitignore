@@ -1,1 +1,4 @@
 tests/
+
+Controller/aquariums/*
+!Controller/aquariums/aquarium.txt

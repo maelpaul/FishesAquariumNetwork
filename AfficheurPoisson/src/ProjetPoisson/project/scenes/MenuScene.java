@@ -266,11 +266,14 @@ public class MenuScene extends Scene {
     }
 
     public void analyseMessage(Message message) {
-        if (message.getMessage().substring(0, 4).equalsIgnoreCase("list")) {
-            if (message.getId() == waitGetFishesResponseId) {
-                analyseGetFished(message);
-                waitGetFishesResponseId = -1;
-            }
+        if (message.getId() == waitGetFishesResponseId) {
+            analyseGetFished(message);
+            waitGetFishesResponseId = -1;
+        } else if (message.getId() == waitResponseId){
+            terminal.addToResultText("< " + message.getMessage());
+            waitResponseId = -1;
+        } else if (message.getId() == -1){
+            terminal.addToResultText("< " + message.getMessage());
         }
     }
 
@@ -331,7 +334,7 @@ public class MenuScene extends Scene {
                         .clearCommandText();
 
                 if (EConnectionState.Connected == currentState.get() && result.getResultAction() == ResultCommand.EResultAction.SendServer)
-                    client.sendMessage(commandText.replace("/", ""));
+                    waitResponseId = client.sendMessage(commandText.replace("/", ""));
             }
         }
 

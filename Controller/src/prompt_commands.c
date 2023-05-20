@@ -1,6 +1,7 @@
 #include "prompt_commands.h"
 
 #define SEND_SIZE 256
+#define F_PATH_SIZE 100
 
 char to_send[SEND_SIZE];
 
@@ -14,8 +15,8 @@ void prompt_load(int check_log, struct command * command, struct aquarium * aqua
         pthread_mutex_unlock(mutex_aquarium_flag);
         char * aquarium_name = command->params[0];
 
-        DIR *dir;
-        struct dirent *ent;
+        DIR *dir = NULL;
+        struct dirent *ent = NULL;
 
         const char *path = "../Controller/aquariums";
 
@@ -39,9 +40,10 @@ void prompt_load(int check_log, struct command * command, struct aquarium * aqua
                 f_name_cp[strlen(ent->d_name)] = '\0';
                 char * file_name;
                 file_name = strtok(f_name_cp, ".");
-
-                char f_path[100];
-                memset(f_path, 0, strlen(f_path));
+                
+                char f_path[F_PATH_SIZE];
+                memset(f_path, 0, F_PATH_SIZE);
+                
                 char * file_path = "../Controller/aquariums/";
                 strcat(f_path, file_path);
                 strcat(f_path, ent->d_name);
@@ -115,7 +117,8 @@ void prompt_add_view(int check_log, struct command * command, struct aquarium * 
         pthread_mutex_lock(mutex_aquarium);
         add_view(aquarium, coords, size, view_name);
         pthread_mutex_unlock(mutex_aquarium);
-        char to_send[256] = "> OK : view ";
+        
+        char to_send[SEND_SIZE] = "> OK : view ";
         strcat(to_send, view_name);
         strcat(to_send, " added.");
         printf("%s\n",to_send);

@@ -21,7 +21,7 @@ import java.util.Random;
 
 public class Fish {
     public enum EFishServerBehaviour {
-        RandomWayPoint
+        RandomWayPoint, HorizontalWayPoint, VerticalWayPoint
     }
 
     public enum EFishBehaviour {
