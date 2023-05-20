@@ -11,15 +11,15 @@ public class ClientThread extends CommunicationThread {
 
     public ClientThread() {
         this.running = true;
-
-        reset();
     }
 
     public void shouldTryConnection(){
         shouldTryConnection = true;
     }
 
-    public void ClientSetup() {
+    @Override
+    public void setup() {
+        super.setup();
         System.out.println("[Debug] Setting up the client...");
         Configuration conf_client = Resources.getInstance().getResource(Configuration.class, "client");
         client = new ClientTcp(conf_client);
@@ -37,10 +37,12 @@ public class ClientThread extends CommunicationThread {
         processedMessageNumber = 0;
 
         shouldTryConnection = false;
+        if (client.isConnected())
+            client.closeConnection();
     }
 
     public void run() {
-        this.ClientSetup();
+        this.setup();
         reset();
 
         try {
@@ -70,17 +72,14 @@ public class ClientThread extends CommunicationThread {
 
                             System.out.println("Messaged received(" + receivedMessageNumber + ") :" + result);
 
-                            if (result.replace("\n", "").equalsIgnoreCase("-1|Timeout")
-                            || result.replace("\n", "").equalsIgnoreCase("-1|Serveur fermé")){
-                                System.out.println("Disconnected from the server");
-                                client.closeConnection();
-                                reset();
-                            }
-
                             result = result.substring(result.indexOf("|") + 1);
 
-                            receivedMessages.add(new Message(receivedMessageNumber - 1, result));
-                            messageToSend.remove(receivedMessageNumber - 1);
+                            if (numberMessage == -1){
+                                receivedMessages.add(new Message(- 1, result));
+                            } else {
+                                receivedMessages.add(new Message(receivedMessageNumber - 1, result));
+                                messageToSend.remove(receivedMessageNumber - 1);
+                            }
                         } else {
                             System.err.println("Message without header : \n" + result);
                         }

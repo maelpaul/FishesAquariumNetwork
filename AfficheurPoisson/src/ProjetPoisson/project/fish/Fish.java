@@ -1,4 +1,4 @@
-package ProjetPoisson.project.display;
+package ProjetPoisson.project.fish;
 
 import ProjetPoisson.mightylib.graphics.renderer._2D.shape.RectangleRenderer;
 import ProjetPoisson.mightylib.graphics.text.ETextAlignment;
@@ -25,7 +25,7 @@ public class Fish {
     }
 
     public enum EFishBehaviour {
-        Straight, Natural, Teleport
+        Straight, Natural
     }
 
     private static final ArrayList<String> list;
@@ -53,7 +53,6 @@ public class Fish {
     private final EFishBehaviour behaviour;
 
     private final Text name;
-    private boolean started;
     public EFishBehaviour getBehaviour() { return behaviour; }
 
     public Fish(WindowInfo windowInfo, String name, String textureName, Vector2f positionPercentage, Vector2f sizePercentage){
@@ -63,9 +62,6 @@ public class Fish {
         random = new Random();
 
         this.behaviour = EFishBehaviour.values()[random.nextInt(EFishBehaviour.values().length)];
-
-        started = true;
-
 
         renderer = new RectangleRenderer("texture2D");
         renderer.switchToTextureMode(textureName);
@@ -108,11 +104,6 @@ public class Fish {
                 .setReference(EDirection.Down)
                 .setColor(new Color4f(0, 0,0 , 0));
     }
-
-    public void start(){
-        started = true;
-    }
-
     public void setShowName(boolean value) {
         name.color.setA((value) ? 1: 0);
     }
@@ -124,32 +115,29 @@ public class Fish {
     }
 
     public void update(){
-        if (!timer.isFinished() && timer.isStarted()){
+        if (!timer.isFinished()){
             goalPosition.update();
             swimMovement.update();
             timer.update();
 
-            if (goalPosition.finished() || behaviour == EFishBehaviour.Teleport) {
+            if (goalPosition.finished()) {
                 setPosition(goalPosition.goalValue());
             }
 
-            if(started) {
-                if (behaviour == EFishBehaviour.Natural) {
-                    setPosition(goalPosition.value());
-                } else {
-                    setPosition(goalPosition.value().add(new Vector2f(swimVector).mul(swimMovement.value())));
-                }
+            if (behaviour == EFishBehaviour.Natural) {
+                setPosition(goalPosition.value());
+            } else {
+                setPosition(goalPosition.value().add(new Vector2f(swimVector).mul(swimMovement.value())));
             }
         }
 
-        if(started) {
-            sizeTweening.update();
-            renderer.setScale(
-                    new Vector3f(sizeTweening.value(),
-                            renderer.scale().y /*sizeTweening.value()*/,
-                            renderer.scale().z)
-            );
-        }
+        sizeTweening.update();
+        renderer.setScale(
+                new Vector3f(sizeTweening.value(),
+                        renderer.scale().y /*sizeTweening.value()*/,
+                        renderer.scale().z)
+        );
+
     }
 
     public boolean finishedTravel(){

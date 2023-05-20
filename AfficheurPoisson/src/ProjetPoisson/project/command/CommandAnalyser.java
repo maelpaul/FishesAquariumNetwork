@@ -1,7 +1,7 @@
 package ProjetPoisson.project.command;
 
 import ProjetPoisson.project.command.commands.*;
-import ProjetPoisson.project.display.FishManager;
+import ProjetPoisson.project.fish.FishManager;
 import ProjetPoisson.project.scenes.MenuScene;
 
 import java.util.HashMap;

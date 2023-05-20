@@ -3,7 +3,7 @@ package ProjetPoisson.project.command.commands;
 import ProjetPoisson.project.command.ICommand;
 import ProjetPoisson.project.command.PromptResultCommand;
 import ProjetPoisson.project.command.ResultCommand;
-import ProjetPoisson.project.display.FishManager;
+import ProjetPoisson.project.fish.FishManager;
 import ProjetPoisson.project.scenes.MenuScene;
 
 public class StartFishCommand implements ICommand<String> {

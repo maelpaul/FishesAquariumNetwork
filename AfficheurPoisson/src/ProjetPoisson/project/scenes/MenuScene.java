@@ -22,7 +22,7 @@ import ProjetPoisson.project.client.Message;
 import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.ResultCommand;
 import ProjetPoisson.project.command.Terminal;
-import ProjetPoisson.project.display.FishManager;
+import ProjetPoisson.project.fish.FishManager;
 import ProjetPoisson.project.lib.ActionId;
 import ProjetPoisson.project.threads.ClientThread;
 import org.joml.Vector2f;
@@ -104,7 +104,7 @@ public class MenuScene extends Scene {
         setClearColor(0, 0, 0, 1f);
 
         Vector2i windowSize = mainContext.getWindow().getInfo().getSizeCopy();
-        terminal = new Terminal(new Vector2f(0,windowSize.y), new Vector2f(windowSize.x * 0.5f,windowSize.y * 0.5f));
+        terminal = new Terminal(new Vector2f(10, windowSize.y), new Vector2f(windowSize.x * 0.5f,windowSize.y * 0.5f));
         main3DCamera.setPos(new Vector3f(0, 0, 0));
 
         if (Resources.getInstance().isExistingResource(Icon.class, "Kraken"))
@@ -256,6 +256,7 @@ public class MenuScene extends Scene {
         terminal.addToResultText("Client Disconnected");
         attemptConnexionTimer.resetStart();
         shouldTryConnexion.set(false);
+        client.reset();
         setConnectionState(EConnectionState.Disconnected);
     }
 
@@ -277,14 +278,28 @@ public class MenuScene extends Scene {
 
 
     public void analyseMessage(Message message) {
-        if (message.getId() == waitGetFishesResponseId) {
+        if (message.getId() == waitGetFishesResponseId && waitGetFishesResponseId != -1) {
             analyseGetFished(message);
             waitGetFishesResponseId = -1;
-        } else if (message.getId() == waitResponseId){
+        } else if (message.getId() == waitResponseId && waitResponseId != -1 ){
             terminal.addToResultText("< " + message.getMessage());
             waitResponseId = -1;
         } else if (message.getId() == -1){
-            terminal.addToResultText("< " + message.getMessage());
+            if (message.getMessage().trim().replace("\n", "").equalsIgnoreCase("timeout")){
+                terminal.addToResultText("<< Timemout, deconnecté du serveur.");
+
+                resetConnexion();
+            } else if (message.getMessage().trim().replace("\n", "").equalsIgnoreCase("serveur fermé")){
+                terminal.addToResultText("<< Server fermé");
+
+                resetConnexion();
+            } else if (message.getMessage().trim().replace("\n", "").equalsIgnoreCase("bye")){
+                terminal.addToResultText("<< Bye");
+
+                resetConnexion();
+            } else {
+                terminal.addToResultText("< " + message.getMessage());
+            }
         }
 
         if (sendCommands.containsKey(message.getId())){
@@ -312,7 +327,7 @@ public class MenuScene extends Scene {
             return;
 
         for (ResultCommand<String>.Action action : result.getActions()){
-            if (action.getAction().equals("clear"))
+            if (action.getAction().equals("clearPrompt"))
                 terminal.clearResultText();
             else if (action.getAction().equals("quit")){
                 sceneManagerInterface.exit(0);

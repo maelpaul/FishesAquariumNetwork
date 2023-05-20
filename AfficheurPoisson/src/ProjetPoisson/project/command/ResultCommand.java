@@ -1,8 +1,6 @@
 package ProjetPoisson.project.command;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ResultCommand <T> {
     public final class Action{

@@ -21,14 +21,21 @@ public  abstract class CommunicationThread extends Thread {
     CommunicationThread(){
         receivedMessages = new ArrayList<>();
         messageToSend = new HashMap<>();
+    }
 
-        reset();
+    public void setup(){
+        messageIdCounter = 0;
+        processedMessageNumber = 0;
+        receivedMessageNumber = 0;
     }
 
     public void reset(){
         messageIdCounter = 0;
         processedMessageNumber = 0;
         receivedMessageNumber = 0;
+
+        receivedMessages.clear();
+        messageToSend.clear();
     }
 
     public void run() {}

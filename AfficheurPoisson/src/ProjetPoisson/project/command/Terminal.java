@@ -169,7 +169,9 @@ public class Terminal {
 
         cursorPosition = index;
         Vector4f charPosition = commandText.getPositionOfChar(cursorPosition);
-        cursor.setPosition(new Vector2f((int)(charPosition.y) - commandText.getFontSize() * 0.05f, (int)(charPosition.z)));
+        cursor.setPosition(new Vector2f(
+                (int)(charPosition.y) - commandText.getFontSize() * 0.05f,
+                (int)(charPosition.z) + commandText.getFontSize() * 0.05f));
 
         cursorTimer.start(CURSOR_FIRST_PERIOD_TIME);
         cursorDisplayed = true;

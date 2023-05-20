@@ -1,4 +1,4 @@
-package ProjetPoisson.project.display;
+package ProjetPoisson.project.fish;
 
 import ProjetPoisson.mightylib.main.WindowInfo;
 import ProjetPoisson.mightylib.resources.Resources;
