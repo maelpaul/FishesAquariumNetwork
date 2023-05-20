@@ -170,7 +170,7 @@ void *thread_client(void *arg) {
         int val = -1;
 
         if (check == 0 && has_view[client_number] == 1) {
-            check = add_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+            check = add_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
         }
         if (check == 0 && has_view[client_number] == 1) {
             check = del_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
@@ -179,10 +179,10 @@ void *thread_client(void *arg) {
             check = start_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0 && has_view[client_number] == 1) {
-            check = get_fish_ls_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_ls_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
         }
         if (check == 0 && has_view[client_number] == 1) {
-            val = get_fish_continuously_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, BUFFER_SIZE);
+            val = get_fish_continuously_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, BUFFER_SIZE, client_view);
             if (val == 1) {
                 printf("Client %d déconnecté.\n", client_number);
                 write_in_log(my_log, "recv", n, client_number, buffer);
@@ -210,10 +210,10 @@ void *thread_client(void *arg) {
             }
         }
         if (check == 0 && val == 0 && has_view[client_number] == 1) {
-            check = get_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
         }
         if (check == 0 && has_view[client_number] == 1) {
-            check = get_status_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+            check = get_status_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
         }
         if (check == 0 && has_view[client_number] == 1) {
             check = ping_server(my_log, client_number, header, message, client_id);
