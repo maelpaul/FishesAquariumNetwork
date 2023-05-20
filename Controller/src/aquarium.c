@@ -3,8 +3,6 @@
 #include <string.h>
 #include <sys/time.h>
 #include "aquarium.h"
-#include "fish.h"
-#include "view.h"
 
 void aquarium_init(struct aquarium * aquarium) {
     aquarium->name = NULL;
