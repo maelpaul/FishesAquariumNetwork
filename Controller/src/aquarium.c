@@ -200,6 +200,7 @@ int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest) {
         if (strcmp(aquarium->fishes[i]->name, fish_name) == 0) {
             if (aquarium->fishes[i]->started == 0) {
                 val = 1;
+                (*(aquarium->fishes[i]->path))(aquarium->fishes[i], aquarium->size[0], aquarium->size[1]);
                 fish_start(aquarium->fishes[i], time_to_dest);
             }
             else {

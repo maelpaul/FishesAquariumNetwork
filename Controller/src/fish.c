@@ -19,14 +19,16 @@ void fish_init(struct fish * fish) {
 }
 
 void fish_create(struct fish * fish, int * coords, int * size, char * name, void (*path)(struct fish *, int, int), int aquarium_width, int aquarium_height) {
+    (void) aquarium_width;
+    (void) aquarium_height;
     fish->name=malloc(strlen(name)+1);
     strcpy(fish->name,name);
     for (int i = 0; i < 2; ++i) {
         fish->coords[i] = coords[i];
         fish->size[i] = size[i];
+        fish->dest[i] = coords[i];
     }
     fish->path = path;
-    (*(fish->path))(fish, aquarium_width, aquarium_height);
     fish->started = 0;
     fish->started_time = 0;
     fish->time_to_dest = 0; 
