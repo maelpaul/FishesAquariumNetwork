@@ -78,7 +78,7 @@ int main() {
 
     pthread_create(&wait_exit, NULL, wait_server_exit, (void *) &client_fd);
 
-    strcpy(buffer, "1|getFishesContinuously\n");
+    strcpy(buffer, "gfc|getFishesContinuously\n");
     n = write(client_fd, buffer, strlen(buffer));
     if (n < 0) {
         perror("Erreur lors de l'écriture sur la socket");

@@ -100,7 +100,7 @@ int get_fish_continuously_server(int check_ls, int client_number, char * header,
     verif[21] = '\0';
     int n;
 
-    if (!strcmp(verif, "getFishesContinuously")) {
+    if (!strcmp(verif, "getFishesContinuously") && !strcmp(header, "gfc")) {
         pthread_create(&wait_log_out, NULL, wait_client_log_out, (void *) &th);
             
         // Réception de la réponse du client
@@ -114,6 +114,9 @@ int get_fish_continuously_server(int check_ls, int client_number, char * header,
             pthread_join(wait_log_out, NULL);
             return 1;
         }
+    }
+    else if (!strcmp(verif, "getFishesContinuously")) {
+        return 2;
     }
     return 0;
 }

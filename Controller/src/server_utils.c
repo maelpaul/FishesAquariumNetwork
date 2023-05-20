@@ -264,6 +264,9 @@ void write_in_log(int check, const char * tag, int n, int number, const char * b
         else if (strcmp(tag, "prompt_send") == 0 && buf != NULL) {
             fprintf(fp, "%s\n", buf);
         }
+        else if (strcmp(tag, "deco") == 0) {
+            fprintf(fp, "Client %d déconnecté.\n", number);
+        }
 
         fclose(fp);
     }

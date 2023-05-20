@@ -166,6 +166,7 @@ void *thread_client(void *arg) {
         
         header = strtok(buffer, "|");
         message = strtok(NULL, "\0");
+        int val = -1;
 
         if (check == 0) {
             check = add_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
@@ -180,7 +181,6 @@ void *thread_client(void *arg) {
             check = get_fish_ls_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            int val = -1;
             val = get_fish_continuously_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, BUFFER_SIZE);
             if (val == 1) {
                 printf("Client %d déconnecté.\n", client_number);
@@ -208,7 +208,7 @@ void *thread_client(void *arg) {
                 pthread_exit(NULL);
             }
         }
-        if (check == 0) {
+        if (check == 0 && val == 0) {
             check = get_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
@@ -222,9 +222,19 @@ void *thread_client(void *arg) {
         }
 
         // check des commandes inexistantes
-        if (check == 0 && strcmp(message, "log out\n") != 0) {
+        if (check == 0 && val == 0 && strcmp(message, "log out\n") != 0) {
             strcpy(buffer, header);
             strcat(buffer, "|NOK : Inexisting command");
+            if (send(client_id, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }
+            write_in_log(my_log, "send", n, client_number, buffer); 
+        }
+
+        if (val == 2) {
+            strcpy(buffer, header);
+            strcat(buffer, "|NOK : Forbidden command");
             if (send(client_id, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
@@ -239,6 +249,8 @@ void *thread_client(void *arg) {
         exit(EXIT_FAILURE);
     }
     write_in_log(my_log, "send", n, client_number, buffer);
+    printf("Client %d déconnecté.\n", client_number);
+    write_in_log(my_log, "deco", n, client_number, buffer);
 
     // Fermer la connexion avec le client
     close(client_id);
