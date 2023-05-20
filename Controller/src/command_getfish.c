@@ -1,6 +1,6 @@
 #include "command_getfish.h"
 
-int get_fish_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
+int get_fish_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id, struct view * client_view){
     char ask_periodic_verif[10];
     strncpy (ask_periodic_verif , buffer, 10);
     ask_periodic_verif[9] = '\0';   /* null character manually added */
@@ -13,7 +13,13 @@ int get_fish_server(int check_ls, int client_number, char * header, char * buffe
         strcat(fish_list, "|list ");
         for (int i = 0; i < aquarium->fishes_len; i++) {
             char fish_info[128];
-            sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1], aquarium->fishes[i]->time_to_dest);
+            int fish_dest[2];
+            fish_dest[0] = ((aquarium->fishes[i]->dest[0] - client_view->coords[0]) * 100) / client_view->size[0];
+            fish_dest[1] = ((aquarium->fishes[i]->dest[1] - client_view->coords[1]) * 100) / client_view->size[1];
+            int fish_size[2];
+            fish_size[0] = (aquarium->fishes[i]->size[0] * 100) / client_view->size[0];
+            fish_size[1] = (aquarium->fishes[i]->size[1] * 100) / client_view->size[1];
+            sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, fish_dest[0], fish_dest[1], fish_size[0], fish_size[1], aquarium->fishes[i]->time_to_dest);
             strcat(fish_list, fish_info);
         }
         strcat(fish_list, "\n");
@@ -29,7 +35,7 @@ int get_fish_server(int check_ls, int client_number, char * header, char * buffe
     return 0;   
 }
 
-int get_fish_ls_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
+int get_fish_ls_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id, struct view * client_view){
     char ls[3];
     strncpy (ls , buffer, 2);
     ls[2] = '\0';
@@ -44,7 +50,13 @@ int get_fish_ls_server(int check_ls, int client_number, char * header, char * bu
             strcat(fish_list, "|list ");
             for (int i = 0; i < aquarium->fishes_len; i++) {
                 char fish_info[128];
-                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1], aquarium->fishes[i]->time_to_dest);
+                int fish_dest[2];
+                fish_dest[0] = ((aquarium->fishes[i]->dest[0] - client_view->coords[0]) * 100) / client_view->size[0];
+                fish_dest[1] = ((aquarium->fishes[i]->dest[1] - client_view->coords[1]) * 100) / client_view->size[1];
+                int fish_size[2];
+                fish_size[0] = (aquarium->fishes[i]->size[0] * 100) / client_view->size[0];
+                fish_size[1] = (aquarium->fishes[i]->size[1] * 100) / client_view->size[1];
+                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, fish_dest[0], fish_dest[1], fish_size[0], fish_size[1], aquarium->fishes[i]->time_to_dest);
                 strcat(fish_list, fish_info);
             }
             strcat(fish_list, "\n");
@@ -67,6 +79,7 @@ void * wait_client_log_out(void * arg){
         // Lister les poissons en continu
         struct for_thread * th = (struct for_thread *) arg;
         struct aquarium * aquarium = th->aquarium;
+        struct view * client_view = th->client_view;
         while(1) {
             pthread_mutex_lock(th->mutex);
             controller_update_fishes(aquarium, REFRESH_TIME);
@@ -75,7 +88,13 @@ void * wait_client_log_out(void * arg){
             strcat(fish_list, "|list ");
             for (int i = 0; i < aquarium->fishes_len; i++) {
                 char fish_info[128];
-                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1], aquarium->fishes[i]->time_to_dest);
+                int fish_dest[2];
+                fish_dest[0] = ((aquarium->fishes[i]->dest[0] - client_view->coords[0]) * 100) / client_view->size[0];
+                fish_dest[1] = ((aquarium->fishes[i]->dest[1] - client_view->coords[1]) * 100) / client_view->size[1];
+                int fish_size[2];
+                fish_size[0] = (aquarium->fishes[i]->size[0] * 100) / client_view->size[0];
+                fish_size[1] = (aquarium->fishes[i]->size[1] * 100) / client_view->size[1];
+                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, fish_dest[0], fish_dest[1], fish_size[0], fish_size[1], aquarium->fishes[i]->time_to_dest);
                 strcat(fish_list, fish_info);
             }
             strcat(fish_list, "\n");
@@ -91,9 +110,9 @@ void * wait_client_log_out(void * arg){
         }
 }
 
-int get_fish_continuously_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id, int buffer_size){
+int get_fish_continuously_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id, int buffer_size, struct view * client_view){
     pthread_t wait_log_out;
-    struct for_thread th = {mutex, aquarium, header, client_id, check_ls, client_number};
+    struct for_thread th = {mutex, aquarium, header, client_id, check_ls, client_number, client_view};
 
     char verif[22];
     strncpy (verif , buffer, 21);
@@ -121,7 +140,7 @@ int get_fish_continuously_server(int check_ls, int client_number, char * header,
     return 0;
 }
 
-int get_status_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
+int get_status_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id, struct view * client_view){
     char status_verif[7];
     strncpy (status_verif, buffer, 6);
     status_verif[6] = '\0';   /* null character manually added */
@@ -150,7 +169,13 @@ int get_status_server(int check_ls, int client_number, char * header, char * buf
 
         for (int i = 0; i < aquarium->fishes_len; i++) {
             char fish_info[128];
-            sprintf(fish_info, "Fish %s at %dx%d, %dx%d ", aquarium->fishes[i]->name, aquarium->fishes[i]->coords[0], aquarium->fishes[i]->coords[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1]);
+            int fish_coords[2];
+            fish_coords[0] = ((aquarium->fishes[i]->coords[0] - client_view->coords[0]) * 100) / client_view->size[0];
+            fish_coords[1] = ((aquarium->fishes[i]->coords[1] - client_view->coords[1]) * 100) / client_view->size[1];
+            int fish_size[2];
+            fish_size[0] = (aquarium->fishes[i]->size[0] * 100) / client_view->size[0];
+            fish_size[1] = (aquarium->fishes[i]->size[1] * 100) / client_view->size[1];
+            sprintf(fish_info, "Fish %s at %dx%d, %dx%d ", aquarium->fishes[i]->name, fish_coords[0], fish_coords[1], fish_size[0], fish_size[1]);
             if (aquarium->fishes[i]->started == 1) {
                 strcat(fish_info, "started");
             }

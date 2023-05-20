@@ -1,6 +1,7 @@
 #ifndef _AQUARIUM_H_
 #define _AQUARIUM_H_
 
+#include <assert.h>
 #include <time.h>
 
 #define DEFAULT_NUMBER_FISH 10

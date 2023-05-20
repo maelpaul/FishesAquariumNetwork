@@ -160,20 +160,35 @@ int get_aquarium_height(struct aquarium * aquarium) {
 }
 
 void RandomWayPoint(struct fish * fish, int width, int height) {
-    fish->dest[0] = rand() % width;
-    fish->dest[1] = rand() % height;    
+    int aquarium_size[2] = {width, height};
+    fish->dest[0] = rand() % width - fish->size[0];
+    fish->dest[1] = rand() % height - fish->size[1];
+    for (int i = 0; i < 2; ++i) {
+        assert(fish->dest[i] > -1);
+        assert(fish->dest[i] < aquarium_size[i]);
+    }    
 }
 
 void HorizontalWayPoint(struct fish * fish, int width, int height) {
+    int aquarium_size[2] = {width, height};
     (void) height;
-    fish->dest[0] = rand() % width;
+    fish->dest[0] = rand() % width - fish->size[0];
     fish->dest[1] = fish->coords[1];
+    for (int i = 0; i < 2; ++i) {
+        assert(fish->dest[i] > -1);
+        assert(fish->dest[i] < aquarium_size[i]);
+    }   
 }
 
 void VerticalWayPoint(struct fish * fish, int width, int height) {
+    int aquarium_size[2] = {width, height};
     (void) width;
     fish->dest[0] = fish->coords[0];
-    fish->dest[1] = rand() % height; 
+    fish->dest[1] = rand() % height - fish->size[1]; 
+    for (int i = 0; i < 2; ++i) {
+        assert(fish->dest[i] > -1);
+        assert(fish->dest[i] < aquarium_size[i]);
+    }   
 }
 
 int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest) {
