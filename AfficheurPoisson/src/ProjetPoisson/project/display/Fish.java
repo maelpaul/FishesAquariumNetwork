@@ -64,7 +64,7 @@ public class Fish {
 
         this.behaviour = EFishBehaviour.values()[random.nextInt(EFishBehaviour.values().length)];
 
-        started = false;
+        started = true;
 
 
         renderer = new RectangleRenderer("texture2D");

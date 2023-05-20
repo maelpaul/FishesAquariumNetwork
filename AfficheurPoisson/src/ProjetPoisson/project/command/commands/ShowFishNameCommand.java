@@ -42,7 +42,7 @@ public class ShowFishNameCommand implements ICommand {
             }
         }
 
-        return new ResultCommand("> NOK : Mauvais argument(s), faites \"showFishName help\" pour plus d'aide");
+        return new ResultCommand("> NOK : Mauvais argument(s), faites \"name help\" pour plus d'aide");
     }
 
     public static boolean isInteger(String s, int radix) {
@@ -56,7 +56,7 @@ public class ShowFishNameCommand implements ICommand {
 
     @Override
     public ResultCommand returnHelp() {
-        return new ResultCommand("> help(showFishCommand) : \n" +
+        return new ResultCommand("> help(name) : \n" +
                 "    showFishCommand true/false or t/f or 0/1");
     }
 }

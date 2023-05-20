@@ -26,7 +26,7 @@ public class CommandAnalyser {
         relations.put("delFish", new DelFishCommand(state, fishManager));
         relations.put("startFish", new StartFishCommand(state, fishManager));
         relations.put("status", new StatusCommand(state));
-        relations.put("showFishName", new ShowFishNameCommand(state, fishManager));
+        relations.put("name", new ShowFishNameCommand(state, fishManager));
         relations.put("log", new LogOutCommand());
         relations.put("tryConnection", new TryConnectionCommand(tryConnection));
 

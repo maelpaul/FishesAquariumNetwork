@@ -23,6 +23,7 @@ import ProjetPoisson.project.command.CommandAnalyser;
 import ProjetPoisson.project.command.ResultCommand;
 import ProjetPoisson.project.command.Terminal;
 import ProjetPoisson.project.display.FishManager;
+import ProjetPoisson.project.lib.ActionId;
 import ProjetPoisson.project.threads.ClientThread;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
@@ -63,10 +64,10 @@ public class MenuScene extends Scene {
 
     public final static float WAIT_FOR_EXIT = 5;
 
-    public final static float UPDATE_FISH_REQUEST_TIME = 0.2f;
+    public final static float UPDATE_FISH_REQUEST_TIME = 1f;
 
     /// Display
-    private Text text;
+    private Text titreProject;
     private RectangleRenderer renderer;
     private Terminal terminal;
     private Texture displacementMap;
@@ -74,6 +75,7 @@ public class MenuScene extends Scene {
     private RectangleRenderer connectionStatusIcon;
     private Text connectionStatusMessage;
 
+    private boolean showText;
 
     /// Systems
     private CommandAnalyser analyser;
@@ -117,8 +119,8 @@ public class MenuScene extends Scene {
         );
         connectionStatusIcon.setPosition(new Vector2f(windowSize.x * 0.02f, windowSize.y * 0.025f));
 
-        text = new Text();
-        text.setText("Aquarium poisson")
+        titreProject = new Text();
+        titreProject.setText("Aquarium poisson")
                 .setFont("bahnschrift")
                 .setAlignment(ETextAlignment.Center)
                 .setReference(EDirection.None)
@@ -127,7 +129,7 @@ public class MenuScene extends Scene {
                 .setFontSize(40);
 
         connectionStatusMessage = new Text();
-        text.copyTo(connectionStatusMessage);
+        titreProject.copyTo(connectionStatusMessage);
 
         connectionStatusMessage.setText("disconnected")
                 .setFontSize(30)
@@ -143,6 +145,8 @@ public class MenuScene extends Scene {
         displacementMapTweening.setTweeningValues(ETweeningType.Linear, ETweeningBehaviour.InOut)
                 .setTweeningOption(ETweeningOption.LoopReversed)
                 .initTwoValue(15f, 0f, 15f);
+
+        showText = true;
 
         /// Systems
 
@@ -316,27 +320,38 @@ public class MenuScene extends Scene {
             }
         }
 
-        terminal.update(mainContext.getInputManager(), mainContext.getSystemInfo());
+        boolean changed = false;
+        if (mainContext.getInputManager().inputPressed(ActionId.SHOW_HIDE_TEXTS) && showText) {
+            showText = false;
+            changed = true;
+        }
 
-        if (terminal.shouldProcessCommand()){
-            String commandText = terminal.getCommandText();
-            ResultCommand result = analyser.analyseCommand(commandText);
+        if (showText){
+            terminal.update(mainContext.getInputManager(), mainContext.getSystemInfo());
 
-            if (result != null) {
-                if (result.getResultAction() == ResultCommand.EResultAction.Clear)
-                     terminal.clearResultText();
-                else if (result.getResultAction() == ResultCommand.EResultAction.Quit) {
-                    waitResponseId = client.sendMessage("log out");
-                } else
-                    terminal.addToResultText(result.getPromptResult());
+            if (terminal.shouldProcessCommand()){
+                String commandText = terminal.getCommandText();
+                ResultCommand result = analyser.analyseCommand(commandText);
 
-                terminal.saveCommand()
-                        .clearCommandText();
+                if (result != null) {
+                    if (result.getResultAction() == ResultCommand.EResultAction.Clear)
+                        terminal.clearResultText();
+                    else if (result.getResultAction() == ResultCommand.EResultAction.Quit) {
+                        waitResponseId = client.sendMessage("log out");
+                    } else
+                        terminal.addToResultText(result.getPromptResult());
 
-                if (EConnectionState.Connected == currentState.get() && result.getResultAction() == ResultCommand.EResultAction.SendServer)
-                    waitResponseId = client.sendMessage(commandText.replace("/", ""));
+                    terminal.saveCommand()
+                            .clearCommandText();
+
+                    if (EConnectionState.Connected == currentState.get() && result.getResultAction() == ResultCommand.EResultAction.SendServer)
+                        waitResponseId = client.sendMessage(commandText.replace("/", ""));
+                }
             }
         }
+
+        if (mainContext.getInputManager().inputPressed(ActionId.SHOW_HIDE_TEXTS) && !showText && !changed)
+            showText = true;
 
         displacementMapTweening.update();
 
@@ -353,12 +368,14 @@ public class MenuScene extends Scene {
 
         fishManager.display();
 
-        text.display();
+        if (showText){
+            titreProject.display();
 
-        terminal.display();
+            terminal.display();
 
-        connectionStatusIcon.display();
-        connectionStatusMessage.display();
+            connectionStatusIcon.display();
+            connectionStatusMessage.display();
+        }
 
         super.setAndDisplayRealScene();
     }
@@ -369,7 +386,7 @@ public class MenuScene extends Scene {
 
         renderer.unload();
 
-        text.unload();
+        titreProject.unload();
         terminal.unload();
 
         client.interrupt();
