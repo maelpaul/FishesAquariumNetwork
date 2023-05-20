@@ -48,15 +48,16 @@ void fish_print(struct fish * fish) {
     printf("fish dest    : (%d,%d)\n", fish->dest[0],fish->dest[1]);
     printf("fish started : %s\n", fish->started == 1 ? "True" : "False");
     printf("started time : %ld\n", fish->started_time);
-    printf("time to dest : %d\n", fish->time_to_dest);
+    printf("time to dest : %d\n", (int) (fish->time_to_dest / 1000000));
     printf("==============================\n");
 }
 
 void fish_start(struct fish * fish, int time_to_dest) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    time_t command_time = tv.tv_sec;
+    unsigned long command_time = tv.tv_sec * 1000000 + tv.tv_usec;
+    unsigned long time_to_dest_us = time_to_dest * 1000000;
     fish->started = 1;
     fish->started_time = command_time;
-    fish->time_to_dest = time_to_dest;
+    fish->time_to_dest = time_to_dest_us;
 }

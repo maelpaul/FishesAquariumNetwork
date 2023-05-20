@@ -211,16 +211,17 @@ int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest) {
 void update_fishes(struct aquarium * aquarium, int refresh_time) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    time_t command_time = tv.tv_sec;
+    unsigned long refresh_time_us = refresh_time * 1000000;
+    unsigned long command_time = tv.tv_sec * 1000000 + tv.tv_usec;
     for (int i = 0; i < aquarium->fishes_len; i++) {
         struct fish * fish = aquarium->fishes[i];
         if (fish->started != 0) {
-            int new_time_to_dest = fish->time_to_dest - (command_time - fish->started_time);
+            long int new_time_to_dest = fish->time_to_dest - (command_time - fish->started_time);
             if (new_time_to_dest <= 0) {
                 fish->coords[0] = fish->dest[0];
                 fish->coords[1] = fish->dest[1];
                 fish->path(fish, get_aquarium_width(aquarium), get_aquarium_height(aquarium));
-                fish->time_to_dest = refresh_time;
+                fish->time_to_dest = refresh_time_us;
                 fish->started_time = command_time;
             }
             else {

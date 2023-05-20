@@ -19,7 +19,7 @@ int get_fish_server(int check_ls, int client_number, char * header, char * buffe
             int fish_size[2];
             fish_size[0] = (aquarium->fishes[i]->size[0] * 100) / client_view->size[0];
             fish_size[1] = (aquarium->fishes[i]->size[1] * 100) / client_view->size[1];
-            sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, fish_dest[0], fish_dest[1], fish_size[0], fish_size[1], aquarium->fishes[i]->time_to_dest);
+            sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, fish_dest[0], fish_dest[1], fish_size[0], fish_size[1], (int) (aquarium->fishes[i]->time_to_dest / 1000000));
             strcat(fish_list, fish_info);
         }
         strcat(fish_list, "\n");
@@ -56,7 +56,7 @@ int get_fish_ls_server(int check_ls, int client_number, char * header, char * bu
                 int fish_size[2];
                 fish_size[0] = (aquarium->fishes[i]->size[0] * 100) / client_view->size[0];
                 fish_size[1] = (aquarium->fishes[i]->size[1] * 100) / client_view->size[1];
-                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, fish_dest[0], fish_dest[1], fish_size[0], fish_size[1], aquarium->fishes[i]->time_to_dest);
+                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, fish_dest[0], fish_dest[1], fish_size[0], fish_size[1], (int) (aquarium->fishes[i]->time_to_dest / 1000000));
                 strcat(fish_list, fish_info);
             }
             strcat(fish_list, "\n");
@@ -94,7 +94,7 @@ void * wait_client_log_out(void * arg){
                 int fish_size[2];
                 fish_size[0] = (aquarium->fishes[i]->size[0] * 100) / client_view->size[0];
                 fish_size[1] = (aquarium->fishes[i]->size[1] * 100) / client_view->size[1];
-                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, fish_dest[0], fish_dest[1], fish_size[0], fish_size[1], aquarium->fishes[i]->time_to_dest);
+                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, fish_dest[0], fish_dest[1], fish_size[0], fish_size[1], (int) (aquarium->fishes[i]->time_to_dest / 1000000));
                 strcat(fish_list, fish_info);
             }
             strcat(fish_list, "\n");
