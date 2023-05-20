@@ -1,6 +1,7 @@
 #ifndef _PARSER_H_
 #define _PARSER_H_
 
+#include "server_utils.h"
 
 struct command {
     char* command_name;
@@ -23,7 +24,7 @@ void init_command(struct command * command);
 * @param argc : the number of arguments given (is reduced by 1 because it includes the ./xxx name)
 * @returns : 1 if the input is correct, 0 otherwise
 */
-int parse_command(struct command * command, char** argv, int argc);
+int parse_command(int check, struct command * command, char** argv, int argc);
 
 
 /* This function prints a 'command struct'

@@ -3,6 +3,6 @@
 
 #include "prompt_commands.h"
 
-void prompt(int * aquarium_flag, struct aquarium * aquarium, pthread_mutex_t * mutex_aquarium, pthread_mutex_t * mutex_aquarium_flag);
+void prompt(int check, int * aquarium_flag, struct aquarium * aquarium, pthread_mutex_t * mutex_aquarium, pthread_mutex_t * mutex_aquarium_flag);
 
 #endif

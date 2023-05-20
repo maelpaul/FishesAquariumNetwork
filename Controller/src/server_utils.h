@@ -47,4 +47,6 @@ void controller_aquarium_print(struct aquarium * aquarium, char * to_print);
 
 int verif(char * buf, char * s, int client_id, pthread_mutex_t * mutex_client_count);
 
+void write_in_log(int check, const char * tag, int n, int number, const char * buf);
+
 #endif

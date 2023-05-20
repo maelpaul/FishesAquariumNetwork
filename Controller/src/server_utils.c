@@ -224,3 +224,47 @@ int verif(char * buf, char * s, int client_count, pthread_mutex_t * mutex_client
     }
     return 1;
 }
+
+void write_in_log(int check, const char * tag, int n, int number, const char * buf) {
+    if (check == 1) {
+        FILE *fp;
+        char filename[256];
+        strcpy(filename, "../Controller/log.txt");
+        fp = fopen(filename, "a");
+
+        if (fp == NULL) {
+            printf("Failed to add in file\n");
+            return;
+        }
+        
+        if (strcmp(tag, "recv") == 0 && n == 0) {
+            fprintf(fp, "Client %d déconnecté.\n", number);
+        }
+        else if (strcmp(tag, "recv") == 0 && n > 0 && buf != NULL) {
+            fprintf(fp, "Message du client %d : %s\n", number, buf);
+        }
+        else if (strcmp(tag, "send") == 0 && buf != NULL) {
+            fprintf(fp, "Message du serveur au client %d : %s\n", number, buf);
+        }
+        else if (strcmp(tag, "timeout") == 0 && buf != NULL) {
+            fprintf(fp, "Client %d inactif pendant 30 secondes. Fermeture de la connexion.\nMessage du serveur au client %d : %s\n", number, number, buf);
+        }
+        else if (strcmp(tag, "occ") == 0 && buf != NULL) {
+            fprintf(fp, "Le serveur est occupé. Impossible de gérer un nouveau client.\nMessage du serveur au client %d : %s\n", number, buf);
+        }
+        else if (strcmp(tag, "con") == 0 && buf != NULL) {
+            fprintf(fp, "Client connecté. Client ID: %d\nMessage du serveur au client %d : %s\n", number, number, buf);
+        }
+        else if (strcmp(tag, "print") == 0 && buf != NULL) {
+            fprintf(fp, "%s", buf);
+        }
+        else if (strcmp(tag, "unk") == 0 && buf != NULL) {
+            fprintf(fp, "> Unknown command : should be \"load\", \"save\", \"show\", \"add view\", \"del view\" or \"exit\" (received %s)\n", buf);
+        }
+        else if (strcmp(tag, "prompt_send") == 0 && buf != NULL) {
+            fprintf(fp, "%s\n", buf);
+        }
+
+        fclose(fp);
+    }
+}

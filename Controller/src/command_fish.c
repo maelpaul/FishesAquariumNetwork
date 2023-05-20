@@ -2,7 +2,7 @@
 
 #define BUFFER_SIZE 256
 
-int add_fish_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
+int add_fish_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
     char add_verif[8];
     strncpy (add_verif, buffer, 7);
     add_verif[7] = '\0';   /* null character manually added */
@@ -74,6 +74,7 @@ int add_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         else if (val == 0 && check_path == 1) {
             strcpy(buffer, header);
@@ -82,6 +83,7 @@ int add_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         else if (val == 1 && check_path == 1) {
             strcpy(buffer, header);
@@ -90,6 +92,7 @@ int add_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             } 
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         else {
             strcpy(buffer, header);
@@ -98,6 +101,7 @@ int add_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }                 
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         return 1; // Success
     }
@@ -106,7 +110,7 @@ int add_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
     }
 }
 
-int del_fish_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
+int del_fish_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
     // Suppression d'un poisson
     char del_verif[8];
     strncpy (del_verif, buffer, 7);
@@ -134,6 +138,7 @@ int del_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         else if (val == 1) {
             strcpy(buffer, header);
@@ -142,6 +147,7 @@ int del_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             } 
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         else {
             strcpy(buffer, header);
@@ -149,7 +155,8 @@ int del_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
-            }                 
+            }     
+            write_in_log(check_ls, "send", 0, client_number, buffer);            
         }
         return 1;
     }
@@ -158,7 +165,7 @@ int del_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
     }
 }
 
-int start_fish_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
+int start_fish_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
     // Démarrage d'un poisson
     char start_verif[10];
     strncpy (start_verif, buffer, 9);
@@ -187,6 +194,7 @@ int start_fish_server(char * header, char * buffer, struct aquarium * aquarium, 
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         else if (val == 1) {
             strcpy(buffer, header);
@@ -195,6 +203,7 @@ int start_fish_server(char * header, char * buffer, struct aquarium * aquarium, 
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             } 
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         else if (val == 2) {
             strcpy(buffer, header);
@@ -202,7 +211,8 @@ int start_fish_server(char * header, char * buffer, struct aquarium * aquarium, 
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
-            }                 
+            }     
+            write_in_log(check_ls, "send", 0, client_number, buffer);            
         }
         else {
             strcpy(buffer, header);
@@ -210,7 +220,8 @@ int start_fish_server(char * header, char * buffer, struct aquarium * aquarium, 
             if (send(sock, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
-            }                 
+            }      
+            write_in_log(check_ls, "send", 0, client_number, buffer);           
         }
         return 1;
     }

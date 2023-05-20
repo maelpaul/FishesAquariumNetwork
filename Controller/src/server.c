@@ -33,6 +33,7 @@ pthread_mutex_t mutex_client_count = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_aquarium = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_is_aquarium_loaded = PTHREAD_MUTEX_INITIALIZER;
 int print_client_answer = 1; 
+int my_log = 0;
 
 struct wait_client_context {
     struct aquarium * aquarium;
@@ -61,6 +62,7 @@ void *thread_client(void *arg) {
         perror("Erreur lors de l'envoi du message au client");
         exit(EXIT_FAILURE);
     }
+    write_in_log(my_log, "send", 0, client_number, buffer);
 
     pthread_mutex_lock(&mutex_is_aquarium_loaded);
     while(is_aquarium_loaded == 0) {
@@ -97,6 +99,7 @@ void *thread_client(void *arg) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(my_log, "timeout", n, client_number, buffer);
             // Fermer la connexion avec le client
             close(client_id);
 
@@ -127,6 +130,7 @@ void *thread_client(void *arg) {
         }
         else if (n == 0) {
             printf("Client %d déconnecté.\n", client_number);
+            write_in_log(my_log, "recv", n, client_number, buffer);
             // Fermer la connexion avec le client
             close(client_id);
 
@@ -151,6 +155,7 @@ void *thread_client(void *arg) {
         if (print_client_answer == 1) {
             printf("Message du client %d : %s\n", client_number, buffer);
         }
+        write_in_log(my_log, "recv", n, client_number, buffer);
 
         int test = 0;
         for(long unsigned int i=0;i<5;i++){
@@ -163,28 +168,28 @@ void *thread_client(void *arg) {
         message = strtok(NULL, "\0");
 
         if (check == 0) {
-            check = add_fish_server(header, message, aquarium, &mutex_aquarium, client_id);
+            check = add_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = del_fish_server(header, message, aquarium, &mutex_aquarium, client_id);
+            check = del_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = start_fish_server(header, message, aquarium, &mutex_aquarium, client_id);
+            check = start_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = get_fish_continuously_server(header, message, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_continuously_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = get_fish_server(header, message, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = get_status_server(header, message, aquarium, &mutex_aquarium, client_id);
+            check = get_status_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = ping_server(header, message, client_id);
+            check = ping_server(my_log, client_number, header, message, client_id);
         }
         if (check == 0) {
-            check = init_client(header, message, aquarium, &mutex_aquarium, client_id, client_view);
+            check = init_client(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
         }
 
         // check des commandes inexistantes
@@ -194,7 +199,8 @@ void *thread_client(void *arg) {
             if (send(client_id, buffer, strlen(buffer), 0) < 0) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
-            } 
+            }
+            write_in_log(my_log, "send", n, client_number, buffer); 
         }
     } while(strcmp(message, "log out\n") != 0);
 
@@ -203,6 +209,7 @@ void *thread_client(void *arg) {
         perror("Erreur lors de l'envoi du message au client");
         exit(EXIT_FAILURE);
     }
+    write_in_log(my_log, "send", n, client_number, buffer);
 
     // Fermer la connexion avec le client
     close(client_id);
@@ -276,6 +283,7 @@ void * wait_for_client(void * arg){
             pthread_mutex_unlock(&mutex_aquarium);
             pthread_create(&threads[first_available], NULL, thread_client, (void *)client_args);
             printf("Client connecté. Client ID: %d\n", number);
+            write_in_log(my_log, "con", 0, number, NULL);
             tab_args[first_available] = client_args;
             client_count++;
         } 
@@ -288,6 +296,7 @@ void * wait_for_client(void * arg){
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(my_log, "occ", 0, 0, buffer);
 
             close(newsockfd);
         }
@@ -304,6 +313,22 @@ int main(int argc, char *argv[])
         }
         if (strcmp(argv[i], "-h") == 0) {
             printf("*** May the Force be with you ***\n");
+            write_in_log(my_log, "print", 0, 0, "*** May the Force be with you ***\n");
+        }
+        if (strcmp(argv[i], "-l") == 0) {
+            my_log = 1;
+
+            FILE *fp;
+            char filename[256];
+            strcpy(filename, "../Controller/log.txt");
+            fp = fopen(filename, "w+");
+
+            if (fp == NULL) {
+                printf("Failed to create file\n");
+                exit(EXIT_FAILURE);
+            }
+
+            fclose(fp);
         }
     }
 
@@ -352,6 +377,7 @@ int main(int argc, char *argv[])
     }
 
     printf("Serveur en attente de connexions...\n");
+    write_in_log(my_log, "print", 0, 0, "Serveur en attente de connexions...\n");
 
     struct wait_client_context context;
     pthread_mutex_lock(&mutex_aquarium);
@@ -361,7 +387,7 @@ int main(int argc, char *argv[])
 
     pthread_create(&wait_client, NULL, wait_for_client, (void *) &context);
     
-    prompt(&is_aquarium_loaded, aquarium, &mutex_aquarium, &mutex_is_aquarium_loaded);
+    prompt(my_log, &is_aquarium_loaded, aquarium, &mutex_aquarium, &mutex_is_aquarium_loaded);
     
     pthread_mutex_lock(&mutex_client_count);
     pthread_mutex_lock(&mutex_aquarium);
@@ -378,6 +404,7 @@ int main(int argc, char *argv[])
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(my_log, "send", 0, i+1, buffer);
 
             close(*(tab_args[i]->client_id));
 
@@ -405,6 +432,7 @@ int main(int argc, char *argv[])
     pthread_mutex_unlock(&mutex_client_count);
     
     printf("Fermeture du serveur...\n");
+    write_in_log(my_log, "print", 0, 0, "Fermeture du serveur...\n");
     close(server_fd);
 
     return 0;

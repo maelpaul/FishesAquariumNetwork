@@ -14,12 +14,13 @@
 #define BUFFER_SIZE 256
 #define MAX_ARG 4
 
-void prompt(int * aquarium_flag, struct aquarium * aquarium, pthread_mutex_t * mutex_aquarium, pthread_mutex_t * mutex_aquarium_flag)
+void prompt(int check, int * aquarium_flag, struct aquarium * aquarium, pthread_mutex_t * mutex_aquarium, pthread_mutex_t * mutex_aquarium_flag)
 {
     char buffer[BUFFER_SIZE];
     char args[MAX_ARG][BUFFER_SIZE];
 
     printf("Enter your command :\n");
+    write_in_log(check, "print", 0, 0, "Enter your command :\n");
     
     int should_continue = 1;
     while (should_continue) {
@@ -65,11 +66,20 @@ void prompt(int * aquarium_flag, struct aquarium * aquarium, pthread_mutex_t * m
         }
 
         char* my_argv[MAX_ARG];
+        char buf[200];
+
         for (int i = 0; i < arg_count; i++) {
             my_argv[i] = args[i];
         }
 
-        if(parse_command(command, my_argv, arg_count)){
+        strcpy(buf, my_argv[0]);
+        for (int i = 1; i < arg_count; i++) {
+            strcat(buf, " ");
+            strcat(buf, my_argv[i]);
+        }
+        write_in_log(check, "prompt_send", 0, 0, buf);
+
+        if(parse_command(check, command, my_argv, arg_count)){
             if (strcmp(command->command_name,"exit")==0) {
                 free_command(command);
                 return;
@@ -78,28 +88,29 @@ void prompt(int * aquarium_flag, struct aquarium * aquarium, pthread_mutex_t * m
             if(!*aquarium_flag){
                 pthread_mutex_unlock(mutex_aquarium_flag);
                 if(strcmp(command->command_name,"load")==0){
-                    prompt_load(command, aquarium, aquarium_flag, mutex_aquarium, mutex_aquarium_flag);
+                    prompt_load(check, command, aquarium, aquarium_flag, mutex_aquarium, mutex_aquarium_flag);
                 }
                 else{
                     printf("> You first need to load an aquarium\n");
+                    write_in_log(check, "print", 0, 0, "> You first need to load an aquarium\n");
                 }
             }
             else{
                 pthread_mutex_unlock(mutex_aquarium_flag);
                 if(strcmp(command->command_name,"load")==0){
-                    prompt_load(command, aquarium, aquarium_flag, mutex_aquarium, mutex_aquarium_flag);
+                    prompt_load(check, command, aquarium, aquarium_flag, mutex_aquarium, mutex_aquarium_flag);
                 }
                 else if(strcmp(command->command_name,"add view")==0){
-                    prompt_add_view(command, aquarium, mutex_aquarium);
+                    prompt_add_view(check, command, aquarium, mutex_aquarium);
                 }
                 else if(strcmp(command->command_name,"del view")==0){
-                    prompt_del_view(command, aquarium, mutex_aquarium);
+                    prompt_del_view(check, command, aquarium, mutex_aquarium);
                 }
                 else if(strcmp(command->command_name,"show")==0){
-                    prompt_show(command, aquarium, mutex_aquarium);
+                    prompt_show(check, command, aquarium, mutex_aquarium);
                 }
                 else if(strcmp(command->command_name,"save")==0){
-                    prompt_save(command, aquarium, mutex_aquarium);   
+                    prompt_save(check, command, aquarium, mutex_aquarium);   
                 }
             }
         }

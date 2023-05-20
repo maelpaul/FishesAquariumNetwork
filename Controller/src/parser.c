@@ -45,7 +45,7 @@ int check_command(struct command * command, char** argv, int argc, char * comman
     return 0;
 }
 
-int parse_command(struct command * command, char** argv, int argc){
+int parse_command(int check, struct command * command, char** argv, int argc){
     int result;
 
     if(strcmp(argv[0], "exit") == 0){
@@ -54,47 +54,53 @@ int parse_command(struct command * command, char** argv, int argc){
     }
     else if(strcmp(argv[0], "help") == 0){
         printf("> You can use \"load\", \"save\", \"show\", \"add view\", \"del view\" or \"exit\" command\n");
+        write_in_log(check, "print", 0, 0, "> You can use \"load\", \"save\", \"show\", \"add view\", \"del view\" or \"exit\" command\n");
         return 0;
 
     } else if(strcmp(argv[0], "load") == 0){
         result = check_command(command, argv, argc, "load", COMMAND_LOAD_START_ARG, COMMAND_LOAD_ARG_SIZE);
-        if (!result)
+        if (!result){
             printf("> Incorrect use of \"load\", there should be 1 argument (received %d) which is the aquarium to load.\n", argc - 1);
+            write_in_log(check, "print", 0, 0, "> Incorrect use of \"load\"\n");}
         return result;
 
     } else if(strcmp(argv[0], "show") == 0){
         result = check_command(command, argv, argc, "show", COMMAND_SHOW_START_ARG, COMMAND_SHOW_ARG_SIZE);
-        if (!result)
+        if (!result){
             printf("> Incorrect use of \"show\", there should be 1 argument (received %d) which is the aquarium to show.\n", argc-1);
+            write_in_log(check, "print", 0, 0, "> Incorrect use of \"show\"\n");}
         return result;
 
     } else if (strcmp(argv[0], "add") == 0 && strcmp(argv[1], "view") == 0){
         if(!check_add_wiew_format(argv[3])){
             printf("> Incorrect use of \"add view\", the second argument should respect the following format :" 
                 "VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received %s)\n",argv[3]);
+            write_in_log(check, "print", 0, 0, "> Incorrect use of \"add view\"\n");
             return 0;
         };
 
         result = check_command(command, argv, argc, "add view", COMMAND_ADD_VIEW_START_ARG, COMMAND_ADD_VIEW_ARG_SIZE);
-        if (!result)
+        if (!result){
             printf("> Incorrect use of \"add view\", there should be 2 arguments (received %d) which are the name of the view and its size\n", argc - 2);
+            write_in_log(check, "print", 0, 0, "> Incorrect use of \"add view\"\n");}
 
         return result;
     } else if(strcmp(argv[0], "del") == 0 && strcmp(argv[1], "view") == 0){
         result = check_command(command, argv, argc, "del view", COMMAND_DEL_VIEW_START_ARG, COMMAND_DEL_VIEW_ARG_SIZE);
-        if (!result)
+        if (!result){
             printf("> Incorrect use of \"del view\", there should be 1 argument (received %d) which is the name of the view to remove.\n", argc - 2);
-        
+            write_in_log(check, "print", 0, 0, "> Incorrect use of \"del view\"\n");}
         return result;
     } else if(strcmp(argv[0], "save") == 0) {
         result = check_command(command, argv, argc, "save", COMMAND_SAVE_START_ARG, COMMAND_SAVE_ARG_SIZE);
-        if (!result)
+        if (!result){
             printf("> Incorrect use of \"save\", there should be 1 argument (received %d) which is the aquarium to save.\n", argc - 1);
-
+            write_in_log(check, "print", 0, 0, "> Incorrect use of \"save\"\n");}
         return result;
     }
 
     printf("> Unknown command : should be \"load\", \"save\", \"show\", \"add view\", \"del view\" or \"exit\" (received %s)\n", argv[0]);
+    write_in_log(check, "unk", 0, 0, argv[0]);
 
     return 0;
 }

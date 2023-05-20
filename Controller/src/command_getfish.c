@@ -1,6 +1,6 @@
 #include "command_getfish.h"
 
-int get_fish_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
+int get_fish_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
     char ask_periodic_verif[10];
     strncpy (ask_periodic_verif , buffer, 10);
     ask_periodic_verif[9] = '\0';   /* null character manually added */
@@ -21,6 +21,7 @@ int get_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
             perror("Erreur lors de l'envoi de la liste des poissons au client");
             exit(EXIT_FAILURE);
         }
+        write_in_log(check_ls, "send", 0, client_number, fish_list);
         pthread_mutex_unlock(mutex);
         return 1;
     }
@@ -28,7 +29,7 @@ int get_fish_server(char * header, char * buffer, struct aquarium * aquarium, pt
     return 0;   
 }
 
-int get_fish_continuously_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
+int get_fish_continuously_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
     char ask_continuous_verif[22];
     char ls[3];
     strncpy (ask_continuous_verif , buffer, 21);
@@ -54,6 +55,7 @@ int get_fish_continuously_server(char * header, char * buffer, struct aquarium *
                 perror("Erreur lors de l'envoi de la liste des poissons au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(check_ls, "send", 0, client_number, fish_list);
             pthread_mutex_unlock(mutex);
             if (i != 9) {
                 sleep(1);
@@ -64,7 +66,7 @@ int get_fish_continuously_server(char * header, char * buffer, struct aquarium *
     return 0;
 }
 
-int get_status_server(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
+int get_status_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
     char status_verif[7];
     strncpy (status_verif, buffer, 6);
     status_verif[6] = '\0';   /* null character manually added */
@@ -107,13 +109,14 @@ int get_status_server(char * header, char * buffer, struct aquarium * aquarium, 
             perror("Erreur lors de l'envoi de la liste des poissons au client");
             exit(EXIT_FAILURE);
         }
+        write_in_log(check_ls, "send", 0, client_number, info);
         pthread_mutex_unlock(mutex);
         return 1;
     }
     return 0;
 }
 
-int ping_server(char * header, char * buffer, int client_id) {
+int ping_server(int check_ls, int client_number, char * header, char * buffer, int client_id) {
     char ping_verif[5];
     strncpy (ping_verif, buffer, 4);
     ping_verif[4] = '\0';   /* null character manually added */
@@ -135,6 +138,7 @@ int ping_server(char * header, char * buffer, int client_id) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         else if (!strcmp(channel, "12345")) {
             strcpy(buffer, header);
@@ -143,6 +147,7 @@ int ping_server(char * header, char * buffer, int client_id) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         else {
             strcpy(buffer, header);
@@ -151,6 +156,7 @@ int ping_server(char * header, char * buffer, int client_id) {
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             }
+            write_in_log(check_ls, "send", 0, client_number, buffer);
         }
         return 1;
     }

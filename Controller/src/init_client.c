@@ -2,7 +2,7 @@
 
 char init_client_buffer[64];
 
-int init_client(char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id, struct view * client_view) {
+int init_client(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id, struct view * client_view) {
     if (!strncmp(buffer,"hello",5)) {
         if (strcmp(client_view->name, "nok") != 0) {
             strcpy(init_client_buffer,header);
@@ -14,6 +14,7 @@ int init_client(char * header, char * buffer, struct aquarium * aquarium, pthrea
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             } 
+            write_in_log(check_ls, "send", 0, client_number, buffer);
             return 1;
         }
         char * view_name = NULL;
@@ -46,6 +47,7 @@ int init_client(char * header, char * buffer, struct aquarium * aquarium, pthrea
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 }
+                write_in_log(check_ls, "send", 0, client_number, init_client_buffer);
             }
             else{
                 strcpy(init_client_buffer, header);
@@ -55,6 +57,7 @@ int init_client(char * header, char * buffer, struct aquarium * aquarium, pthrea
                     perror("Erreur lors de l'envoi du message au client");
                     exit(EXIT_FAILURE);
                 } 
+                write_in_log(check_ls, "send", 0, client_number, init_client_buffer);
             }
         }
         else{
@@ -64,6 +67,7 @@ int init_client(char * header, char * buffer, struct aquarium * aquarium, pthrea
                 perror("Erreur lors de l'envoi du message au client");
                 exit(EXIT_FAILURE);
             } 
+            write_in_log(check_ls, "send", 0, client_number, init_client_buffer);
         }
         return 1;
     }
