@@ -56,7 +56,7 @@ void *thread_client(void *arg) {
     int n;
 
     // Envoi d'un message au client
-    strcpy(buffer, "-1|> Bonjour client ");
+    strcpy(buffer, "-1|Bonjour client ");
     char chaine[10];
     sprintf(chaine, "%d !\n", client_number);
     strcat(buffer, chaine);
@@ -76,6 +76,7 @@ void *thread_client(void *arg) {
 
     char * header;
     char * message;
+    char log_out_verif[8];
     time_t last_communication_time;
     time(&last_communication_time);
 
@@ -169,6 +170,8 @@ void *thread_client(void *arg) {
         header = strtok(buffer, "|");
         message = strtok(NULL, "\0");
         int val = -1;
+        strncpy(log_out_verif, message, 7);
+        log_out_verif[7] = '\0';   /* null character manually added */
 
         if (check == 0 && has_view[client_number] == 1) {
             check = add_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
@@ -230,7 +233,7 @@ void *thread_client(void *arg) {
         }
 
         // check des commandes inexistantes
-        if (check == 0 && val == 0 && strcmp(message, "log out\n") != 0) {
+        if (check == 0 && val == 0 && strcmp(log_out_verif, "log out") != 0) {
             strcpy(buffer, header);
             strcat(buffer, "|NOK : Inexisting command");
             if (send(client_id, buffer, strlen(buffer), 0) < 0) {
@@ -240,7 +243,7 @@ void *thread_client(void *arg) {
             write_in_log(my_log, "send", n, client_number, buffer); 
         }
 
-        if (check == 0 && (has_view[client_number] == 0 || val == 2)) {
+        if (check == 0 && (has_view[client_number] == 0 || val == 2) && strcmp(log_out_verif, "log out") != 0) {
             strcpy(buffer, header);
             strcat(buffer, "|NOK : Forbidden command");
             if (send(client_id, buffer, strlen(buffer), 0) < 0) {
@@ -249,7 +252,7 @@ void *thread_client(void *arg) {
             }
             write_in_log(my_log, "send", n, client_number, buffer); 
         }
-    } while(strcmp(message, "log out\n") != 0);
+    } while(strcmp(log_out_verif, "log out") != 0);
 
     strcpy(buffer, "-1|Bye");
     if (send(client_id, buffer, strlen(buffer), 0) < 0) {
