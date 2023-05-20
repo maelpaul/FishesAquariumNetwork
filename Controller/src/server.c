@@ -34,6 +34,7 @@ pthread_mutex_t mutex_aquarium = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_is_aquarium_loaded = PTHREAD_MUTEX_INITIALIZER;
 int print_client_answer = 1; 
 int my_log = 0;
+int has_view[NB_CLIENTS];
 
 struct wait_client_context {
     struct aquarium * aquarium;
@@ -168,19 +169,19 @@ void *thread_client(void *arg) {
         message = strtok(NULL, "\0");
         int val = -1;
 
-        if (check == 0) {
+        if (check == 0 && has_view[client_number] == 1) {
             check = add_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
-        if (check == 0) {
+        if (check == 0 && has_view[client_number] == 1) {
             check = del_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
-        if (check == 0) {
+        if (check == 0 && has_view[client_number] == 1) {
             check = start_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
-        if (check == 0) {
+        if (check == 0 && has_view[client_number] == 1) {
             check = get_fish_ls_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
-        if (check == 0) {
+        if (check == 0 && has_view[client_number] == 1) {
             val = get_fish_continuously_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, BUFFER_SIZE);
             if (val == 1) {
                 printf("Client %d déconnecté.\n", client_number);
@@ -208,17 +209,20 @@ void *thread_client(void *arg) {
                 pthread_exit(NULL);
             }
         }
-        if (check == 0 && val == 0) {
+        if (check == 0 && val == 0 && has_view[client_number] == 1) {
             check = get_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
-        if (check == 0) {
+        if (check == 0 && has_view[client_number] == 1) {
             check = get_status_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
-        if (check == 0) {
+        if (check == 0 && has_view[client_number] == 1) {
             check = ping_server(my_log, client_number, header, message, client_id);
         }
         if (check == 0) {
             check = init_client(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
+            if (check == 1 && is_view_free(client_view) == 0) {
+                has_view[client_number] = 1;
+            }
         }
 
         // check des commandes inexistantes
@@ -232,7 +236,7 @@ void *thread_client(void *arg) {
             write_in_log(my_log, "send", n, client_number, buffer); 
         }
 
-        if (val == 2) {
+        if (check == 0 && (has_view[client_number] == 0 || val == 2)) {
             strcpy(buffer, header);
             strcat(buffer, "|NOK : Forbidden command");
             if (send(client_id, buffer, strlen(buffer), 0) < 0) {
@@ -375,6 +379,7 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < NB_CLIENTS; i++) {
         available[i] = 1;
+        has_view[i] = 0;
     }
 
     struct config conf;

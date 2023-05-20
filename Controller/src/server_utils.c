@@ -129,6 +129,10 @@ char * client_connection(struct aquarium *aquarium, char* view_name, struct view
                     change_view_status(aquarium->views[i]);
                     change_view_status(client_view);
                     strcpy(client_view->name, aquarium->views[i]->name);
+                    for(int j=0; j<2; j++){
+                        client_view->coords[j]=aquarium->views[i]->coords[j];
+                        client_view->size[j]=aquarium->views[i]->size[j];
+                    }
                     return aquarium->views[i]->name;   
                 }
                 else{
@@ -147,6 +151,10 @@ char * find_and_attibute_free_view(struct aquarium *aquarium, struct view * clie
             change_view_status(aquarium->views[i]);
             change_view_status(client_view);
             strcpy(client_view->name, aquarium->views[i]->name);
+            for(int j=0; j<2; j++){
+                client_view->coords[j]=aquarium->views[i]->coords[j];
+                client_view->size[j]=aquarium->views[i]->size[j];
+            }
             return aquarium->views[i]->name;                
         }
     }
