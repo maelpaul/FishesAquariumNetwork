@@ -177,7 +177,36 @@ void *thread_client(void *arg) {
             check = start_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0) {
-            check = get_fish_continuously_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_ls_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+        }
+        if (check == 0) {
+            int val = -1;
+            val = get_fish_continuously_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, BUFFER_SIZE);
+            if (val == 1) {
+                printf("Client %d déconnecté.\n", client_number);
+                write_in_log(my_log, "recv", n, client_number, buffer);
+            
+                // Fermer la connexion avec le client
+                close(client_id);
+
+                for (int i = 0; i < aquarium->views_len; i++) {
+                    if (strcmp(client_view->name, aquarium->views[i]->name) == 0) {
+                        change_view_status(aquarium->views[i]);
+                        change_view_status(client_args->client_view);
+                    }
+                }
+                
+                view_free(client_args->client_view);
+                free(client_args->client_id);
+                free(arg);
+
+                pthread_mutex_lock(&mutex_client_count);
+                client_count--;
+                available[thread_number] = 1;
+                pthread_mutex_unlock(&mutex_client_count);
+
+                pthread_exit(NULL);
+            }
         }
         if (check == 0) {
             check = get_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);

@@ -29,17 +29,14 @@ int get_fish_server(int check_ls, int client_number, char * header, char * buffe
     return 0;   
 }
 
-int get_fish_continuously_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
-    char ask_continuous_verif[22];
+int get_fish_ls_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id){
     char ls[3];
-    strncpy (ask_continuous_verif , buffer, 21);
     strncpy (ls , buffer, 2);
-    ask_continuous_verif[21] = '\0';   /* null character manually added */
     ls[2] = '\0';
 
-    if (!strcmp(ask_continuous_verif, "getFishesContinuously") || !strcmp(ls, "ls")) {
+    if (!strcmp(ls, "ls")) {
         // Lister les poissons en continu
-        for (int i = 0; i < 10; ++i) {
+        for (int j = 0; j < 10; ++j) {
             pthread_mutex_lock(mutex);
             controller_update_fishes(aquarium, REFRESH_TIME);
             char fish_list[1024];
@@ -57,11 +54,66 @@ int get_fish_continuously_server(int check_ls, int client_number, char * header,
             }
             write_in_log(check_ls, "send", 0, client_number, fish_list);
             pthread_mutex_unlock(mutex);
-            if (i != 9) {
+            if (j != 9) {
                 sleep(1);
             }              
         }
         return 1;
+    }
+    return 0;
+}
+
+void * wait_client_log_out(void * arg){
+        // Lister les poissons en continu
+        struct for_thread * th = (struct for_thread *) arg;
+        struct aquarium * aquarium = th->aquarium;
+        while(1) {
+            pthread_mutex_lock(th->mutex);
+            controller_update_fishes(aquarium, REFRESH_TIME);
+            char fish_list[1024];
+            strcpy(fish_list, th->header);
+            strcat(fish_list, "|list ");
+            for (int i = 0; i < aquarium->fishes_len; i++) {
+                char fish_info[128];
+                sprintf(fish_info, "[%s at %dx%d,%dx%d,%d] ", aquarium->fishes[i]->name, aquarium->fishes[i]->dest[0], aquarium->fishes[i]->dest[1], aquarium->fishes[i]->size[0], aquarium->fishes[i]->size[1], aquarium->fishes[i]->time_to_dest);
+                strcat(fish_list, fish_info);
+            }
+            strcat(fish_list, "\n");
+            
+            if (send(th->client_id, fish_list, strlen(fish_list), 0) < 0) {
+                perror("Erreur lors de l'envoi de la liste des poissons au client");
+                exit(EXIT_FAILURE);
+            }
+            write_in_log(th->check_ls, "send", 0, th->client_number, fish_list);
+
+            pthread_mutex_unlock(th->mutex);
+            sleep(1);  
+        }
+}
+
+int get_fish_continuously_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int client_id, int buffer_size){
+    pthread_t wait_log_out;
+    struct for_thread th = {mutex, aquarium, header, client_id, check_ls, client_number};
+
+    char verif[22];
+    strncpy (verif , buffer, 21);
+    verif[21] = '\0';
+    int n;
+
+    if (!strcmp(verif, "getFishesContinuously")) {
+        pthread_create(&wait_log_out, NULL, wait_client_log_out, (void *) &th);
+            
+        // Réception de la réponse du client
+        memset(buffer, 0, buffer_size);
+        if ((n = recv(client_id, buffer, sizeof(buffer), 0)) < 0) {
+            perror("Erreur lors de la réception de la réponse du client");
+            exit(EXIT_FAILURE);
+        }
+        else if (n == 0) {
+            pthread_cancel(wait_log_out);
+            pthread_join(wait_log_out, NULL);
+            return 1;
+        }
     }
     return 0;
 }

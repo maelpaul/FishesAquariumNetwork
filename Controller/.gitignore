@@ -8,6 +8,7 @@ prompt
 server
 client
 client_bidon
+client_gfc
 result.txt
 ../.vscode/
 .vscode/

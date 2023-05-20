@@ -77,23 +77,31 @@ int main() {
 
     int val = 1;
     int check_ls = 0;
+    int forbidden = 0;
 
     pthread_create(&wait_exit, NULL, wait_server_exit, (void *) &client_fd);
 
     do{ 
+        forbidden = 0;
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
             memset(buffer_cp, 0, strlen(buffer_cp));
             strcpy(buffer_cp, "1|");
             strcat(buffer_cp, buffer);
             val = strcmp(buffer, "log out\n");
             check_ls = 0;
-            if (!strcmp(buffer, "getFishesContinuously\n") || !strcmp(buffer, "ls\n")) {
+            if (!strcmp(buffer, "ls\n")) {
                 check_ls = 1;
             }
-            n = write(client_fd, buffer_cp, strlen(buffer_cp));
-            if (n < 0) {
-                perror("Erreur lors de l'écriture sur la socket");
-                exit(EXIT_FAILURE);
+            if (!strcmp(buffer, "getFishesContinuously\n")) {
+                printf("> Commande interdite\n");
+                forbidden = 1;
+            }
+            if (forbidden != 1) {
+                n = write(client_fd, buffer_cp, strlen(buffer_cp));
+                if (n < 0) {
+                    perror("Erreur lors de l'écriture sur la socket");
+                    exit(EXIT_FAILURE);
+                }
             }
             sleep(1);
         } else {
