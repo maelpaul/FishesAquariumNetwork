@@ -51,10 +51,15 @@ public class FishManager {
         fishes = new HashMap<>();
 
         File folderFish = new File(configuration.getPathForFishesResources());
-        for (String childPath : Objects.requireNonNull(folderFish.list())) {
-            String fileName = childPath.substring(childPath.lastIndexOf("/") + 1, childPath.lastIndexOf("."));
-            Resources.getInstance().createAndInit(Texture.class, fileName, configuration.getPathForFishesResources() + "/" + childPath);
-            fishesFileName.add(fileName);
+
+        String[] fileList = folderFish.list();
+
+        if (fileList != null) {
+            for (String childPath : fileList) {
+                String fileName = childPath.substring(childPath.lastIndexOf("/") + 1, childPath.lastIndexOf("."));
+                Resources.getInstance().createAndInit(Texture.class, fileName, configuration.getPathForFishesResources() + "/" + childPath);
+                fishesFileName.add(fileName);
+            }
         }
     }
 
@@ -89,7 +94,7 @@ public class FishManager {
         }
 
         if (!found)
-            fishTextureName = fishesFileName.get(rand.nextInt(fishesFileName.size()));
+            fishTextureName = fishesFileName.get(0);
 
         fishes.put(
                 name,
@@ -127,8 +132,11 @@ public class FishManager {
         System.out.println("Update Fish : " + fishArgs);
 
         String[] parts = fishArgs.trim().split(" ");
-        if (parts.length != UPDATE_FISH_COMMAND_SIZE)
+        if (parts.length != UPDATE_FISH_COMMAND_SIZE) {
+            System.err.println("Cant analyse : " + fishArgs);
+
             return;
+        }
 
         String data = parts[UPDATE_FISH_ARG_DATA].replace(" ", "");
 
@@ -152,10 +160,14 @@ public class FishManager {
                     time
             );
         } else {
-            addFish(parts[UPDATE_FISH_ARG_NAME],
+            EResult result = addFish(parts[UPDATE_FISH_ARG_NAME],
                     new Vector2f(x, y),
                     new Vector2f(width, height),
-                    Fish.EFishBehaviour.values()[rand.nextInt(Fish.EFishBehaviour.values().length)].name());
+                    Fish.EFishServerBehaviour.values()[0].name());
+
+            if (result != EResult.AddSuccessfully){
+                System.err.println("Error when adding fish : " + result.name());
+            }
         }
     }
 

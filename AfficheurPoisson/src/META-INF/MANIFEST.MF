@@ -1,3 +1,71 @@
 Manifest-Version: 1.0
 Main-Class: ProjetPoisson.project.main.Main
+Class-Path: lwjgl.jar lwjgl-nfd.jar lwjgl-ovr.jar lwjgl-stb.jar lwjgl-vm
+ a.jar lwjgl-cuda.jar lwjgl-glfw.jar joml-1.9.19.jar lwjgl-assimp.jar lw
+ jgl-openal.jar lwjgl-opencl.jar lwjgl-opengl.jar lwjgl-openvr.jar lwjgl
+ -tinyfd.jar lwjgl-tootle.jar lwjgl-vulkan.jar json-20190722.jar lwjgl-j
+ avadoc.jar lwjgl-shaderc.jar lwjgl-sources.jar lwjgl-tinyexr.jar lwjgl-
+ jemalloc.jar lwjgl-opengles.jar lwjgl-rpmalloc.jar lwjgl-libdivide.jar 
+ lwjgl-nfd-javadoc.jar lwjgl-nfd-sources.jar lwjgl-ovr-javadoc.jar lwjgl
+ -ovr-sources.jar lwjgl-stb-javadoc.jar lwjgl-stb-sources.jar lwjgl-vma-
+ javadoc.jar lwjgl-vma-sources.jar lwjgl-cuda-javadoc.jar lwjgl-cuda-sou
+ rces.jar lwjgl-glfw-javadoc.jar lwjgl-glfw-sources.jar joml-1.9.19-java
+ doc.jar joml-1.9.19-sources.jar lwjgl-natives-linux.jar lwjgl-natives-m
+ acos.jar lwjgl-assimp-javadoc.jar lwjgl-assimp-sources.jar lwjgl-openal
+ -javadoc.jar lwjgl-openal-sources.jar lwjgl-opencl-javadoc.jar lwjgl-op
+ encl-sources.jar lwjgl-opengl-javadoc.jar lwjgl-opengl-sources.jar lwjg
+ l-openvr-javadoc.jar lwjgl-openvr-sources.jar lwjgl-tinyfd-javadoc.jar 
+ lwjgl-tinyfd-sources.jar lwjgl-tootle-javadoc.jar lwjgl-tootle-sources.
+ jar lwjgl-vulkan-javadoc.jar lwjgl-vulkan-sources.jar lwjgl-natives-win
+ dows.jar lwjgl-shaderc-javadoc.jar lwjgl-shaderc-sources.jar lwjgl-tiny
+ exr-javadoc.jar lwjgl-tinyexr-sources.jar lwjgl-jemalloc-javadoc.jar lw
+ jgl-jemalloc-sources.jar lwjgl-opengles-javadoc.jar lwjgl-opengles-sour
+ ces.jar lwjgl-rpmalloc-javadoc.jar lwjgl-rpmalloc-sources.jar lwjgl-lib
+ divide-javadoc.jar lwjgl-libdivide-sources.jar lwjgl-nfd-natives-linux.
+ jar lwjgl-nfd-natives-macos.jar lwjgl-stb-natives-linux.jar lwjgl-stb-n
+ atives-macos.jar lwjgl-vma-natives-linux.jar lwjgl-vma-natives-macos.ja
+ r lwjgl-glfw-natives-linux.jar lwjgl-glfw-natives-macos.jar lwjgl-nativ
+ es-linux-arm32.jar lwjgl-natives-linux-arm64.jar lwjgl-natives-windows-
+ x86.jar lwjgl-nfd-natives-windows.jar lwjgl-ovr-natives-windows.jar lwj
+ gl-stb-natives-windows.jar lwjgl-vma-natives-windows.jar lwjgl-assimp-n
+ atives-linux.jar lwjgl-assimp-natives-macos.jar lwjgl-glfw-natives-wind
+ ows.jar lwjgl-openal-natives-linux.jar lwjgl-openal-natives-macos.jar l
+ wjgl-opengl-natives-linux.jar lwjgl-opengl-natives-macos.jar lwjgl-open
+ vr-natives-linux.jar lwjgl-openvr-natives-macos.jar lwjgl-tinyfd-native
+ s-linux.jar lwjgl-tinyfd-natives-macos.jar lwjgl-tootle-natives-linux.j
+ ar lwjgl-tootle-natives-macos.jar lwjgl-vulkan-natives-macos.jar lwjgl-
+ shaderc-natives-linux.jar lwjgl-shaderc-natives-macos.jar lwjgl-tinyexr
+ -natives-linux.jar lwjgl-tinyexr-natives-macos.jar lwjgl-assimp-natives
+ -windows.jar lwjgl-jemalloc-natives-linux.jar lwjgl-jemalloc-natives-ma
+ cos.jar lwjgl-openal-natives-windows.jar lwjgl-opengl-natives-windows.j
+ ar lwjgl-opengles-natives-linux.jar lwjgl-opengles-natives-macos.jar lw
+ jgl-openvr-natives-windows.jar lwjgl-rpmalloc-natives-linux.jar lwjgl-r
+ pmalloc-natives-macos.jar lwjgl-tinyfd-natives-windows.jar lwjgl-tootle
+ -natives-windows.jar lwjgl-libdivide-natives-linux.jar lwjgl-libdivide-
+ natives-macos.jar lwjgl-nfd-natives-windows-x86.jar lwjgl-ovr-natives-w
+ indows-x86.jar lwjgl-shaderc-natives-windows.jar lwjgl-stb-natives-linu
+ x-arm32.jar lwjgl-stb-natives-linux-arm64.jar lwjgl-stb-natives-windows
+ -x86.jar lwjgl-tinyexr-natives-windows.jar lwjgl-vma-natives-linux-arm3
+ 2.jar lwjgl-vma-natives-linux-arm64.jar lwjgl-vma-natives-windows-x86.j
+ ar lwjgl-glfw-natives-linux-arm32.jar lwjgl-glfw-natives-linux-arm64.ja
+ r lwjgl-glfw-natives-windows-x86.jar lwjgl-jemalloc-natives-windows.jar
+  lwjgl-opengles-natives-windows.jar lwjgl-rpmalloc-natives-windows.jar 
+ lwjgl-libdivide-natives-windows.jar lwjgl-assimp-natives-linux-arm32.ja
+ r lwjgl-assimp-natives-linux-arm64.jar lwjgl-assimp-natives-windows-x86
+ .jar lwjgl-openal-natives-linux-arm32.jar lwjgl-openal-natives-linux-ar
+ m64.jar lwjgl-openal-natives-windows-x86.jar lwjgl-opengl-natives-linux
+ -arm32.jar lwjgl-opengl-natives-linux-arm64.jar lwjgl-opengl-natives-wi
+ ndows-x86.jar lwjgl-openvr-natives-windows-x86.jar lwjgl-tinyfd-natives
+ -linux-arm32.jar lwjgl-tinyfd-natives-linux-arm64.jar lwjgl-tinyfd-nati
+ ves-windows-x86.jar lwjgl-tootle-natives-windows-x86.jar lwjgl-shaderc-
+ natives-linux-arm32.jar lwjgl-shaderc-natives-linux-arm64.jar lwjgl-sha
+ derc-natives-windows-x86.jar lwjgl-tinyexr-natives-linux-arm32.jar lwjg
+ l-tinyexr-natives-linux-arm64.jar lwjgl-tinyexr-natives-windows-x86.jar
+  lwjgl-jemalloc-natives-linux-arm32.jar lwjgl-jemalloc-natives-linux-ar
+ m64.jar lwjgl-jemalloc-natives-windows-x86.jar lwjgl-opengles-natives-l
+ inux-arm32.jar lwjgl-opengles-natives-linux-arm64.jar lwjgl-opengles-na
+ tives-windows-x86.jar lwjgl-rpmalloc-natives-linux-arm32.jar lwjgl-rpma
+ lloc-natives-linux-arm64.jar lwjgl-rpmalloc-natives-windows-x86.jar lwj
+ gl-libdivide-natives-linux-arm32.jar lwjgl-libdivide-natives-linux-arm6
+ 4.jar lwjgl-libdivide-natives-windows-x86.jar
 

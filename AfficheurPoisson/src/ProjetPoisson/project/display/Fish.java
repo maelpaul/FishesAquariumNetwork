@@ -64,7 +64,7 @@ public class Fish {
 
         this.behaviour = EFishBehaviour.values()[random.nextInt(EFishBehaviour.values().length)];
 
-        started = false;
+        started = true;
 
 
         renderer = new RectangleRenderer("texture2D");
@@ -164,6 +164,8 @@ public class Fish {
     public void travelToNewPosition(Vector2f positionPercentage, float time){
         if (goalPositionPercentage.x == positionPercentage.x && goalPositionPercentage.y == positionPercentage.y)
             return;
+
+        time -= 1;
 
         goalPositionPercentage = new Vector2f(positionPercentage);
 
