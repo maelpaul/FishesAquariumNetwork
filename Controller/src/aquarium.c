@@ -158,20 +158,35 @@ int get_aquarium_height(struct aquarium * aquarium) {
 }
 
 void RandomWayPoint(struct fish * fish, int width, int height) {
-    fish->dest[0] = rand() % width;
-    fish->dest[1] = rand() % height;    
+    int aquarium_size[2] = {width, height};
+    fish->dest[0] = rand() % (width - fish->size[0]);
+    fish->dest[1] = rand() % (height - fish->size[1]);
+    for (int i = 0; i < 2; ++i) {
+        assert(fish->dest[i] > -1);
+        assert(fish->dest[i] < aquarium_size[i]);
+    }    
 }
 
 void HorizontalWayPoint(struct fish * fish, int width, int height) {
+    int aquarium_size[2] = {width, height};
     (void) height;
-    fish->dest[0] = rand() % width;
+    fish->dest[0] = rand() % (width - fish->size[0]);
     fish->dest[1] = fish->coords[1];
+    for (int i = 0; i < 2; ++i) {
+        assert(fish->dest[i] > -1);
+        assert(fish->dest[i] < aquarium_size[i]);
+    }   
 }
 
 void VerticalWayPoint(struct fish * fish, int width, int height) {
+    int aquarium_size[2] = {width, height};
     (void) width;
     fish->dest[0] = fish->coords[0];
-    fish->dest[1] = rand() % height; 
+    fish->dest[1] = rand() % (height - fish->size[1]); 
+    for (int i = 0; i < 2; ++i) {
+        assert(fish->dest[i] > -1);
+        assert(fish->dest[i] < aquarium_size[i]);
+    }   
 }
 
 int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest) {
@@ -180,6 +195,7 @@ int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest) {
         if (strcmp(aquarium->fishes[i]->name, fish_name) == 0) {
             if (aquarium->fishes[i]->started == 0) {
                 val = 1;
+                (*(aquarium->fishes[i]->path))(aquarium->fishes[i], aquarium->size[0], aquarium->size[1]);
                 fish_start(aquarium->fishes[i], time_to_dest);
             }
             else {
@@ -193,16 +209,17 @@ int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest) {
 void update_fishes(struct aquarium * aquarium, int refresh_time) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    time_t command_time = tv.tv_sec;
+    unsigned long refresh_time_us = refresh_time * 1000000;
+    unsigned long command_time = tv.tv_sec * 1000000 + tv.tv_usec;
     for (int i = 0; i < aquarium->fishes_len; i++) {
         struct fish * fish = aquarium->fishes[i];
         if (fish->started != 0) {
-            int new_time_to_dest = fish->time_to_dest - (command_time - fish->started_time);
+            long int new_time_to_dest = fish->time_to_dest - (command_time - fish->started_time);
             if (new_time_to_dest <= 0) {
                 fish->coords[0] = fish->dest[0];
                 fish->coords[1] = fish->dest[1];
                 fish->path(fish, get_aquarium_width(aquarium), get_aquarium_height(aquarium));
-                fish->time_to_dest = refresh_time;
+                fish->time_to_dest = refresh_time_us;
                 fish->started_time = command_time;
             }
             else {

@@ -14,8 +14,8 @@ public class StatusCommand implements ICommand {
     @Override
     public ResultCommand process(String[] args) {
         return (state.get() == MenuScene.EConnectionState.Connected) ?
-                new ResultCommand("-> OK : Connecté au contrôle", ResultCommand.EResultAction.SendServer) :
-                new ResultCommand("-> NOK : Controleur introuvable");
+                new ResultCommand("> OK : Connecté au contrôle", ResultCommand.EResultAction.SendServer) :
+                new ResultCommand("> NOK : Controleur introuvable");
     }
 
     @Override

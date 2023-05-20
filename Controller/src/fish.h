@@ -10,8 +10,8 @@ struct fish {
     int dest[2];
     void (*path)(struct fish *, int, int);
     int started;
-    time_t started_time;
-    int time_to_dest;
+    unsigned long started_time;
+    unsigned long time_to_dest;
 };
 
 void fish_init(struct fish * fish);

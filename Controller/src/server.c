@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <sys/select.h>
+#include <sys/ioctl.h>
 
 #include "server_utils.h"
 #include "command_fish.h"
@@ -170,7 +171,7 @@ void *thread_client(void *arg) {
         int val = -1;
 
         if (check == 0 && has_view[client_number] == 1) {
-            check = add_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+            check = add_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
         }
         if (check == 0 && has_view[client_number] == 1) {
             check = del_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
@@ -179,10 +180,10 @@ void *thread_client(void *arg) {
             check = start_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0 && has_view[client_number] == 1) {
-            check = get_fish_ls_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_ls_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
         }
         if (check == 0 && has_view[client_number] == 1) {
-            val = get_fish_continuously_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, BUFFER_SIZE);
+            val = get_fish_continuously_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, BUFFER_SIZE, client_view);
             if (val == 1) {
                 printf("Client %d déconnecté.\n", client_number);
                 write_in_log(my_log, "recv", n, client_number, buffer);
@@ -210,10 +211,10 @@ void *thread_client(void *arg) {
             }
         }
         if (check == 0 && val == 0 && has_view[client_number] == 1) {
-            check = get_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+            check = get_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
         }
         if (check == 0 && has_view[client_number] == 1) {
-            check = get_status_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+            check = get_status_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id, client_view);
         }
         if (check == 0 && has_view[client_number] == 1) {
             check = ping_server(my_log, client_number, header, message, client_id);
@@ -352,13 +353,22 @@ void * wait_for_client(void * arg){
 
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
     for (int i = 0; i < argc; ++i) {
         if (strcmp(argv[i], "-m") == 0) {
             print_client_answer = 0;
         }
         if (strcmp(argv[i], "-h") == 0) {
-            printf("*** May the Force be with you ***\n");
-            write_in_log(my_log, "print", 0, 0, "*** May the Force be with you ***\n");
+            char * to_print = "\
+===== [ HELP ] =====\nThis program corresponds to the server, which manages an aquarium with views and fishes. You first need to use \"load <aquarium_name>\" to load an aquarium. Then, the connected clients can interact with the server. A set of commands is avaible for the server : \n\
+    - load <aquarium_name> : loads an aquarium.\n\
+    - show <aquarium_name> : prints the state of the loaded aquarium. Shows the size of the aquarium and informations about the views.\n\
+    - add view <view_name> <VIEW_X x VIEW_Y + VIEW_WIDTH + VIEW_HEIGHT> : adds a view to the laoded aquarium, the parameters of the view should be given without spaces.\n\
+    - del view <view_name> : deletes a view from the loaded aquarium.\n\
+    - save <aquarium_name> : saves the state of the aquarium into a .txt file, which will have the same name as the aquarium.\n\
+===== [ HELP ] =====\n";
+            printf("%s",to_print);
+            write_in_log(my_log, "print", 0, 0, to_print);
         }
         if (strcmp(argv[i], "-l") == 0) {
             my_log = 1;
@@ -374,6 +384,10 @@ int main(int argc, char *argv[])
             }
 
             fclose(fp);
+        }
+        if (strcmp(argv[i], "-s") == 0) {
+            int seed = atoi(argv[i+1]);
+            srand(seed);
         }
     }
 

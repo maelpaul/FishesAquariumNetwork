@@ -112,7 +112,7 @@ public class AddFishCommand implements ICommand {
 
     @Override
     public ResultCommand returnHelp() {
-        return new ResultCommand("  -> help(addFish) : \n" +
+        return new ResultCommand("> help(addFish) : \n" +
                 "    addFish NAME at WIDTHxHEIGHT, XxY, BEHAVIOUR : ajoute un poisson\n" +
                 "    addFish -d : affiche la liste des types de déplacements\n" +
                 "    addFish -n : affiche la liste des noms utilisés");

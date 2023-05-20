@@ -14,7 +14,7 @@ public class QuitCommand implements ICommand {
 
     @Override
     public ResultCommand returnHelp() {
-        return new ResultCommand("  -> help(quit) : \n" +
+        return new ResultCommand("> help(quit) : \n" +
                 "    quit : close the program");
     }
 }

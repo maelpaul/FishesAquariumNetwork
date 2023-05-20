@@ -2,7 +2,7 @@
 
 #define BUFFER_SIZE 256
 
-int add_fish_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
+int add_fish_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock, struct view * client_view) {
     char add_verif[8];
     strncpy (add_verif, buffer, 7);
     add_verif[7] = '\0';   /* null character manually added */
@@ -62,7 +62,19 @@ int add_fish_server(int check_ls, int client_number, char * header, char * buffe
                 }
                 
                 pthread_mutex_lock(mutex);
-                val = controller_add_fish(aquarium, coords, size, name, new_path);
+                int fish_coords[2];
+                fish_coords[0] = (coords[0] * client_view->size[0]) / 100 + client_view->coords[0];
+                fish_coords[1] = (coords[1] * client_view->size[1]) / 100 + client_view->coords[1];
+                int fish_size[2];
+                fish_size[0] = (size[0] * client_view->size[0]) / 100;
+                fish_size[1] = (size[1] * client_view->size[1]) / 100;
+                for (int i = 0; i < 2; ++i) {
+                    assert(fish_coords[i] > -1);
+                    assert(fish_coords[i] < aquarium->size[i]);
+                    assert(fish_size[i] > -1);
+                    assert(fish_size[i] < aquarium->size[i]);
+                }
+                val = controller_add_fish(aquarium, fish_coords, fish_size, name, new_path);
                 pthread_mutex_unlock(mutex);
             }
         }
