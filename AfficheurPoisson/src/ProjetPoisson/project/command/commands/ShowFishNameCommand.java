@@ -24,7 +24,7 @@ public class ShowFishNameCommand implements ICommand {
     @Override
     public ResultCommand process(String[] args) {
         if (state.get() != MenuScene.EConnectionState.Connected)
-            return new ResultCommand("-> NOK : Controleur introuvable");
+            return new ResultCommand("> NOK : Controleur introuvable");
 
         if (args.length == COMMAND_SIZE) {
             String value = args[ARG_VALUE];
@@ -33,16 +33,16 @@ public class ShowFishNameCommand implements ICommand {
                     || value.equalsIgnoreCase("t")
                     || value.equalsIgnoreCase("1") ) {
                 manager.setShowName(true);
-                return new ResultCommand("  -> OK : Noms poisson affichés");
+                return new ResultCommand("> OK : Noms poisson affichés");
             } else if (value.equalsIgnoreCase("false")
                     || value.equalsIgnoreCase("f")
                     || value.equalsIgnoreCase("0") ) {
                 manager.setShowName(false);
-                return new ResultCommand("  -> OK : Noms poisson cachés");
+                return new ResultCommand("> OK : Noms poisson cachés");
             }
         }
 
-        return new ResultCommand("  -> NOK : Mauvais argument(s), faites \"showFishName help\" pour plus d'aide");
+        return new ResultCommand("> NOK : Mauvais argument(s), faites \"showFishName help\" pour plus d'aide");
     }
 
     public static boolean isInteger(String s, int radix) {
@@ -56,7 +56,7 @@ public class ShowFishNameCommand implements ICommand {
 
     @Override
     public ResultCommand returnHelp() {
-        return new ResultCommand("  -> help(showFishCommand) : \n" +
+        return new ResultCommand("> help(showFishCommand) : \n" +
                 "    showFishCommand true/false or t/f or 0/1");
     }
 }

@@ -165,6 +165,8 @@ public class Fish {
         if (goalPositionPercentage.x == positionPercentage.x && goalPositionPercentage.y == positionPercentage.y)
             return;
 
+        time -= 1;
+
         goalPositionPercentage = new Vector2f(positionPercentage);
 
         setPosition(goalPosition.goalValue());

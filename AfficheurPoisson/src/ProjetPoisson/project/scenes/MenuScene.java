@@ -63,7 +63,7 @@ public class MenuScene extends Scene {
 
     public final static float WAIT_FOR_EXIT = 5;
 
-    public final static float UPDATE_FISH_REQUEST_TIME = 1;
+    public final static float UPDATE_FISH_REQUEST_TIME = 0.2f;
 
     /// Display
     private Text text;
@@ -217,7 +217,7 @@ public class MenuScene extends Scene {
                         if (message.getId() != waitResponseId)
                             continue;
 
-                        terminal.addToResultText("<" + message.getMessage());
+                        terminal.addToResultText("< " + message.getMessage());
                         String[] parts = message.getMessage().split(" ");
                         idClient = parts[1];
                         if (parts.length == 3)

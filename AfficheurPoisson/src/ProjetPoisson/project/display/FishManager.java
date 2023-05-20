@@ -51,10 +51,15 @@ public class FishManager {
         fishes = new HashMap<>();
 
         File folderFish = new File(configuration.getPathForFishesResources());
-        for (String childPath : Objects.requireNonNull(folderFish.list())) {
-            String fileName = childPath.substring(childPath.lastIndexOf("/") + 1, childPath.lastIndexOf("."));
-            Resources.getInstance().createAndInit(Texture.class, fileName, configuration.getPathForFishesResources() + "/" + childPath);
-            fishesFileName.add(fileName);
+
+        String[] fileList = folderFish.list();
+
+        if (fileList != null) {
+            for (String childPath : fileList) {
+                String fileName = childPath.substring(childPath.lastIndexOf("/") + 1, childPath.lastIndexOf("."));
+                Resources.getInstance().createAndInit(Texture.class, fileName, configuration.getPathForFishesResources() + "/" + childPath);
+                fishesFileName.add(fileName);
+            }
         }
     }
 

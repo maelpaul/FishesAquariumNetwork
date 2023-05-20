@@ -41,8 +41,8 @@ public final class MainLoop {
         contextManager = ContextManager.getInstance();
 
         WindowCreationInfo wci = new WindowCreationInfo();
-        wci.Size = new Vector2i(1280, 720);
-        wci.VirtualSize = new Vector2i(1280, 720);
+        wci.Size = new Vector2i(800, 500);
+        wci.VirtualSize = new Vector2i(800, 500);
         wci.WindowName = projectName;
         wci.Fullscreen = false;
 
