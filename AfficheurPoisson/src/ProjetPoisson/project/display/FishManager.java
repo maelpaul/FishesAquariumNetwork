@@ -19,8 +19,6 @@ public class FishManager {
 
         DeleteSuccessfully,
         DeleteErrorNameNotExisting,
-
-        StartSuccessfully, StartErrorUnknownName
     }
 
     private final static int UPDATE_FISH_COMMAND_SIZE = 3;
@@ -104,20 +102,6 @@ public class FishManager {
         return EResult.AddSuccessfully;
     }
 
-    public EResult startFish(String name) {
-        if (name.equalsIgnoreCase("all")){
-            for (Fish fish : fishes.values())
-                fish.start();
-        }
-
-        if (!fishes.containsKey(name))
-            return EResult.StartErrorUnknownName;
-
-        fishes.get(name).start();
-
-        return EResult.StartSuccessfully;
-    }
-
     public EResult delFish(String name){
         if (!fishes.containsKey(name))
             return EResult.DeleteErrorNameNotExisting;
@@ -193,6 +177,10 @@ public class FishManager {
         return result.toString();
     }
 
+    public String[] getFishNames (){
+        return fishes.keySet().toArray(new String[0]);
+    }
+
     public String getNamesStr(String delimiter, int namePerLine, String lineDelimiter){
         if (fishes.size() == 0)
             return null;
@@ -207,11 +195,6 @@ public class FishManager {
     public void update(){
         for (Fish fish : fishes.values()){
             fish.update();
-
-            /*if (fish.finishedTravel()){
-                Vector2f position = new Vector2f(rand.nextFloat(), rand.nextFloat());
-                fish.travelToNewPosition(position, 1 + rand.nextFloat() * 3);
-            }*/
         }
     }
 

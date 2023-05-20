@@ -4,15 +4,14 @@ import ProjetPoisson.project.command.ICommand;
 import ProjetPoisson.project.command.PromptResultCommand;
 import ProjetPoisson.project.command.ResultCommand;
 
-public class LogOutCommand implements ICommand<String>  {
-
+public class StartFishAll implements ICommand<String> {
     @Override
     public ResultCommand<String> process(String[] args) {
-        if (args.length != 2 && !args[1].equals("out"))
-            return new PromptResultCommand("> NOK : Mauvais argument(s), faites \"delFish help\" pour plus d'aide");
+        if (args.length != 1)
+            return new PromptResultCommand("> NOK : Mauvais argument(s), faites \"startFishAll help\" pour plus d'aide");
 
         return new ResultCommand<String>()
-                .addAction("resultPrompt", new Object[]{"> OK : Log out"})
+                .addAction("resultPrompt", new Object[]{"> OK : demande au server pour démarrer tout les poissons"})
                 .addAction("runCommand", null)
                 .addAction("showResult", null);
     }
@@ -20,7 +19,7 @@ public class LogOutCommand implements ICommand<String>  {
     @Override
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand(
-                "> help(log out) : \n" +
-                     "    log out : se deconnecte du serveur");
+                "> help(startFishAll) : \n" +
+                        "    startFishAll : démarre tout les poissons existant");
     }
 }

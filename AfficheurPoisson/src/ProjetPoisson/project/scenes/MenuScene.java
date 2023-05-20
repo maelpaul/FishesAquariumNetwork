@@ -29,6 +29,8 @@ import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 
+import java.util.HashMap;
+
 public class MenuScene extends Scene {
     public enum EConnectionState {
         Disconnected,
@@ -64,7 +66,7 @@ public class MenuScene extends Scene {
 
     public final static float WAIT_FOR_EXIT = 5;
 
-    public final static float UPDATE_FISH_REQUEST_TIME = 1f;
+    public final static float UPDATE_FISH_REQUEST_TIME = 0.5f;
 
     /// Display
     private Text titreProject;
@@ -92,6 +94,8 @@ public class MenuScene extends Scene {
     private int waitResponseId;
     private int waitGetFishesResponseId;
     private String idClient = "??";
+
+    private HashMap<Integer, ResultCommand<String>> sendCommands;
 
     public void init(String[] args) {
         super.init(args, new BasicBindableObject().setQualityTexture(TextureParameters.REALISTIC_PARAMETERS));
@@ -174,6 +178,8 @@ public class MenuScene extends Scene {
         client = new ClientThread();
         client.start();
 
+        sendCommands = new HashMap<>();
+
         setConnectionState(EConnectionState.Disconnected);
 
         analyser = new CommandAnalyser(currentState, fishManager, shouldTryConnexion);
@@ -254,12 +260,11 @@ public class MenuScene extends Scene {
     }
 
     public void analyseGetFished(Message message){
-        String fishMessage = message.getMessage();
+        String fishMessage = message.getMessage().trim().replace("\n", "");
 
         if (fishMessage.contains("]")){
             String[] fishesArguments = fishMessage
                     .replace("list", "")
-                    .replace("\n", "")
                     .replace("[", "")
                     .split("]");
 
@@ -268,6 +273,8 @@ public class MenuScene extends Scene {
             }
         }
     }
+
+
 
     public void analyseMessage(Message message) {
         if (message.getId() == waitGetFishesResponseId) {
@@ -279,6 +286,52 @@ public class MenuScene extends Scene {
         } else if (message.getId() == -1){
             terminal.addToResultText("< " + message.getMessage());
         }
+
+        if (sendCommands.containsKey(message.getId())){
+            for (ResultCommand<String>.Action action : sendCommands.get(message.getId()).getActions()){
+                if (action.getAction().equals("showErrorResult") && message.getMessage().contains("NOK"))
+                    terminal.addToResultText("< " + message.getMessage());
+                else if (action.getAction().equals("showSuccessResult") && message.getMessage().contains("OK"))
+                    terminal.addToResultText("< " + message.getMessage());
+                else if (action.getAction().equals("showResult"))
+                    terminal.addToResultText("< " + message.getMessage());
+                else if (action.getAction().equals("successRun") && message.getMessage().contains("OK")){
+                    for (int i = 0; i < action.argsSize(); ++i) {
+                        if (action.getArgs(i) instanceof Runnable)
+                            ((Runnable) action.getArgs(i)).run();
+                    }
+                }
+            }
+
+            sendCommands.remove(message.getId());
+        }
+    }
+
+    public void analyseResultCommand(String commandText, ResultCommand<String> result) {
+        if (result == null)
+            return;
+
+        for (ResultCommand<String>.Action action : result.getActions()){
+            if (action.getAction().equals("clear"))
+                terminal.clearResultText();
+            else if (action.getAction().equals("quit")){
+                sceneManagerInterface.exit(0);
+            } else if (action.getAction().equals("runCommand") && EConnectionState.Connected == currentState.get()) {
+                int waitResponseId;
+                if (action.argsNull() || action.argsSize() < 0 || !(action.getArgs(0) instanceof String))
+                    waitResponseId = client.sendMessage(commandText.replace("/", ""));
+                else
+                    waitResponseId = client.sendMessage((String)action.getArgs(0));
+
+                sendCommands.put(waitResponseId, result);
+            } else if (action.getAction().equals("resultPrompt")) {
+                for (int i = 0; i < action.argsSize(); ++i){
+                    terminal.addToResultText((String) action.getArgs(i));
+                }
+            }
+        }
+
+        terminal.saveCommand().clearCommandText();
     }
 
     public void update() {
@@ -331,22 +384,8 @@ public class MenuScene extends Scene {
 
             if (terminal.shouldProcessCommand()){
                 String commandText = terminal.getCommandText();
-                ResultCommand result = analyser.analyseCommand(commandText);
 
-                if (result != null) {
-                    if (result.getResultAction() == ResultCommand.EResultAction.Clear)
-                        terminal.clearResultText();
-                    else if (result.getResultAction() == ResultCommand.EResultAction.Quit) {
-                        waitResponseId = client.sendMessage("log out");
-                    } else
-                        terminal.addToResultText(result.getPromptResult());
-
-                    terminal.saveCommand()
-                            .clearCommandText();
-
-                    if (EConnectionState.Connected == currentState.get() && result.getResultAction() == ResultCommand.EResultAction.SendServer)
-                        waitResponseId = client.sendMessage(commandText.replace("/", ""));
-                }
+                analyseResultCommand(commandText, analyser.analyseCommand(commandText));
             }
         }
 

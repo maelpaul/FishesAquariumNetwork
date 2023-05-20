@@ -88,7 +88,7 @@ class ProjectLoading {
 
                 new ActionInput(ActionId.SHOW_HIDE_TEXTS, "SHOW_HIDE_TEXTS",
                         new InputSimple(
-                                GLFW_KEY_H, EInputType.Keyboard
+                                GLFW_KEY_F12, EInputType.Keyboard
                         ))
         };
 
