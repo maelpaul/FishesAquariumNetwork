@@ -163,7 +163,7 @@ void prompt_show(int check_log, struct command * command, struct aquarium * aqua
 
     if (!strcmp(aquarium_name, "aquarium")) {
         clear(to_send,SEND_SIZE);
-        strcpy(to_send,"> OK : \n");
+        strcpy(to_send,"OK : \n");
         pthread_mutex_lock(mutex_aquarium);
         controller_aquarium_print(aquarium, to_send);
         pthread_mutex_unlock(mutex_aquarium);
