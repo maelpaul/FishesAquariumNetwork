@@ -48,6 +48,8 @@ void VerticalWayPoint(struct fish * fish, int width, int height);
 
 int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest);
 
+int start_fish_all(struct aquarium * aquarium, int time_to_dest);
+
 void update_fishes(struct aquarium * aquarium, int refresh_time);
 
 #endif

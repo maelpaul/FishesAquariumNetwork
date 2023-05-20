@@ -242,3 +242,46 @@ int start_fish_server(int check_ls, int client_number, char * header, char * buf
     }
 }
         
+int start_fish_all_server(int check_ls, int client_number, char * header, char * buffer, struct aquarium * aquarium, pthread_mutex_t * mutex, int sock) {
+    char start_verif[13];
+    strncpy (start_verif, buffer, 12);
+    start_verif[12] = '\0';   /* null character manually added */
+
+    if (!strcmp(start_verif, "startFishAll")) {
+        pthread_mutex_lock(mutex);
+        int val = controller_start_fish_all(aquarium, REFRESH_TIME);
+        pthread_mutex_unlock(mutex);
+
+        if (val == 0) {
+            strcpy(buffer, header);
+            strcat(buffer, "|NOK : Tous les poissons sont déjà démarés");
+            if (send(sock, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }
+            write_in_log(check_ls, "send", 0, client_number, buffer);
+        }
+        else if (val == 1) {
+            strcpy(buffer, header);
+            strcat(buffer, "|OK");
+            if (send(sock, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            } 
+            write_in_log(check_ls, "send", 0, client_number, buffer);
+        }
+        else {
+            strcpy(buffer, header);
+            strcat(buffer, "|NOK");
+            if (send(sock, buffer, strlen(buffer), 0) < 0) {
+                perror("Erreur lors de l'envoi du message au client");
+                exit(EXIT_FAILURE);
+            }      
+            write_in_log(check_ls, "send", 0, client_number, buffer);           
+        }
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}

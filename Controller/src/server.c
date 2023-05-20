@@ -177,6 +177,9 @@ void *thread_client(void *arg) {
             check = del_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0 && has_view[client_number] == 1) {
+            check = start_fish_all_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
+        }
+        if (check == 0 && has_view[client_number] == 1) {
             check = start_fish_server(my_log, client_number, header, message, aquarium, &mutex_aquarium, client_id);
         }
         if (check == 0 && has_view[client_number] == 1) {

@@ -43,6 +43,8 @@ void controller_update_fishes(struct aquarium * aquarium, int refresh_time);
 
 int controller_start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest);
 
+int controller_start_fish_all(struct aquarium * aquarium, int time_to_dest);
+
 void controller_aquarium_print(struct aquarium * aquarium, char * to_print);
 
 int verif(char * buf, char * s, int client_id, pthread_mutex_t * mutex_client_count);

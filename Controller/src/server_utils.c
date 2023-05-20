@@ -193,6 +193,14 @@ int controller_start_fish(struct aquarium * aquarium, char * fish_name, int time
     return -1;
 }
 
+int controller_start_fish_all(struct aquarium * aquarium, int time_to_dest) {
+    if (time_to_dest != 0) {
+        int val = start_fish_all(aquarium, time_to_dest);
+        return val;
+    }
+    return -1;
+}
+
 void controller_aquarium_print(struct aquarium * aquarium, char * to_print){
     char buffer [sizeof(int)*16+1];
     sprintf(buffer, "%d", aquarium->size[0]);

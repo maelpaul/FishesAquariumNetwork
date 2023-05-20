@@ -208,6 +208,18 @@ int start_fish(struct aquarium * aquarium, char * fish_name, int time_to_dest) {
     return val;
 }
 
+int start_fish_all(struct aquarium * aquarium, int time_to_dest) {
+    int val = 0;
+    for (int i = 0; i < aquarium->fishes_len; i++) {
+        if (aquarium->fishes[i]->started == 0) {
+            val = 1;
+            (*(aquarium->fishes[i]->path))(aquarium->fishes[i], aquarium->size[0], aquarium->size[1]);
+            fish_start(aquarium->fishes[i], time_to_dest);
+        }
+    }
+    return val;
+}
+
 void update_fishes(struct aquarium * aquarium, int refresh_time) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
