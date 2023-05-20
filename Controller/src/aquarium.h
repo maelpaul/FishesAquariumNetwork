@@ -4,6 +4,9 @@
 #include <assert.h>
 #include <time.h>
 
+#include "fish.h"
+#include "view.h"
+
 #define DEFAULT_NUMBER_FISH 10
 #define DEFAULT_NUMBER_VIEW 10
 

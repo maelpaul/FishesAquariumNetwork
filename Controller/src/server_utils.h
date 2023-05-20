@@ -10,8 +10,6 @@
 #include <string.h>
 
 #include "aquarium.h"
-#include "view.h"
-#include "fish.h"
 
 #define REFRESH_TIME 5
 
