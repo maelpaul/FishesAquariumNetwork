@@ -353,6 +353,7 @@ void * wait_for_client(void * arg){
 
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
     for (int i = 0; i < argc; ++i) {
         if (strcmp(argv[i], "-m") == 0) {
             print_client_answer = 0;
@@ -383,6 +384,10 @@ int main(int argc, char *argv[])
             }
 
             fclose(fp);
+        }
+        if (strcmp(argv[i], "-s") == 0) {
+            int seed = atoi(argv[i+1]);
+            srand(seed);
         }
     }
 
