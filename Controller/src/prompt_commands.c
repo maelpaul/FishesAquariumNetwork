@@ -51,7 +51,7 @@ void prompt_load(int check_log, struct command * command, struct aquarium * aqua
                 if (!strcmp(aquarium_name, file_name)) {
                     check = 1;
                     clear(to_send,SEND_SIZE);
-                    strcpy(to_send, "> OK : aquarium loaded (");
+                    strcpy(to_send, "OK : aquarium loaded (");
                     pthread_mutex_lock(mutex_aquarium);
                     load_initial_aquarium_config(f_path, aquarium, aquarium_name);
                     int nb_views = aquarium->views_len;
@@ -80,14 +80,14 @@ void prompt_load(int check_log, struct command * command, struct aquarium * aqua
         // Fermer le répertoire
         closedir(dir);
         if (check == 0) {
-            printf("> NOK : aquarium not existing\n");
-            write_in_log(check_log, "print", 0, 0, "> NOK : aquarium not existing\n");
+            printf("NOK : aquarium not existing\n");
+            write_in_log(check_log, "print", 0, 0, "NOK : aquarium not existing\n");
         }
     }
     else if(*aquarium_flag == 1){
         pthread_mutex_unlock(mutex_aquarium_flag);
-        printf("> NOK : aquarium already loaded\n");
-        write_in_log(check_log, "print", 0, 0, "> NOK : aquarium already loaded\n");
+        printf("NOK : aquarium already loaded\n");
+        write_in_log(check_log, "print", 0, 0, "NOK : aquarium already loaded\n");
     }
 }
 
@@ -108,8 +108,8 @@ void prompt_add_view(int check_log, struct command * command, struct aquarium * 
     pthread_mutex_lock(mutex_aquarium);
     if(view_name_check(aquarium, view_name)){
         pthread_mutex_unlock(mutex_aquarium);
-        printf("> NOK : View already exists\n");
-        write_in_log(check_log, "print", 0, 0, "> NOK : View already exists\n");
+        printf("NOK : View already exists\n");
+        write_in_log(check_log, "print", 0, 0, "NOK : View already exists\n");
     }
     else{
         pthread_mutex_unlock(mutex_aquarium);
@@ -118,7 +118,7 @@ void prompt_add_view(int check_log, struct command * command, struct aquarium * 
         add_view(aquarium, coords, size, view_name);
         pthread_mutex_unlock(mutex_aquarium);
         
-        char to_send[SEND_SIZE] = "> OK : view ";
+        char to_send[SEND_SIZE] = "OK : view ";
         strcat(to_send, view_name);
         strcat(to_send, " added.");
         printf("%s\n",to_send);
@@ -137,15 +137,15 @@ void prompt_del_view(int check_log, struct command * command, struct aquarium * 
                 clear(to_send,SEND_SIZE);
                 del_view(aquarium, view_name);
                 removed = 1;
-                strcpy(to_send,"> OK : view ");
+                strcpy(to_send,"OK : view ");
                 strcat(to_send, view_name);
                 strcat(to_send, " deleted.");
                 printf("%s\n",to_send);
                 write_in_log(check_log, "prompt_send", 0, 0, to_send);
             }
             else {
-                printf("> NOK : view used by a client\n");
-                write_in_log(check_log, "print", 0, 0, "> NOK : view used by a client\n");
+                printf("NOK : view used by a client\n");
+                write_in_log(check_log, "print", 0, 0, "NOK : view used by a client\n");
                 pthread_mutex_unlock(mutex_aquarium);
                 return;
             }
@@ -153,8 +153,8 @@ void prompt_del_view(int check_log, struct command * command, struct aquarium * 
     }
     pthread_mutex_unlock(mutex_aquarium);
     if(!removed){
-        printf("> NOK : view not existing\n");
-        write_in_log(check_log, "print", 0, 0, "> NOK : view not existing\n");
+        printf("NOK : view not existing\n");
+        write_in_log(check_log, "print", 0, 0, "NOK : view not existing\n");
     }
 }
 
@@ -163,7 +163,7 @@ void prompt_show(int check_log, struct command * command, struct aquarium * aqua
 
     if (!strcmp(aquarium_name, "aquarium")) {
         clear(to_send,SEND_SIZE);
-        strcpy(to_send,"> OK : \n");
+        strcpy(to_send,"OK : \n");
         pthread_mutex_lock(mutex_aquarium);
         controller_aquarium_print(aquarium, to_send);
         pthread_mutex_unlock(mutex_aquarium);
@@ -171,8 +171,8 @@ void prompt_show(int check_log, struct command * command, struct aquarium * aqua
         write_in_log(check_log, "prompt_send", 0, 0, to_send);
     }
     else {
-        printf("> NOK : aquarium not existing\n");
-        write_in_log(check_log, "print", 0, 0, "> NOK : aquarium not existing\n");
+        printf("NOK : aquarium not existing\n");
+        write_in_log(check_log, "print", 0, 0, "NOK : aquarium not existing\n");
     }
 }
 
@@ -182,6 +182,6 @@ void prompt_save(int check_log, struct command * command, struct aquarium * aqua
     pthread_mutex_lock(mutex_aquarium);
     save_aquarium(aquarium, aquarium_name);
     pthread_mutex_unlock(mutex_aquarium);
-    printf("> OK : aquarium saved\n");
-    write_in_log(check_log, "print", 0, 0, "> OK : aquarium saved\n");
+    printf("OK : aquarium saved\n");
+    write_in_log(check_log, "print", 0, 0, "OK : aquarium saved\n");
 }
