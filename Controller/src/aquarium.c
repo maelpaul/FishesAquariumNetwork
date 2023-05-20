@@ -160,6 +160,7 @@ int get_aquarium_height(struct aquarium * aquarium) {
 }
 
 void RandomWayPoint(struct fish * fish, int width, int height) {
+    srand( time( NULL ) );
     int aquarium_size[2] = {width, height};
     fish->dest[0] = rand() % (width - fish->size[0]);
     fish->dest[1] = rand() % (height - fish->size[1]);
@@ -170,6 +171,7 @@ void RandomWayPoint(struct fish * fish, int width, int height) {
 }
 
 void HorizontalWayPoint(struct fish * fish, int width, int height) {
+    srand( time( NULL ) );
     int aquarium_size[2] = {width, height};
     (void) height;
     fish->dest[0] = rand() % (width - fish->size[0]);
@@ -181,6 +183,7 @@ void HorizontalWayPoint(struct fish * fish, int width, int height) {
 }
 
 void VerticalWayPoint(struct fish * fish, int width, int height) {
+    srand( time( NULL ) );
     int aquarium_size[2] = {width, height};
     (void) width;
     fish->dest[0] = fish->coords[0];
