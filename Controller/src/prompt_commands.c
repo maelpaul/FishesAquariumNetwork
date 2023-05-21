@@ -106,7 +106,7 @@ void prompt_add_view(int check_log, struct command * command, struct aquarium * 
     int aquarium_size[2] = {aquarium->size[0], aquarium->size[1]};
     int verif = 0;
     for (int i = 0; i < 2; ++i) {
-        if (coords[i] > -1 && size[i] > 0 && coords[i] < aquarium_size[i] && size[i] < aquarium_size[i] + 1) {
+        if (coords[i] > -1 && size[i] > 0 && coords[i] < aquarium_size[i] && size[i] < aquarium_size[i] + 1 && coords[i] + size[i] < aquarium_size[i] + 1) {
             verif++;
         }
     }
