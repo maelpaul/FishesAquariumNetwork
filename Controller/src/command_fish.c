@@ -197,7 +197,6 @@ int start_fish_server(int check_ls, int client_number, char * header, char * buf
 
         pthread_mutex_lock(mutex);
         int val = controller_start_fish(aquarium, name, REFRESH_TIME);
-        controller_update_fishes(aquarium, REFRESH_TIME);
         pthread_mutex_unlock(mutex);
 
         if (val == 0) {
@@ -251,7 +250,6 @@ int start_fish_all_server(int check_ls, int client_number, char * header, char *
     if (!strcmp(start_verif, "startFishAll")) {
         pthread_mutex_lock(mutex);
         int val = controller_start_fish_all(aquarium, REFRESH_TIME);
-        controller_update_fishes(aquarium, REFRESH_TIME);
         pthread_mutex_unlock(mutex);
 
         if (val == 0) {

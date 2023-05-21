@@ -253,6 +253,7 @@ void update_fishes(struct aquarium * aquarium, int refresh_time) {
                     fish->coords[1] = fish->coords[1] + y_done;
                 }
                 fish->time_to_dest = new_time_to_dest;
+                fish->started_time = command_time;
             }
         }
     }
