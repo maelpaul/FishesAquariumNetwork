@@ -367,6 +367,10 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i], "-h") == 0) {
             char * to_print = "\
 ===== [ HELP ] =====\nThis program corresponds to the server, which manages an aquarium with views and fishes. You first need to use \"load <aquarium_name>\" to load an aquarium. Then, the connected clients can interact with the server. A set of commands is avaible for the server : \n\
+    - option -m : ne pas afficher les messages des clients\n\
+    - option -h : afficher l'aide\n\
+    - option -l : save les logs dans le fichier log.txt\n\
+    - option -s : set la seed au nombre entré juste après -s\n\
     - load <aquarium_name> : loads an aquarium.\n\
     - show <aquarium_name> : prints the state of the loaded aquarium. Shows the size of the aquarium and informations about the views.\n\
     - add view <view_name> <VIEW_X x VIEW_Y + VIEW_WIDTH + VIEW_HEIGHT> : adds a view to the laoded aquarium, the parameters of the view should be given without spaces.\n\
