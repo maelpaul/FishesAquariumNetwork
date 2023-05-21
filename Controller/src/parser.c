@@ -72,9 +72,9 @@ int parse_command(int check, struct command * command, char** argv, int argc){
         return result;
 
     } else if (strcmp(argv[0], "add") == 0 && strcmp(argv[1], "view") == 0){
-        if(!check_add_wiew_format(argv[3])){
+        if(strcmp(argv[2], "") == 0 || strcmp(argv[3], "") == 0 || !check_add_wiew_format(argv[3])){
             printf("> Incorrect use of \"add view\", the second argument should respect the following format :" 
-                "VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received %s)\n",argv[3]);
+                "VIEW_X x VIEW_Y + VIEW_WITDH + VIEW_HEIGHT without spaces (received %s)\n", argv[3]);
             write_in_log(check, "print", 0, 0, "> Incorrect use of \"add view\"\n");
             return 0;
         };

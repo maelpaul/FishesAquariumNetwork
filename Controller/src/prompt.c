@@ -66,6 +66,9 @@ void prompt(int check, int * aquarium_flag, struct aquarium * aquarium, pthread_
         }
 
         char* my_argv[MAX_ARG];
+        for (int i = 0; i < MAX_ARG; i++) {
+            my_argv[i] = "";
+        }
         char buf[200];
 
         for (int i = 0; i < arg_count; i++) {
