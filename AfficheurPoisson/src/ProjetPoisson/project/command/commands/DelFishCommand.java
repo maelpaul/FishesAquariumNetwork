@@ -30,6 +30,7 @@ public class DelFishCommand implements ICommand<String>  {
 
                     return new ResultCommand<String>()
                             .addAction("resultPrompt", new Object[] { "> OK : Demande au serveur pour supprimer Poisson" })
+                            .addAction("runCommand", null)
                             .addAction("showErrorResult", null)
                             .addAction("showSuccessResult",  null)
                             .addAction("successRun", new Object[] { delFish });
@@ -45,6 +46,6 @@ public class DelFishCommand implements ICommand<String>  {
     @Override
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand("> help(delFish) : \n" +
-                "    delFish NAME : supprime le poisson nommé NAME");
+                "    delFish NAME : supprime le poisson nommé NAME", "    ");
     }
 }

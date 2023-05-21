@@ -24,6 +24,6 @@ public class TryConnectionCommand implements ICommand<String> {
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand(
                 "> help(tryConnection) : \n" +
-                "    tryConnection : l'application va tenter de se connecter en boucle, a faire après un log out");
+                "    tryConnection : l'application va tenter de se connecter en boucle, a faire après un log out", "    ");
     }
 }

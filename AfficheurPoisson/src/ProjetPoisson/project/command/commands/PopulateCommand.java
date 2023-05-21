@@ -18,10 +18,10 @@ public class PopulateCommand implements ICommand<String> {
             try {
                 int num = Integer.parseInt(args[COMMAND_ARG_NUMBER]);
 
-                if (num >= 0 && num <= 15){
+                if (num > 0 && num <= 15){
                     return new ResultCommand<String>()
-                            .addAction("resultPrompt", new Object[]{ "> OK : tentative ajout" + args[COMMAND_ARG_NUMBER] + " poisson(s)"})
-                            .addAction("addFish", new Object[]{args[COMMAND_ARG_NUMBER]});
+                            .addAction("resultPrompt", new Object[]{ "> OK : tentative ajout " + num + " poisson(s)"})
+                            .addAction("addFish", new Object[]{num});
                 }
 
                 return new PromptResultCommand("> NOK : Mauvais nombre poisson, faites \"quit help\" pour plus d'aide");
@@ -40,6 +40,6 @@ public class PopulateCommand implements ICommand<String> {
         return new PromptResultCommand("> help(populate) : \n" +
                 "    populate : ajoute 15 nouveau poisson avec des noms valides\n" +
                 "   populate NUMBER  : ajoute NUMBER nouveau(x) poissons avec des noms valides\n" +
-                "   [NUMBER > 0 && NUMBER < 15]");
+                "   [NUMBER > 0 && NUMBER <= 15]", "    ");
     }
 }

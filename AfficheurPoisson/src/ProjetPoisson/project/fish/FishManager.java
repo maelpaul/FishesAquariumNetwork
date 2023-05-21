@@ -40,8 +40,9 @@ public class FishManager {
     private final HashMap<String, Fish> fishes;
     ArrayList<String> fishesFileName = new ArrayList<>();
     private final Random rand = new Random();
-
     private final WindowInfo info;
+
+    private boolean showFishName;
 
     public FishManager(WindowInfo info, Configuration configuration){
         this.info = info;
@@ -59,6 +60,8 @@ public class FishManager {
                 fishesFileName.add(fileName);
             }
         }
+
+        showFishName = false;
     }
 
     public EResult addFish(String name, Vector2f positionPercentage, Vector2f sizePercentage, String behaviour){
@@ -99,7 +102,38 @@ public class FishManager {
                 new Fish(info, name, fishTextureName , positionPercentage, sizePercentage)
         );
 
+        fishes.get(name).setShowName(showFishName);
+
         return EResult.AddSuccessfully;
+    }
+
+    public Object[][] returnFishAddCommands(int number) {
+        Object[][] result = new Object[number][];
+
+        for (int i = 0; i < number; ++i){
+            StringBuilder fishName = new StringBuilder(fishesFileName.get(rand.nextInt(fishesFileName.size())));
+            for (int j = 0; j <  (1 + rand.nextInt(2)); ++j)
+                fishName.append("_").append(rand.nextInt(1000));
+
+            int size = 7 + rand.nextInt(5);
+            int x = rand.nextInt(100 - size);
+            int y = rand.nextInt(100 - size);
+
+            // Take random behaviour
+            Fish.EFishServerBehaviour behaviour = Fish.EFishServerBehaviour.values()[rand.nextInt(Fish.EFishServerBehaviour.values().length)];
+
+            String command = "addFish " + fishName + " at " + size + "x" + size + ", " + x + "x" + y + ", " + behaviour.name();
+
+            Runnable addFish =  () -> addFish(
+                    fishName.toString(),
+                    new Vector2f(x / 100f, y / 100f),
+                    new Vector2f(size / 100f, size / 100f),
+                    behaviour.name());
+
+            result[i] = new Object[]{ command, addFish};
+        }
+
+        return result;
     }
 
     public EResult delFish(String name){
@@ -113,7 +147,7 @@ public class FishManager {
     }
 
     public void processFishUpdate(String fishArgs){
-        System.out.println("Update Fish : " + fishArgs);
+        //System.out.println("Update Fish : " + fishArgs);
 
         String[] parts = fishArgs.trim().split(" ");
         if (parts.length != UPDATE_FISH_COMMAND_SIZE) {
@@ -126,15 +160,15 @@ public class FishManager {
 
         String[] dataParts = data.split(",");
 
-        String size = dataParts[UPDATE_FISH_ARG_SIZE];
-
-        float width = Float.parseFloat(size.split("x")[UPDATE_FISH_ARG_WIDTH]) / 100f;
-        float height = Float.parseFloat(size.split("x")[UPDATE_FISH_ARG_HEIGHT]) / 100f;
-
         String position = dataParts[UPDATE_FISH_ARG_POSITION];
 
         float x = Float.parseFloat(position.split("x")[UPDATE_FISH_ARG_X]) / 100f;
         float y = Float.parseFloat(position.split("x")[UPDATE_FISH_ARG_Y]) / 100f;
+
+        String size = dataParts[UPDATE_FISH_ARG_SIZE];
+
+        float width = Float.parseFloat(size.split("x")[UPDATE_FISH_ARG_WIDTH]) / 100f;
+        float height = Float.parseFloat(size.split("x")[UPDATE_FISH_ARG_HEIGHT]) / 100f;
 
         int time = Integer.parseInt(dataParts[UPDATE_FISH_ARG_TIME]);
 
@@ -199,6 +233,8 @@ public class FishManager {
     }
 
     public void setShowName(boolean value){
+        showFishName = value;
+
         for (Fish fish : fishes.values()){
             fish.setShowName(value);
         }

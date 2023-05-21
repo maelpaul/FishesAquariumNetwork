@@ -57,6 +57,6 @@ public class ShowFishNameCommand implements ICommand<String> {
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand(
                 "> help(name) : \n" +
-                "    showFishCommand true/false or t/f or 0/1");
+                "    name true/false or t/f or 0/1", "    ");
     }
 }

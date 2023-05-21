@@ -26,6 +26,6 @@ public class StatusCommand implements ICommand<String> {
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand("> help(startFish) : \n" +
                 "    startFish NAME : démarre le poisson nommé NAME,\n" +
-                "    startFish all : démarre tout les poissons");
+                "    startFish all : démarre tout les poissons", "    ");
     }
 }

@@ -18,6 +18,6 @@ public class ClearCommand implements ICommand<String> {
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand(
                    "> help(clear) : \n" +
-                        "    clear : nettoie le terminal");
+                        "    clear : nettoie le terminal", "    ");
     }
 }

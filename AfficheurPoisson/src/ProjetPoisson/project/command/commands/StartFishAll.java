@@ -20,6 +20,6 @@ public class StartFishAll implements ICommand<String> {
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand(
                 "> help(startFishAll) : \n" +
-                        "    startFishAll : démarre tout les poissons existant");
+                        "    startFishAll : démarre tout les poissons existant", "    ");
     }
 }

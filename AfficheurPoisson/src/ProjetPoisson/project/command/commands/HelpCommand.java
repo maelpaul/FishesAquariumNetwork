@@ -14,6 +14,6 @@ public class HelpCommand implements ICommand<String> {
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand(
                    "> help(help) : \n" +
-                        "   help : affiche une aide générale");
+                        "   help : affiche une aide générale", "    ");
     }
 }

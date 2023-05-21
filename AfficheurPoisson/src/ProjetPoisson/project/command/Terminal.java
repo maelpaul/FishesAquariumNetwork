@@ -53,7 +53,7 @@ public class Terminal {
                 .setPosition(new Vector2f(referencePosition))
                 .setColor(new Color4f(0.8f, 0.8f, 0.8f, 1f))
                 .setFontSize(30)
-                .fitText(commandTextCpy.toString(), maxSize, true);
+                .fitText(commandTextCpy.toString(), maxSize, true, "");
 
         resultText = new Text();
         commandText.copyTo(resultText)
@@ -140,7 +140,7 @@ public class Terminal {
             return;
 
         commandTextCpy.insert(index, chr);
-        commandText.fitText(commandTextCpy.toString(), maxSize, true);
+        commandText.fitText(commandTextCpy.toString(), maxSize, true, "");
 
         updateCursorPosition(cursorPosition + chr.length());
     }
@@ -157,7 +157,7 @@ public class Terminal {
             return;
 
         commandTextCpy.deleteCharAt(index);
-        commandText.fitText(commandTextCpy.toString(), maxSize, true);
+        commandText.fitText(commandTextCpy.toString(), maxSize, true, "");
 
         updateCursorPosition(cursorPosition - 1);
     }
@@ -192,33 +192,40 @@ public class Terminal {
     }
 
     public Terminal clearCommandText() {
-        commandTextCpy.replace(0, commandTextCpy.length(), "/");
-        commandText.fitText(commandTextCpy.toString(), maxSize, true);
+        commandTextCpy.delete(0, commandTextCpy.length());
+        commandTextCpy.append("/");
+        commandText.fitText(commandTextCpy.toString(), maxSize, true, "");
         updateCursorPosition(0);
 
         previousCommandSelected = previousCommands.size();
 
-        //addToResultText("\n");
+        updateResultPosition();
 
         return this;
     }
 
     public Terminal clearResultText(){
         resultText.setText(BASE_RESULT_MESSAGE);
-        commandText.fitText(commandTextCpy.toString(), maxSize, true);
+        commandText.fitText(commandTextCpy.toString(), maxSize, true, "");
 
         return this;
     }
 
     public Terminal addToResultText(String text){
+        return addToResultText(text, "  ");
+    }
+
+    public Terminal addToResultText(String text, String breakLineStr){
         if (text == null)
             return this;
 
         if (text.charAt(text.length() - 1) != '\n')
             text += "\n";
 
-        resultText.setText(resultText.text().substring(0, resultText.text().length() - BASE_RESULT_MESSAGE.length())
-                + text + BASE_RESULT_MESSAGE);
+        resultText.fitText(
+                resultText.text().substring(0, resultText.text().length() - BASE_RESULT_MESSAGE.length()) + text + BASE_RESULT_MESSAGE,
+                new Vector2f(maxSize.x, maxSize.y * 500),
+                false, breakLineStr);
 
         return this;
     }

@@ -19,6 +19,6 @@ public class QuitCommand implements ICommand<String> {
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand(
                 "> help(quit) : \n" +
-                "    quit : termine l'application");
+                "    quit : termine l'application", "    ");
     }
 }

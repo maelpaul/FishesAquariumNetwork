@@ -6,6 +6,11 @@ import ProjetPoisson.project.client.Message;
 
 public class ClientThread extends CommunicationThread {
 
+    public static final int SLEEP_TIME = 10;
+    public static final int SPECIAL_ID = -1;
+
+    public static final String HEADER_SEPARATION = "|";
+
     protected ClientTcp client;
     protected boolean shouldTryConnection;
 
@@ -47,12 +52,12 @@ public class ClientThread extends CommunicationThread {
 
         try {
             while (this.running){
-                Thread.sleep(50); // Add a delay of 500 milliseconds
+                Thread.sleep(SLEEP_TIME);
                 //System.out.println(messageProcessed + " " + messageReceived + " " + messageToSend.size());
 
                 if (client.isConnected()){
                     if (messageToSend.size() > 0 && receivedMessageNumber == processedMessageNumber) {
-                        String toSend = processedMessageNumber + "|" + messageToSend.get(processedMessageNumber);
+                        String toSend = processedMessageNumber + HEADER_SEPARATION + messageToSend.get(processedMessageNumber);
 
                         System.out.println("Messaged sent(" + receivedMessageNumber + ") :" + toSend);
                         client.sendMessage(toSend);
@@ -66,16 +71,16 @@ public class ClientThread extends CommunicationThread {
                             this.running = false;
                         }
                         if (result.contains("|")) {
-                            int numberMessage = Integer.parseInt(result.substring(0, result.indexOf("|")));
+                            int numberMessage = Integer.parseInt(result.substring(0, result.indexOf(HEADER_SEPARATION)));
                             if (numberMessage >= receivedMessageNumber)
                                 receivedMessageNumber = numberMessage + 1;
 
                             System.out.println("Messaged received(" + receivedMessageNumber + ") :" + result);
 
-                            result = result.substring(result.indexOf("|") + 1);
+                            result = result.substring(result.indexOf(HEADER_SEPARATION) + 1);
 
-                            if (numberMessage == -1){
-                                receivedMessages.add(new Message(- 1, result));
+                            if (numberMessage == SPECIAL_ID){
+                                receivedMessages.add(new Message(SPECIAL_ID, result));
                             } else {
                                 receivedMessages.add(new Message(receivedMessageNumber - 1, result));
                                 messageToSend.remove(receivedMessageNumber - 1);

@@ -21,6 +21,6 @@ public class LogOutCommand implements ICommand<String>  {
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand(
                 "> help(log out) : \n" +
-                     "    log out : se deconnecte du serveur");
+                     "    log out : se deconnecte du serveur", "    ");
     }
 }

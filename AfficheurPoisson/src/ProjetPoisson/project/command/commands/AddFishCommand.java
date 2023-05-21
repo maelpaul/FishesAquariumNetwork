@@ -102,13 +102,13 @@ public class AddFishCommand implements ICommand<String> {
         String result;
 
         if (option.equals("d")) {
-            result = fishManager.getMovementsTypeStr(", ", 4, "\n");
+            result = fishManager.getMovementsTypeStr("", 1, ", ");
             if (result == null)
                 return new PromptResultCommand("> OK : Aucun mouvement enregistré !");
 
             return new PromptResultCommand("> OK : Liste des types de mouvements :\n" + result);
         } else if (option.equals("n")) {
-            result = fishManager.getNamesStr(", ", 4, "\n");
+            result = fishManager.getNamesStr("", 1, ", ");
             if (result == null)
                 return new PromptResultCommand("> OK : Aucun poisson enregistré !");
 
@@ -130,8 +130,9 @@ public class AddFishCommand implements ICommand<String> {
     @Override
     public ResultCommand<String> returnHelp() {
         return new PromptResultCommand("> help(addFish) : \n" +
-                "    addFish NAME at WIDTHxHEIGHT, XxY, BEHAVIOUR : ajoute un poisson\n" +
+                "    addFish NAME at XxY, WIDTHxHEIGHT, BEHAVIOUR : ajoute un poisson\n" +
                 "    addFish -d : affiche la liste des types de déplacements\n" +
-                "    addFish -n : affiche la liste des noms utilisés");
+                "    addFish -n : affiche la liste des noms utilisés"
+                , "    ");
     }
 }
