@@ -103,10 +103,23 @@ void prompt_add_view(int check_log, struct command * command, struct aquarium * 
     size[0]=atoi(strtok(NULL,"+"));
     size[1]=atoi(strtok(NULL,"\0"));
 
+    int aquarium_size[2] = {aquarium->size[0], aquarium->size[1]};
+    int verif = 0;
+    for (int i = 0; i < 2; ++i) {
+        if (coords[i] > -1 && size[i] > 0 && coords[i] < aquarium_size[i] && size[i] < aquarium_size[i] + 1) {
+            verif++;
+        }
+    }
+
     clear(buff,SEND_SIZE);
 
     pthread_mutex_lock(mutex_aquarium);
-    if(view_name_check(aquarium, view_name)){
+    if (verif != 2) {
+        pthread_mutex_unlock(mutex_aquarium);
+        printf("NOK : Bad position and/or size\n");
+        write_in_log(check_log, "print", 0, 0, "NOK : Bad position and/or size\n");
+    }
+    else if(view_name_check(aquarium, view_name)){
         pthread_mutex_unlock(mutex_aquarium);
         printf("NOK : View already exists\n");
         write_in_log(check_log, "print", 0, 0, "NOK : View already exists\n");
