@@ -14,8 +14,6 @@
 
 #include "server_utils.h"
 
-#define REFRESH_TIME 5
-
 struct client_args {
     int *client_id;
     struct aquarium * aquarium;

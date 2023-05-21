@@ -55,9 +55,10 @@ void fish_print(struct fish * fish) {
 void fish_start(struct fish * fish, int time_to_dest) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
+    unsigned long random = (rand() % 6) * 1000000;
     unsigned long command_time = tv.tv_sec * 1000000 + tv.tv_usec;
     unsigned long time_to_dest_us = time_to_dest * 1000000;
     fish->started = 1;
     fish->started_time = command_time;
-    fish->time_to_dest = time_to_dest_us;
+    fish->time_to_dest = time_to_dest_us + random;
 }
