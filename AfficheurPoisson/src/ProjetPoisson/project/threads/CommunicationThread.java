@@ -39,6 +39,7 @@ public  abstract class CommunicationThread extends Thread {
     }
 
     public void run() {}
+    public boolean isRunning(){ return running; }
 
     public boolean didReceiveMessage() {
         return receivedMessages.size() != 0;

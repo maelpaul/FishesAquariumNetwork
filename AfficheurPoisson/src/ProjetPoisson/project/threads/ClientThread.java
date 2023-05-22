@@ -50,8 +50,6 @@ public class ClientThread extends CommunicationThread {
         shouldTryConnection = false;
         if (client.isConnected())
             client.closeConnection();
-
-        running = false;
     }
 
     public void run() {
@@ -108,6 +106,8 @@ public class ClientThread extends CommunicationThread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        System.out.println("End of thread client");
     }
 
     public boolean hasTimeOut(){

@@ -300,11 +300,16 @@ public class MenuScene extends Scene {
             for (ResultCommand<String>.Action action : sendCommands.get(message.getId()).getActions()){
                 if (action.getAction().equals("showErrorResult") && message.getMessage().contains("NOK"))
                     terminal.addToResultText("< " + message.getMessage());
-                else if (action.getAction().equals("showSuccessResult") && message.getMessage().contains("OK"))
+                else if (action.getAction().equals("showSuccessResult") && !message.getMessage().contains("NOK"))
                     terminal.addToResultText("< " + message.getMessage());
                 else if (action.getAction().equals("showResult"))
                     terminal.addToResultText("< " + message.getMessage());
-                else if (action.getAction().equals("successRun") && message.getMessage().contains("OK")){
+                else if (action.getAction().equals("successRun") && !message.getMessage().contains("NOK")){
+                    for (int i = 0; i < action.argsSize(); ++i) {
+                        if (action.getArgs(i) instanceof Runnable)
+                            ((Runnable) action.getArgs(i)).run();
+                    }
+                } else if (action.getAction().equals("errorRun") && message.getMessage().contains("NOK")){
                     for (int i = 0; i < action.argsSize(); ++i) {
                         if (action.getArgs(i) instanceof Runnable)
                             ((Runnable) action.getArgs(i)).run();
@@ -369,6 +374,9 @@ public class MenuScene extends Scene {
         fishManager.update();
 
         if (timerExit.isStarted()) {
+            if (!client.getClient().isConnected())
+                client.doStop();
+
             timerExit.update();
 
             if (lastSecondPrinted == -1){
@@ -507,7 +515,14 @@ public class MenuScene extends Scene {
         titreProject.unload();
         terminal.unload();
 
-        client.interrupt();
+        if (client.isRunning()){
+            client.doStop();
+        }
+        try {
+            client.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         connectionStatusIcon.unload();
         connectionStatusMessage.unload();
