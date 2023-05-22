@@ -1,21 +1,27 @@
 package ProjetPoisson.project.threads;
+import ProjetPoisson.mightylib.main.GameTime;
 import ProjetPoisson.mightylib.resources.Resources;
+import ProjetPoisson.mightylib.util.Timer;
 import ProjetPoisson.project.client.ClientTcp;
 import ProjetPoisson.project.client.Configuration;
 import ProjetPoisson.project.client.Message;
 
 public class ClientThread extends CommunicationThread {
 
-    public static final int SLEEP_TIME = 10;
+    public static final int SLEEP_TIME = 10; // MILLISECONDS
     public static final int SPECIAL_ID = -1;
+
+    public static final int TIME_OUT_TIME = 40;
 
     public static final String HEADER_SEPARATION = "|";
 
-    protected ClientTcp client;
+    protected  ClientTcp client;
     protected boolean shouldTryConnection;
 
+    protected float timeOutCounter;
+
     public ClientThread() {
-        this.running = true;
+        timeOutCounter = GameTime.currentTime();
     }
 
     public void shouldTryConnection(){
@@ -44,11 +50,14 @@ public class ClientThread extends CommunicationThread {
         shouldTryConnection = false;
         if (client.isConnected())
             client.closeConnection();
+
+        running = false;
     }
 
     public void run() {
         this.setup();
         reset();
+        this.running = true;
 
         try {
             while (this.running){
@@ -67,9 +76,11 @@ public class ClientThread extends CommunicationThread {
 
                     String result = client.readMessage();
                     if (result != null) {
-                        if (result.contains("Connection lost")){
+                        /*if (result.contains("Connection lost")){
                             this.running = false;
-                        }
+                        }*/
+                        timeOutCounter = GameTime.currentTime();
+
                         if (result.contains("|")) {
                             int numberMessage = Integer.parseInt(result.substring(0, result.indexOf(HEADER_SEPARATION)));
                             if (numberMessage >= receivedMessageNumber)
@@ -97,6 +108,10 @@ public class ClientThread extends CommunicationThread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean hasTimeOut(){
+        return GameTime.currentTime() - timeOutCounter >= TIME_OUT_TIME;
     }
 
     @Override

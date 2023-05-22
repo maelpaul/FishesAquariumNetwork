@@ -80,10 +80,10 @@ public class MenuScene extends Scene {
     /// Systems
     private CommandAnalyser analyser;
     private FishManager fishManager;
-    private Timer pingTimer;
     private Timer attemptConnexionTimer;
     private Timer updateFishRequestTime;
-
+    private Timer timerExit;
+    private int lastSecondPrinted;
 
     /// Network
     private TryConnectionContainer shouldTryConnexion;
@@ -160,9 +160,8 @@ public class MenuScene extends Scene {
         Configuration configuration = Resources.getInstance().getResource(Configuration.class, "affichage");
         fishManager = new FishManager(mainContext.getWindow().getInfo(), configuration);
 
-        pingTimer = new Timer();
-        pingTimer.start(PING_TIME);
-        pingTimer.stop();
+        timerExit = new Timer();
+        lastSecondPrinted = -1;
 
         attemptConnexionTimer = new Timer();
         attemptConnexionTimer.start(ATTEMPT_CONNECTION_TIME);
@@ -255,7 +254,7 @@ public class MenuScene extends Scene {
     }
 
 
-    /// ANALYSING PART
+    /// ANALYSING PART ///
 
     public void analyseGetFished(Message message){
         String fishMessage = message.getMessage().trim().replace("\n", "");
@@ -325,7 +324,10 @@ public class MenuScene extends Scene {
             if (action.getAction().equals("clearPrompt"))
                 terminal.clearResultText();
             else if (action.getAction().equals("quit")){
-                sceneManagerInterface.exit(0);
+                if (EConnectionState.Connected == currentState.get())
+                    client.sendMessage("log out");
+
+                timerExit.start(WAIT_FOR_EXIT);
             } else if (action.getAction().equals("runCommand") && EConnectionState.Connected == currentState.get()) {
                 int waitResponseId;
                 if (action.argsNull() || action.argsSize() < 0 || !(action.getArgs(0) instanceof String))
@@ -349,7 +351,7 @@ public class MenuScene extends Scene {
         terminal.saveCommand().clearCommandText();
     }
 
-    /// UPDATE PART
+    /// UPDATE PART ///
     public void actionAddFish(int number){
         Object[][] commands = fishManager.returnFishAddCommands(number);
 
@@ -365,9 +367,31 @@ public class MenuScene extends Scene {
 
     public void updateModel(){
         fishManager.update();
+
+        if (timerExit.isStarted()) {
+            timerExit.update();
+
+            if (lastSecondPrinted == -1){
+                lastSecondPrinted = (int)WAIT_FOR_EXIT;
+                terminal.addToResultText("> Exit in " + lastSecondPrinted + " secondes");
+            } else if ((int)(Math.ceil(WAIT_FOR_EXIT - timerExit.getElapsedTime())) != lastSecondPrinted){
+                lastSecondPrinted = (int)(Math.ceil(WAIT_FOR_EXIT - timerExit.getElapsedTime()));
+                terminal.addToResultText("> " + lastSecondPrinted + " secondes");
+            }
+
+            if (timerExit.isFinished())
+                sceneManagerInterface.exit(0);
+        }
     }
 
     public void updateConnected(){
+        if (client.hasTimeOut()) {
+            terminal.addToResultText("Server has timed out");
+            resetConnexion();
+
+            return;
+        }
+
         if (client.didReceiveMessage()) {
             for (Message message : client.message()) {
                 analyseMessage(message);
@@ -406,7 +430,7 @@ public class MenuScene extends Scene {
             changed = true;
         }
 
-        if (showText){
+        if (showText && !timerExit.isStarted()){
             terminal.update(mainContext.getInputManager(), mainContext.getSystemInfo());
 
             if (terminal.shouldProcessCommand()){
@@ -441,7 +465,7 @@ public class MenuScene extends Scene {
         updateGraphics();
     }
 
-    /// DISPLAY PART
+    /// DISPLAY PART ///
 
     public void display() {
         super.setVirtualScene();
@@ -464,7 +488,7 @@ public class MenuScene extends Scene {
         super.setAndDisplayRealScene();
     }
 
-    /// UNLOAD / RESET PART
+    /// UNLOAD / RESET PART ///
 
     public void resetConnexion(){
         idClient = "??";

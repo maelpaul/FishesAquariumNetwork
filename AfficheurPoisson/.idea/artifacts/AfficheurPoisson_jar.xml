@@ -2,6 +2,9 @@
   <artifact type="jar" name="AfficheurPoisson:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/AfficheurPoisson_jar</output-path>
     <root id="archive" name="AfficheurPoisson.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/resources/META-INF/MANIFEST.MF" />
+      </element>
       <element id="module-output" name="AfficheurPoisson" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl-3.2.3/lwjgl.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl-3.2.3/lwjgl-nfd.jar" path-in-jar="/" />

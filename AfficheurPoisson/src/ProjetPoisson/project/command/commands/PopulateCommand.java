@@ -3,14 +3,25 @@ package ProjetPoisson.project.command.commands;
 import ProjetPoisson.project.command.ICommand;
 import ProjetPoisson.project.command.PromptResultCommand;
 import ProjetPoisson.project.command.ResultCommand;
+import ProjetPoisson.project.scenes.MenuScene;
 
 public class PopulateCommand implements ICommand<String> {
     public static final int COMMAND_FULL_SIZE = 2;
     public static final int COMMAND_MINIMUM_SIZE = 1;
 
     public static final int COMMAND_ARG_NUMBER = 1;
+
+    private final MenuScene.ConnectionStateContainer state;
+
+    public PopulateCommand(MenuScene.ConnectionStateContainer state){
+        this.state = state;
+    }
+
     @Override
     public ResultCommand<String> process(String[] args) {
+        if (state.get() != MenuScene.EConnectionState.Connected)
+            return new PromptResultCommand( "> NOK : Controleur introuvable");
+
         if (args.length != COMMAND_MINIMUM_SIZE) {
             if (args.length != COMMAND_FULL_SIZE)
                 return new PromptResultCommand("> NOK : Mauvais argument(s), faites \"quit help\" pour plus d'aide");

@@ -122,7 +122,7 @@ public class FishManager {
             // Take random behaviour
             Fish.EFishServerBehaviour behaviour = Fish.EFishServerBehaviour.values()[rand.nextInt(Fish.EFishServerBehaviour.values().length)];
 
-            String command = "addFish " + fishName + " at " + size + "x" + size + ", " + x + "x" + y + ", " + behaviour.name();
+            String command = "addFish " + fishName + " at " + x + "x" + y + ", " + size + "x" + size + ", " + behaviour.name();
 
             Runnable addFish =  () -> addFish(
                     fishName.toString(),
@@ -178,7 +178,8 @@ public class FishManager {
                     time
             );
         } else {
-            EResult result = addFish(parts[UPDATE_FISH_ARG_NAME],
+            EResult result = addFish(
+                    parts[UPDATE_FISH_ARG_NAME],
                     new Vector2f(x, y),
                     new Vector2f(width, height),
                     Fish.EFishServerBehaviour.values()[0].name());
