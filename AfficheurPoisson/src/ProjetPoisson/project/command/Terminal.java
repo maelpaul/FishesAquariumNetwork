@@ -93,6 +93,10 @@ public class Terminal {
                 if (manager.inputPressed(ActionId.TEXT_INPUT_RIGHT_DELETE)){
                     removeCharAtPosition(cursorPosition + 1);
                     updateCursorPosition(cursorPosition + 1);
+                } else if (manager.inputPressed(ActionId.TEXT_WORD_RIGHT) && cursorPosition < commandText.text().length() - 1) {
+                    updateCursorPosition(navigateWordRight());
+                } else if (manager.inputPressed(ActionId.TEXT_WORD_LEFT)  && cursorPosition > 0) {
+                    updateCursorPosition(navigateWordLeft() - 1);
                 } else if (manager.inputPressed(ActionId.TEXT_CURSOR_RIGHT) && cursorPosition < commandText.text().length() - 1) {
                     updateCursorPosition(cursorPosition + 1);
                 } else if (manager.inputPressed(ActionId.TEXT_CURSOR_LEFT) && cursorPosition > 0) {
@@ -162,6 +166,34 @@ public class Terminal {
         updateCursorPosition(cursorPosition - 1);
     }
 
+    public int navigateWordLeft() {
+        int position = cursorPosition;
+
+        while (position > 0 && !Character.isLetterOrDigit(commandTextCpy.charAt(position - 1))) {
+            position--;
+        }
+
+        while (position > 0 && Character.isLetterOrDigit(commandTextCpy.charAt(position - 1))) {
+            position--;
+        }
+
+        return position;
+    }
+
+    public int navigateWordRight() {
+        int length = commandTextCpy.length();
+        int position = cursorPosition;
+
+        while (position < length - 1 && Character.isLetterOrDigit(commandTextCpy.charAt(position + 1))) {
+            position++;
+        }
+
+        while (position < length - 1 && !Character.isLetterOrDigit(commandTextCpy.charAt(position + 1))) {
+            position++;
+        }
+
+        return position;
+    }
 
     private void updateCursorPosition(int index){
         if (index < 0 || index > commandText.text().length() - 1)

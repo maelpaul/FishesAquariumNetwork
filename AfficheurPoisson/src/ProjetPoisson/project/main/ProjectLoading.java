@@ -52,10 +52,24 @@ class ProjectLoading {
                 new ActionInput(ActionId.TEXT_CURSOR_LEFT, "TEXT_CURSOR_LEFT",
                         new InputSimple(GLFW_KEY_LEFT, EInputType.Keyboard)),
 
+                new ActionInput(ActionId.TEXT_WORD_LEFT, "TEXT_WORD_LEFT",
+                        new InputAnd(
+                                new InputSimple(GLFW_KEY_LEFT, EInputType.Keyboard),
+                                new InputOr(
+                                        new InputSimple(GLFW_KEY_LEFT_CONTROL, EInputType.Keyboard),
+                                        new InputSimple(GLFW_KEY_RIGHT_CONTROL, EInputType.Keyboard)
+                                ))),
+
                 new ActionInput(ActionId.TEXT_CURSOR_RIGHT, "TEXT_CURSOR_RIGHT",
                         new InputSimple(GLFW_KEY_RIGHT, EInputType.Keyboard)),
 
-
+                new ActionInput(ActionId.TEXT_WORD_RIGHT, "TEXT_WORD_RIGHT",
+                        new InputAnd(
+                                new InputSimple(GLFW_KEY_RIGHT, EInputType.Keyboard),
+                                new InputOr(
+                                        new InputSimple(GLFW_KEY_LEFT_CONTROL, EInputType.Keyboard),
+                                        new InputSimple(GLFW_KEY_RIGHT_CONTROL, EInputType.Keyboard)
+                                ))),
 
                 new ActionInput(ActionId.SHIFT_MODIFIER, "SHIFT_MODIFIER",
                         new InputOr(

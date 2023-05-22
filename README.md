@@ -108,7 +108,7 @@ Follow these steps :
 
 <br>
 
-**Fishes swin through all the views (client)**
+**Fishes swim through all the views (client)**
 
 <img src="screenshots/screen5.png" alt="Alt Text" style="max-width:50%;">
 

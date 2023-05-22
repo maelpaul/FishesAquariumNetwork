@@ -61,7 +61,7 @@ public class Fish {
 
         random = new Random();
 
-        this.behaviour = EFishBehaviour.values()[random.nextInt(EFishBehaviour.values().length)];
+        this.behaviour = EFishBehaviour.values()[1];
 
         renderer = new RectangleRenderer("texture2D");
         renderer.switchToTextureMode(textureName);
