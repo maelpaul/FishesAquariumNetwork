@@ -8,18 +8,22 @@ LAM Mathieu
 BAZIN Maxence  
 PRZYBYLSKI Nicolas  
 
-<br>
-
 ## Resources
 
-Subjet :  
-https://docs.google.com/document/d/1MzZG0qDfVr8U50v8X79yvaPfToj8Yz4DwiGg3swl1kk/edit  
-Reference class :  
-https://moodle.bordeaux-inp.fr/pluginfile.php/165937/mod_resource/content/1/Cours%20RE218%202020_2021.pdf
+Subject :  
+See the file : Projet_Reseaux_2023_v1.pdf
 
-<br>
+## Server
 
-## Lauch our Java client
+Follow these steps : 
+
+- Go to the "Controller" directory and run "make".
+
+- Run "./server".
+
+- Load an aquarium with "load aquarium". You can show the aquarium with "show aquarium". To know more about what you can do with the server, read the part "Programme "contrôleur"" of the subject.
+
+## Launch our Java client
 
 Follow these steps : 
 
@@ -35,29 +39,27 @@ Follow these steps :
 
 - Create a folder named "out" under "AfficherPoisson". Right-click on it and select "Mark Directory As" -> "Excluded".
 
-- Now you need to set up your SDK. Go to "File" -> "Project Settings" and select the "Project" tab.
+- Now you need to set up your SDK. Go to "File" -> "Project Structure" and select the "Project" tab.
 
 - Choose the path of the SDK (version 11 or higher), set the language level to 11, and choose an output folder (the "out" folder you created).
 
-- Still in "Project Settings," you need to link the libraries used by our project.
+- Still in "Project Structure", you need to link the libraries used by our project.
 
 - Go to the "Libraries" tab, click on the "+" button, select "Java," and choose the folder "AfficheurPoisson/lib/lwjgl-3.2.3".
 
 - The last thing to do is to inform the software which Java file should be the main one.
 
-- Open "src/ProjetPoisson/projet/main/Main.java" and click on the green triangle on the left of the main function.
+- Open "src/ProjetPoisson/project/main/Main.java" and click on the green triangle on the left of the main function.
 
 - Now the project is set up. In the top right corner, you can find the "Main" name and another green triangle. Click on it, and it will launch the application.
 
-<br>
-
-## Compiling the java client
+## Compiling the Java client
 
 The steps mentioned above should have already been completed.
 
 Follow these steps : 
 
-- To continue, navigate back to the "Project Settings" folder. This time, go to the "Artifacts" tab and click on the "+" button. Select "Java" and choose the module with dependencies.
+- To continue, navigate back to the "Project Settings" folder. This time, go to the "Artifacts" tab and click on the "+" button. Select "JAR" and choose the module with dependencies.
 
 - A window should appear, allowing you to choose the main classes. Look for the "Main" file in the preview pane.
 
@@ -71,44 +73,28 @@ Follow these steps :
 
 - The last step is to copy the "resources" folder and paste it alongside the generated jar.
 
-- Now open a terminal in the "AfficheurPoisson" folder. Run the command "java -jar out/artifacts/AfficheurPoisson_jar/AfficheurPoisson.jar &" as many times as you want clients to be open.
+- Now open a terminal in the "AfficheurPoisson" folder. Run the command "java -jar out/artifacts/AfficheurPoisson_jar/AfficheurPoisson.jar &" as many times as you want clients to be open. You need to launch the server before and load an aquarium if you want to use the Java client.
 
-<br>
+- To use the client, read the part "Programme "Affichage"" of the subject. You can use 3 different fish: PoissonRouge, PoissonSanglier and PoissonZebre.
 
 ## Preview of client
-
-<br>
-
 
 **Disconnected client**
 
 <img src="screenshots/screen1.png" alt="Alt Text" style="max-width:50%;">
 
-
-<br>
-
 **Connected client**
 
 <img src="screenshots/screen2.png" alt="Alt Text" style="max-width:50%;">
-
-
-<br>
 
 **4 fishes added to the aquarium**
 
 <img src="screenshots/screen3.png" alt="Alt Text" style="max-width:50%;">
 
-
-<br>
-
 **Start fishes with corresponding command**
 
 <img src="screenshots/screen4.png" alt="Alt Text" style="max-width:50%;">
 
-
-<br>
-
-**Fishes swim through all the views (client)**
+**Fishes swim through all the views (clients)**
 
 <img src="screenshots/screen5.png" alt="Alt Text" style="max-width:50%;">
-
